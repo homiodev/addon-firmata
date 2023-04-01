@@ -3,8 +3,8 @@
 
 #include <ConfigurableFirmata.h>
 
-#include "Touchhome.h"
-Touchhome touchhome;
+#include "homio.h"
+homio homio;
 
 #include <DigitalInputFirmata.h>
 DigitalInputFirmata digitalInput;
@@ -53,7 +53,7 @@ void initFirmata()
 {
   Firmata.setFirmwareVersion(FIRMATA_FIRMWARE_MAJOR_VERSION, FIRMATA_FIRMWARE_MINOR_VERSION);
 
-  firmataExt.addFeature(touchhome);
+  firmataExt.addFeature(homio);
   firmataExt.addFeature(digitalInput);
   firmataExt.addFeature(digitalOutput);
   firmataExt.addFeature(analogInput);
@@ -69,7 +69,7 @@ void initFirmata()
 void setup()
 {
   initFirmata();
-  touchhome.setup();
+  homio.setup();
   Firmata.parse(SYSTEM_RESET);
 }
 
@@ -79,7 +79,7 @@ void loop()
       Firmata.processInput();
     }
 
-    if(touchhome.loop(millis())) {
+    if(homio.loop(millis())) {
       if(reporting.elapsed()) {
         digitalInput.report();
         analogInput.report();

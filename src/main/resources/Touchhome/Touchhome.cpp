@@ -1,4 +1,4 @@
-#include "Touchhome.h"
+#include "homio.h"
 
 #ifdef COMM_ESP8266_WIFI
 
@@ -84,7 +84,7 @@ void hostConnectionCallback(byte state)
   }
 }
 
-void Touchhome::startAP() {
+void homio::startAP() {
 	    digitalWrite(LED_BUILTIN, HIGH);
 		DEBUG_PRINTLN("Creating WiFi AP");
         checkConnection = false;
@@ -108,7 +108,7 @@ void Touchhome::startAP() {
 		digitalWrite(LED_BUILTIN, LOW);
 }
 
-void Touchhome::connectToRouterIfRequire() {
+void homio::connectToRouterIfRequire() {
 	if(WiFi.status() == WL_CONNECTED) {
 		return;
 	}
@@ -154,7 +154,7 @@ void Touchhome::connectToRouterIfRequire() {
 }
 #endif
 
-void Touchhome::setup()
+void homio::setup()
 {
 	DEBUG_PRINTLN("setup...");
 	pinMode(LED_BUILTIN, OUTPUT);
@@ -211,7 +211,7 @@ void Touchhome::setup()
 	#endif
 }
 
-bool Touchhome::loop(unsigned long currentMillis) {
+bool homio::loop(unsigned long currentMillis) {
     if (previousMillis == 0 || currentMillis - previousMillis > 30000) { // check not often than once per 30 sec
         previousMillis = currentMillis;
         if (currentMillis - lastPing > 600000) { // if device pinged too ago 10 min. Server pings each 3 min
@@ -229,7 +229,7 @@ bool Touchhome::loop(unsigned long currentMillis) {
 				Udp.write(udpPayload, udpPayloadLength);
                 Udp.endPacket();
 			#endif
-			sendTouchhomeCommand(SYSEX_REGISTER, 0, sizeof(BOARD), (byte*)BOARD);
+			sendhomioCommand(SYSEX_REGISTER, 0, sizeof(BOARD), (byte*)BOARD);
         }
     }
 #ifdef COMM_ESP8266_WIFI
@@ -238,7 +238,7 @@ bool Touchhome::loop(unsigned long currentMillis) {
     return uniqueID != 0;
 }
 
-void Touchhome::sendTouchhomeCommand(byte command, byte messageID, byte argc, byte argv[])
+void homio::sendhomioCommand(byte command, byte messageID, byte argc, byte argv[])
 {
     byte payload[3 + argc];
     payload[0] = messageID;
@@ -250,7 +250,7 @@ void Touchhome::sendTouchhomeCommand(byte command, byte messageID, byte argc, by
     Firmata.sendSysex(command, 3 + argc, payload);
 }
 
-boolean Touchhome::handleSysex(byte command, byte argc, byte *argv)
+boolean homio::handleSysex(byte command, byte argc, byte *argv)
 {
     // skip handling for some commands
     if(command == ANALOG_MAPPING_QUERY || command ==PIN_MODE_SERIAL || command == PIN_STATE_QUERY || command == CAPABILITY_QUERY) {
@@ -274,7 +274,7 @@ boolean Touchhome::handleSysex(byte command, byte argc, byte *argv)
                 union longConvertor data {
                 };
                 data.whole = millis();
-                sendTouchhomeCommand(SYSEX_GET_TIME_COMMAND, messageID, 8, data.nybble.buff);
+                sendhomioCommand(SYSEX_GET_TIME_COMMAND, messageID, 8, data.nybble.buff);
                 break;
             }
         }

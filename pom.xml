@@ -23,21 +23,26 @@
       <artifactId>bcprov-jdk15on</artifactId>
       <version>1.70</version>
     </dependency>
+    <dependency>
+      <artifactId>junit-jupiter-api</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <description>Firmata bundle to communicate with firmata protocol on arduino, etc...</description>
   <modelVersion>4.0.0</modelVersion>
   <name>Firmata</name>
   <packaging>jar</packaging>
-  
+
   <properties>
     <category>Microcontrollers</category>
   </properties>
 
   <parent>
     <artifactId>addon-parent</artifactId>
-    <groupId>org.touchhome</groupId>
-    <version>1.2.1</version>
+    <groupId>org.homio</groupId>
+    <version>1.2.3</version>
   </parent>
 
   <version>1.0.1-SNAPSHOT</version>

@@ -1,6 +1,6 @@
 //#pragma once
-#ifndef TOUCHHOME_H
-#define TOUCHHOME_H
+#ifndef homio_H
+#define homio_H
 
 #include <EEPROM.h>
 #include <ConfigurableFirmata.h>
@@ -118,9 +118,9 @@ namespace {
 	} config;
 }
 
-class Touchhome: public FirmataFeature {
+class homio: public FirmataFeature {
 public:
-    Touchhome()
+    homio()
     {
     }
 
@@ -139,7 +139,7 @@ public:
 
     void setup();
 
-    void sendTouchhomeCommand(byte command, byte messageID, byte argc, byte argv[]);
+    void sendhomioCommand(byte command, byte messageID, byte argc, byte argv[]);
 
     bool loop(unsigned long currentMillis);
 
