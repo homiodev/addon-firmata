@@ -85,7 +85,7 @@ public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>> extends 
         return ActionResponseModel.showError(ex);
       }
     }
-    return ActionResponseModel.showWarn("ACTION.COMMUNICATOR.NOT_FOUND");
+    return ActionResponseModel.showWarn("action.communicator.not_found");
   }
 
   @UIContextMenuAction("UPLOAD_SKETCH")

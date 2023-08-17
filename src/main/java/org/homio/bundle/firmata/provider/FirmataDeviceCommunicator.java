@@ -79,12 +79,12 @@ public abstract class FirmataDeviceCommunicator<T extends FirmataBaseEntity<T>> 
   public final String restart() {
     // skip restart if status ONLINE
     if (entity.getStatus() == Status.ONLINE && entity.getJoined() == Status.ONLINE) {
-      return "ACTION.COMMUNICATOR.ALREADY_RUN";
+      return "action.communicator.already_run";
     }
 
     // try restart not often that once per minute
     if (System.currentTimeMillis() - lastRestartAttempt < 60000) {
-      throw new RuntimeException("ACTION.COMMUNICATOR.RESTART_TOO_OFTEN");
+      throw new RuntimeException("action.communicator.restart_too_often");
     }
     lastRestartAttempt = System.currentTimeMillis();
 
@@ -94,7 +94,7 @@ public abstract class FirmataDeviceCommunicator<T extends FirmataBaseEntity<T>> 
 
       this.ioDevice = this.createIODevice(this.entity);
       if (ioDevice == null) {
-        throw new RuntimeException("ACTION.COMMUNICATOR.UNABLE_CREATE");
+        throw new RuntimeException("action.communicator.unable_create");
       }
       this.device = new IODeviceWrapper(ioDevice, this);
       ioDevice.addProtocolMessageHandler("sysexCustomMessage", this);
@@ -108,8 +108,6 @@ public abstract class FirmataDeviceCommunicator<T extends FirmataBaseEntity<T>> 
       FirmataWatchdog watchdog = new FirmataWatchdog(
           TimeUnit.MINUTES.toMillis(entityContext.setting().getValue(FirmataWatchDogIntervalSetting.class)), () -> {
         entityContext.updateDelayed(entity, t -> t.setJoined(Status.ERROR));
-        entityContext.ui().addBellWarningNotification(entity.getEntityID(), "Firmata-" + entity.getEntityID(),
-            "Firmata Watchdog error");
         this.entityContext.event().fireEvent("firmata-status-" + entity.getEntityID(), Status.ERROR);
       });
 
@@ -118,11 +116,11 @@ public abstract class FirmataDeviceCommunicator<T extends FirmataBaseEntity<T>> 
         this.device.sendMessage(FirmataCommand.SYSEX_REGISTER);
       }
 
-      return "ACTION.COMMUNICATOR.SUCCESS";
+      return "action.communicator.success";
     } catch (Exception ex) {
       updateStatus(entity, Status.ERROR, CommonUtils.getErrorMessage(ex));
       log.error("Error while initialize device: {} for device type: {}", entity.getTitle(), getClass().getSimpleName(), ex);
-      throw new RuntimeException("ACTION.COMMUNICATOR.UNKNOWN_ERROR");
+      throw new RuntimeException("action.communicator.unknown_error");
     }
   }
 
@@ -180,8 +178,6 @@ public abstract class FirmataDeviceCommunicator<T extends FirmataBaseEntity<T>> 
   private void updateStatus(T entity, Status status, String statusMessage) {
     if (entity.getStatus() != status) {
       entity.setStatus(status, statusMessage);
-      entityContext.ui().addBellWarningNotification(entity.getEntityID(), "A-" + entity.getEntityID(),
-          "Communicator status: " + status);
     }
     if (status == Status.OFFLINE || status == Status.ERROR) {
       this.entityContext.event().fireEvent("firmata-status-" + entity.getEntityID(), status);

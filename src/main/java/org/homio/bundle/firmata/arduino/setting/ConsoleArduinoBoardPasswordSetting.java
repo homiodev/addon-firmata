@@ -31,6 +31,6 @@ public class ConsoleArduinoBoardPasswordSetting implements SettingPluginButton, 
   @Override
   public List<ActionInputParameter> getInputParameters(EntityContext entityContext, String value) {
     return Collections.singletonList(new ActionInputParameter("PASSWORD", UIActionInput.Type.password, null, null)
-        .setDescription("arduino.PASSWORD_DESCRIPTION"));
+        .setDescription("arduino.password_description"));
   }
 }

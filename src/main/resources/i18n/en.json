@@ -1,4 +1,14 @@
 {
+  "action": {
+    "communicator": {
+      "success": "Communicator restarted successfully",
+      "not_found": "Communicator not found",
+      "already_run": "Communicator already run",
+      "restart_too_often": "Communicator restart calls too often",
+      "unable_create": "Unable to create communicator for such device",
+      "unknown_error": "Unknown error while restart communicator. See logs"
+    }
+  },
   "workspace": {
     "firmata": "Firmata",
     "firmata-onewire": "Firmata 1-Wire sensors",
@@ -50,16 +60,17 @@
     "FirmataUsbEntity": "Firmata Usb device",
     "FirmataNetworkEntity": "Firmata Network device"
   },
-  "CONTEXT": {
-    "ACTION": {
-      "UPLOAD_SKETCH": "Upload sketch automatically",
-      "UPLOAD_SKETCH_MANUALLY": "Upload sketch manually"
+  "context": {
+    "action": {
+      "upload_sketch": "Upload sketch automatically",
+      "upload_sketch_manually": "Upload sketch manually"
     }
   },
   "arduino": {
-    "PASSWORD_DESCRIPTION": "Board password to upload a new sketch"
+    "password_description": "Board password to upload a new sketch"
   },
   "CONSOLE": {
+    "firmata": "Arduino editor",
     "st_ConsoleArduinoFetchEsp8266PackagesSetting": "Download esp8266 boards",
     "st_ConsoleArduinoLibraryManagerSetting": "Library Manager",
     "st_ConsoleArduinoBoardManagerSetting": "Boards Manager",
