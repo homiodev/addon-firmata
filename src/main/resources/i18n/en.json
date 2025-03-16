@@ -9,7 +9,7 @@
       "unknown_error": "Unknown error while restart communicator. See logs"
     }
   },
-  "workspace": {
+  "WORKSPACE": {
     "firmata": "Firmata",
     "firmata-onewire": "Firmata 1-Wire sensors",
     "firmata-ic": "Firmata I2C devices",
@@ -30,7 +30,8 @@
     "firmata_protocol": "Returns the name of a protocol that the device uses.",
     "firmata-onewire_DS18B20": "Get DS18B20 temperature value"
   },
-  "placeholder": {
+  "PLACEHOLDER": {
+    "st_ConsoleHeaderArduinoSketchNameSetting": "Sketch",
     "st_FirmataScanPortRangeSetting": "Scan port range i.e.: 192.168.0.0-255",
     "st_ConsoleHeaderArduinoIncludeLibrarySetting": "Include library",
     "st_ConsoleHeaderArduinoIncludeLibrarySetting_unavailable": "Select board first",
@@ -40,10 +41,10 @@
     "st_ConsoleHeaderArduinoProgrammerSetting": "Programmer",
     "st_ConsoleHeaderArduinoProgrammerSetting_unavailable": "No programmers available for this board"
   },
-  "firmata": {
+  "FIRMATA": {
     "name": "Firmata",
-    "setting": {
-      "label": "Firmata settings",
+    "SETTING": {
+      "LABEL": "Firmata settings",
       "st_FirmataScanPortRangeSetting": "Scan port range",
       "st_FirmataWatchDogIntervalSetting": "Watch dog max inactivity",
       "st_ConsoleHeaderArduinoPortSetting": "Select arduino port",
@@ -52,16 +53,16 @@
       "st_ConsoleHeaderArduinoBuildSketchSetting": "Verify/Compile sketch",
       "st_ConsoleHeaderArduinoGetBoardsSetting": "Select board",
       "st_ConsoleHeaderGetBoardsDynamicSetting": "Additional settings",
-      "st_ConsoleHeaderArduinoIncludeLibrarySetting": "Load example",
+      "st_ConsoleHeaderArduinoIncludeLibrarySetting": "Load library",
       "st_ConsoleHeaderGetBoardInfoSetting": "Get board info"
     }
   },
-  "selection": {
+  "SELECTION": {
     "FirmataUsbEntity": "Firmata Usb device",
     "FirmataNetworkEntity": "Firmata Network device"
   },
-  "context": {
-    "action": {
+  "CONTEXT": {
+    "ACTION": {
       "upload_sketch": "Upload sketch automatically",
       "upload_sketch_manually": "Upload sketch manually"
     }

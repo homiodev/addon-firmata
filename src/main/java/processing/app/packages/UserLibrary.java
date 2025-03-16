@@ -28,8 +28,14 @@
  */
 package processing.app.packages;
 
-import static processing.app.I18n.format;
-import static processing.app.I18n.tr;
+import cc.arduino.Constants;
+import cc.arduino.contributions.VersionHelper;
+import cc.arduino.contributions.libraries.ContributedLibraryDependency;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.maven.artifact.versioning.ComparableVersion;
+import processing.app.helpers.PreferencesMap;
+import processing.app.packages.UserLibraryFolder.Location;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,32 +46,45 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import com.github.zafarkhaja.semver.Version;
-
-import cc.arduino.Constants;
-import cc.arduino.contributions.VersionHelper;
-import cc.arduino.contributions.libraries.ContributedLibraryDependency;
-import processing.app.helpers.PreferencesMap;
-import processing.app.packages.UserLibraryFolder.Location;
+import static processing.app.I18n.format;
+import static processing.app.I18n.tr;
 
 public class UserLibrary {
 
+  @Getter
+  protected File installedFolder;
+  @Getter
+  protected Location location;
+  protected LibraryLayout layout;
+  @Getter
   private String name;
+  @Getter
   private String version;
+  @Getter
   private String author;
+  @Getter
   private String maintainer;
+  @Getter
   private String sentence;
+  @Getter
   private String paragraph;
+  @Getter
   private String website;
+  @Setter
+  @Getter
   private String category;
+  @Getter
   private String license;
+  @Getter
   private List<String> architectures;
+  @Setter
+  @Getter
   private List<String> types = new ArrayList<>();
+  @Getter
   private List<String> declaredTypes;
   private boolean onGoingDevelopment;
+  @Getter
   private List<String> includes;
-  protected File installedFolder;
-  protected Location location;
 
   public static UserLibrary create(UserLibraryFolder libFolderDesc) throws IOException {
     File libFolder = libFolderDesc.folder;
@@ -152,10 +171,10 @@ public class UserLibrary {
     }
 
     String declaredVersion = properties.get("version").trim();
-    Optional<Version> version = VersionHelper.valueOf(declaredVersion);
-    if (!version.isPresent()) {
+    Optional<ComparableVersion> version = VersionHelper.valueOf(declaredVersion);
+    if (version.isEmpty()) {
       System.out.println(
-          format(tr("Invalid version '{0}' for library in: {1}"), declaredVersion, libFolder.getAbsolutePath()));
+        format(tr("Invalid version '{0}' for library in: {1}"), declaredVersion, libFolder.getAbsolutePath()));
     }
 
     UserLibrary res = new UserLibrary();
@@ -178,97 +197,23 @@ public class UserLibrary {
     return res;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public List<String> getArchitectures() {
-    return architectures;
-  }
-
-  public String getAuthor() {
-    return author;
-  }
-
-  public String getParagraph() {
-    return paragraph;
-  }
-
-  public String getSentence() {
-    return sentence;
-  }
-
-  public String getWebsite() {
-    return website;
-  }
-
-  public String getCategory() {
-    return category;
-  }
-
-  public List<String> getTypes() {
-    return types;
-  }
-
-  public void setTypes(List<String> types) {
-    this.types = types;
-  }
-
-  public String getLicense() {
-    return license;
-  }
-
-  public void setCategory(String category) {
-    this.category = category;
-  }
-
-  public String getVersion() {
-    return version;
-  }
-
-  public String getMaintainer() {
-    return maintainer;
-  }
-
   public List<ContributedLibraryDependency> getRequires() {
     return null;
-  }
-
-  public List<String> getDeclaredTypes() {
-    return declaredTypes;
   }
 
   public boolean onGoingDevelopment() {
     return onGoingDevelopment;
   }
 
-  public List<String> getIncludes() {
-    return includes;
-  }
-
-  protected enum LibraryLayout {
-    FLAT, RECURSIVE
-  }
-
-  protected LibraryLayout layout;
-
   public File getSrcFolder() {
-    switch (layout) {
-      case FLAT:
-        return installedFolder;
-      case RECURSIVE:
-        return new File(installedFolder, "src");
-      default:
-        return null; // Keep compiler happy :-(
-    }
+    return switch (layout) {
+      case FLAT -> installedFolder;
+      case RECURSIVE -> new File(installedFolder, "src");
+    };
   }
 
   public boolean useRecursion() {
     return (layout == LibraryLayout.RECURSIVE);
-  }
-
-  public Location getLocation() {
-    return location;
   }
 
   public boolean isIDEBuiltIn() {
@@ -280,8 +225,7 @@ public class UserLibrary {
     return name + ":" + version + " " + architectures + " " + location;
   }
 
-  public File getInstalledFolder() {
-    return installedFolder;
+  protected enum LibraryLayout {
+    FLAT, RECURSIVE
   }
-
 }

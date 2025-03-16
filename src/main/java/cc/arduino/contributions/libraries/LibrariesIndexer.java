@@ -31,12 +31,13 @@ package cc.arduino.contributions.libraries;
 
 import cc.arduino.Constants;
 import cc.arduino.contributions.packages.ContributedPlatform;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.compress.utils.IOUtils;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.io.IOUtils;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.helpers.filefilters.OnlyDirs;
@@ -52,7 +53,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,20 +61,25 @@ import static processing.app.I18n.tr;
 
 public class LibrariesIndexer {
 
-  private LibrariesIndex index;
   private final LibraryList installedLibraries = new LibraryList();
-  private List<UserLibraryFolder> librariesFolders;
+  @Getter
   private final File indexFile;
+  @Getter
   private final File stagingFolder;
-
   private final List<String> badLibNotified = new ArrayList<>();
+  @Getter
+  private LibrariesIndex index;
+  @Getter
+  @Setter
+  private List<UserLibraryFolder> librariesFolders;
+  private UserLibraryPriorityComparator priorityComparator = new UserLibraryPriorityComparator(null);
 
   public LibrariesIndexer(File preferencesFolder) {
     indexFile = new File(preferencesFolder, "library_index.json");
     stagingFolder = new File(new File(preferencesFolder, "staging"), "libraries");
   }
 
-  public void parseIndex() throws IOException {
+  public void parseIndex() {
     index = new LibrariesIndex(); // Fallback
 
     if (!indexFile.exists()) {
@@ -86,7 +91,7 @@ public class LibrariesIndexer {
     // TODO: resolve libraries inner references
   }
 
-  private void parseIndex(File file) throws IOException {
+  private void parseIndex(File file) {
     InputStream indexIn = null;
     try {
       indexIn = new FileInputStream(file);
@@ -104,8 +109,8 @@ public class LibrariesIndexer {
       index = newIndex;
     } catch (JsonParseException | JsonMappingException e) {
       System.err.println(
-          format(tr("Error parsing libraries index: {0}\nTry to open the Library Manager to update the libraries index."),
-              e.getMessage()));
+        format(tr("Error parsing libraries index: {0}\nTry to open the Library Manager to update the libraries index."),
+          e.getMessage()));
     } catch (Exception e) {
       System.err.println(format(tr("Error reading libraries index: {0}"), e.getMessage()));
     } finally {
@@ -113,20 +118,10 @@ public class LibrariesIndexer {
     }
   }
 
-  public void setLibrariesFolders(List<UserLibraryFolder> folders) {
-    this.librariesFolders = folders;
-  }
-
   public void setLibrariesFoldersAndRescan(List<UserLibraryFolder> folders) {
     setLibrariesFolders(folders);
     rescanLibraries();
   }
-
-  public List<UserLibraryFolder> getLibrariesFolders() {
-    return librariesFolders;
-  }
-
-  private UserLibraryPriorityComparator priorityComparator = new UserLibraryPriorityComparator(null);
 
   public void addToInstalledLibraries(UserLibrary lib) {
     UserLibrary toReplace = installedLibraries.getByName(lib.getName());
@@ -164,19 +159,17 @@ public class LibrariesIndexer {
     }
 
     installedLibraries.stream() //
-        .filter(l -> l.getTypes().contains("Contributed")) //
-        .filter(l -> l.getLocation() == Location.CORE || l.getLocation() == Location.REFERENCED_CORE) //
-        .forEach(l -> {
-          File libFolder = l.getInstalledFolder();
-          Optional<ContributedPlatform> platform = BaseNoGui.indexer.getPlatformByFolder(libFolder);
-          if (platform.isPresent()) {
-            l.setTypes(Collections.singletonList(platform.get().getCategory()));
-          }
-        });
+      .filter(l -> l.getTypes().contains("Contributed")) //
+      .filter(l -> l.getLocation() == Location.CORE || l.getLocation() == Location.REFERENCED_CORE) //
+      .forEach(l -> {
+        File libFolder = l.getInstalledFolder();
+        Optional<ContributedPlatform> platform = BaseNoGui.indexer.getPlatformByFolder(libFolder);
+        platform.ifPresent(contributedPlatform -> l.setTypes(List.of(contributedPlatform.getCategory())));
+      });
   }
 
   private void scanInstalledLibraries(UserLibraryFolder folderDesc) {
-    File list[] = folderDesc.folder.listFiles(OnlyDirs.ONLY_DIRS);
+    File[] list = folderDesc.folder.listFiles(OnlyDirs.ONLY_DIRS);
     // if a bad folder or something like that, this might come back null
     if (list == null)
       return;
@@ -190,10 +183,11 @@ public class LibrariesIndexer {
 
           badLibNotified.add(subfolderName);
 
-          String mess = I18n.format(tr("The library \"{0}\" cannot be used.\n"
-              + "Library folder names must start with a letter or number, followed by letters,\n"
-              + "numbers, dashes, dots and underscores. Maximum length is 63 characters."),
-              subfolderName);
+          String mess = I18n.format(tr("""
+              The library "{0}" cannot be used.
+              Library folder names must start with a letter or number, followed by letters,
+              numbers, dashes, dots and underscores. Maximum length is 63 characters."""),
+            subfolderName);
           BaseNoGui.showMessage(tr("Ignoring library with bad name"), mess);
         }
         continue;
@@ -246,23 +240,11 @@ public class LibrariesIndexer {
     }
 
     if (lib.getTypes().isEmpty()) {
-      lib.setTypes(Collections.singletonList("Contributed"));
+      lib.setTypes(List.of("Contributed"));
     }
-  }
-
-  public LibrariesIndex getIndex() {
-    return index;
   }
 
   public LibraryList getInstalledLibraries() {
     return new LibraryList(installedLibraries);
-  }
-
-  public File getStagingFolder() {
-    return stagingFolder;
-  }
-
-  public File getIndexFile() {
-    return indexFile;
   }
 }

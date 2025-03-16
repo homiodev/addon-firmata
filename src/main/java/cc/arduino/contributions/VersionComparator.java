@@ -29,9 +29,8 @@
 
 package cc.arduino.contributions;
 
-import com.github.zafarkhaja.semver.Version;
-
 import cc.arduino.contributions.libraries.ContributedLibrary;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 
 import java.util.Comparator;
 import java.util.Optional;
@@ -39,8 +38,8 @@ import java.util.Optional;
 public class VersionComparator implements Comparator<String> {
 
   public static int compareTo(String a, String b) {
-    Optional<Version> versionA = VersionHelper.valueOf(a);
-    Optional<Version> versionB = VersionHelper.valueOf(b);
+    Optional<ComparableVersion> versionA = VersionHelper.valueOf(a);
+    Optional<ComparableVersion> versionB = VersionHelper.valueOf(b);
     if (versionA.isPresent() && versionB.isPresent()) {
       return versionA.get().compareTo(versionB.get());
     }
@@ -51,11 +50,6 @@ public class VersionComparator implements Comparator<String> {
       return -1;
     }
     return 0;
-  }
-
-  @Override
-  public int compare(String a, String b) {
-    return compareTo(a, b);
   }
 
   public static boolean greaterThan(String a, String b) {
@@ -80,5 +74,10 @@ public class VersionComparator implements Comparator<String> {
 
   public static int compareTo(ContributedLibrary a, ContributedLibrary b) {
     return compareTo(a.getParsedVersion(), b.getParsedVersion());
+  }
+
+  @Override
+  public int compare(String a, String b) {
+    return compareTo(a, b);
   }
 }

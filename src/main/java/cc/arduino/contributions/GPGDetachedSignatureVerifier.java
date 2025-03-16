@@ -29,17 +29,28 @@
 
 package cc.arduino.contributions;
 
-import org.apache.commons.compress.utils.IOUtils;
-import org.bouncycastle.openpgp.*;
+import org.apache.commons.io.IOUtils;
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPObjectFactory;
+import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
+import org.bouncycastle.openpgp.PGPSignature;
+import org.bouncycastle.openpgp.PGPSignatureList;
+import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator;
 import org.bouncycastle.openpgp.operator.bc.BcPGPContentVerifierBuilderProvider;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 
 public class GPGDetachedSignatureVerifier extends SignatureVerifier {
 
-  private String keyId;
+  private final String keyId;
 
   public GPGDetachedSignatureVerifier() {
     this("7F294291");
