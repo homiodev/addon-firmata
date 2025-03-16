@@ -1,6 +1,5 @@
 package org.homio.addon.firmata.arduino.setting;
 
-import cc.arduino.contributions.ConsoleProgressListener;
 import cc.arduino.contributions.ProgressListener;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.ContributedLibraryReleases;
@@ -14,6 +13,8 @@ import org.homio.api.model.Icon;
 import org.homio.api.setting.SettingPluginPackageInstall;
 import org.homio.api.setting.console.ConsoleSettingPlugin;
 import org.homio.hquery.ProgressBar;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import processing.app.BaseNoGui;
 import processing.app.packages.UserLibrary;
@@ -49,7 +50,7 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
   }
 
   @Override
-  public PackageContext installedPackages(Context context) {
+  public PackageContext installedPackages(@NotNull Context context) {
     Collection<PackageModel> bundleEntities = new ArrayList<>();
     if (BaseNoGui.packages != null) {
       for (UserLibrary library : BaseNoGui.librariesIndexer.getInstalledLibraries()) {
@@ -60,12 +61,13 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
   }
 
   @Override
-  public PackageContext allPackages(Context context) {
+  public PackageContext allPackages(@NotNull Context context) {
     releases = null;
     AtomicReference<String> error = new AtomicReference<>();
     Collection<PackageModel> bundleEntities = new ArrayList<>();
     if (BaseNoGui.packages != null) {
-      for (ContributedLibraryReleases release : getReleases(null, error).values()) {
+      var progress = context.ui().progress().createProgressBar("all-packages", false);
+      for (ContributedLibraryReleases release : getReleases(progress, error).values()) {
         ContributedLibrary latest = release.getLatest();
         bundleEntities.add(buildBundleEntity(release.getReleases().stream().map(ContributedLibrary::getVersion).collect(Collectors.toList()), latest));
       }
@@ -75,7 +77,7 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
   }
 
   @Override
-  public void installPackage(Context context, PackageRequest packageRequest, ProgressBar progressBar) throws Exception {
+  public void installPackage(@NotNull Context context, @NotNull PackageRequest packageRequest, @NotNull ProgressBar progressBar) throws Exception {
     if (BaseNoGui.packages != null) {
       LibraryInstaller installer = ArduinoConfiguration.getLibraryInstaller();
       ContributedLibrary lib = searchLibrary(getReleases(progressBar, null), packageRequest.getName(), packageRequest.getVersion());
@@ -92,7 +94,7 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
   }
 
   @Override
-  public void unInstallPackage(Context context, PackageRequest packageRequest, ProgressBar progressBar) throws IOException {
+  public void unInstallPackage(@NotNull Context context, @NotNull PackageRequest packageRequest, @NotNull ProgressBar progressBar) throws IOException {
     if (BaseNoGui.packages != null) {
       ContributedLibrary lib = getReleases(progressBar, null).values().stream()
         .filter(r -> r.getInstalled().isPresent() && r.getInstalled().get().getName().equals(packageRequest.getName()))
@@ -160,21 +162,21 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
     return packageModel;
   }
 
-  private void reBuildLibraries(Context context, ProgressBar progressBar) {
+  private void reBuildLibraries(@NotNull Context context, @NotNull ProgressBar progressBar) {
     ConsoleArduinoLibraryManagerSetting.releases = null;
     getReleases(progressBar, null);
     context.ui().dialog().reloadWindow("Re-Initialize page after library installation");
   }
 
   @SneakyThrows
-  private synchronized Map<String, ContributedLibraryReleases> getReleases(ProgressBar progressBar, AtomicReference<String> error) {
+  private synchronized Map<String, ContributedLibraryReleases> getReleases(@NotNull ProgressBar progressBar, @Nullable AtomicReference<String> error) {
     if (releases == null) {
       releases = new HashMap<>();
 
       BaseNoGui.onBoardOrPortChange();
 
-      ProgressListener progressListener = progressBar != null ? progress -> progressBar.progress(progress.getProgress(), progress.getStatus()) :
-        new ConsoleProgressListener();
+      ProgressListener progressListener = progress ->
+        progressBar.progress(progress.getProgress(), progress.getStatus());
 
       try {
         LibraryInstaller libraryInstaller = ArduinoConfiguration.getLibraryInstaller();
@@ -186,6 +188,8 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
         error.set(ex.getMessage());
         BaseNoGui.librariesIndexer.parseIndex();
         BaseNoGui.librariesIndexer.rescanLibraries();
+      } finally {
+        progressBar.done();
       }
 
       for (ContributedLibrary lib : BaseNoGui.librariesIndexer.getIndex().getLibraries()) {

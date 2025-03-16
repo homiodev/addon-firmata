@@ -46,10 +46,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static org.homio.api.entity.HasJsonData.LEVEL_DELIMITER;
+
 @Component
 @RequiredArgsConstructor
 public class ArduinoSketchService {
 
+  public static final String PACKAGE_PLATFORM_DELIMITER = "@@@";
   private final Context context;
   private final InlineLogsConsolePlugin inlineLogsConsolePlugin;
 
@@ -87,7 +90,7 @@ public class ArduinoSketchService {
     boolean success = false;
     try {
       if (!PreferencesData.has("serial.port")) {
-        throw new ServerException("NO_PORT_SELECTED");
+        throw new ServerException("W.ERROR.NO_PORT_SELECTED");
       }
       success = inlineLogsConsolePlugin.consoleLogUsingStdout(
         () -> {
@@ -117,18 +120,22 @@ public class ArduinoSketchService {
         context.ui().sendJsonMessage("BOARD_INFO", boardPort);
       }
     } else {
-      context.ui().toastr().error("NO_PORT_SELECTED");
+      context.ui().toastr().error("W.ERROR.NO_PORT_SELECTED");
     }
   }
 
   public void selectBoard(String board) {
     if (StringUtils.isNotEmpty(board)) {
-      String[] values = board.split("~~~");
-      TargetPackage targetPackage = BaseNoGui.packages.values().stream().filter(p -> p.getId().equals(values[0])).findAny()
+      String[] values = board.split(LEVEL_DELIMITER);
+      String[] packageAndPlatform = values[0].split(PACKAGE_PLATFORM_DELIMITER);
+      String packageName = packageAndPlatform[0];
+      String platformName = packageAndPlatform[1];
+      String boardName = values[1];
+      TargetPackage targetPackage = BaseNoGui.packages.values().stream().filter(p -> p.getId().equals(packageName)).findAny()
         .orElseThrow(() -> new RuntimeException("NO_BOARD_SELECTED"));
-      TargetPlatform targetPlatform = targetPackage.platforms().stream().filter(p -> p.getId().equals(values[1])).findAny()
+      TargetPlatform targetPlatform = targetPackage.platforms().stream().filter(p -> p.getId().equals(platformName)).findAny()
         .orElseThrow(() -> new RuntimeException("NO_BOARD_SELECTED"));
-      TargetBoard targetBoard = targetPlatform.getBoards().values().stream().filter(b -> b.getId().equals(values[2])).findAny()
+      TargetBoard targetBoard = targetPlatform.getBoards().values().stream().filter(b -> b.getId().equals(boardName)).findAny()
         .orElseThrow(() -> new RuntimeException("NO_BOARD_SELECTED"));
 
       BaseNoGui.selectBoard(targetBoard);
@@ -141,6 +148,13 @@ public class ArduinoSketchService {
             PreferencesMap preferencesMap = targetBoard.getMenuLabels(customMenuEntry.getKey());
             if (!preferencesMap.isEmpty()) {
               dynamicSettings.add(new BoardDynamicSettings(customMenuEntry.getKey(), customMenuEntry.getValue(), preferencesMap));
+              var firstKey = preferencesMap.keySet().iterator().next();
+              var keyValue = targetBoard.getMenuPreferences(customMenuEntry.getKey(), firstKey);
+              if(keyValue != null) {
+                for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+                  PreferencesData.set(entry.getKey(), entry.getValue());
+                }
+              }
             }
           }
         }

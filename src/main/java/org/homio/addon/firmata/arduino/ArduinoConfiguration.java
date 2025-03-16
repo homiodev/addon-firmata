@@ -1,12 +1,14 @@
 package org.homio.addon.firmata.arduino;
 
 import cc.arduino.Constants;
-import cc.arduino.contributions.ConsoleProgressListener;
 import cc.arduino.contributions.GPGDetachedSignatureVerifier;
+import cc.arduino.contributions.ProgressListener;
 import cc.arduino.contributions.libraries.LibraryInstaller;
 import cc.arduino.contributions.packages.ContributionInstaller;
 import cc.arduino.files.DeleteFilesOnShutdown;
 import lombok.extern.log4j.Log4j2;
+import org.homio.api.Context;
+import org.jetbrains.annotations.NotNull;
 import processing.app.BaseNoGui;
 import processing.app.Platform;
 import processing.app.PreferencesData;
@@ -75,8 +77,12 @@ public class ArduinoConfiguration {
     return platform;
   }
 
-  public static ContributionInstaller getContributionInstaller() {
+  public static ContributionInstaller getContributionInstaller(@NotNull Context context) {
     if (contributionInstaller == null) {
+      var progressBar = context.ui().progress().createProgressBar("update-contrib-installer", false, null, true);
+      ProgressListener progressListener = progress ->
+        progressBar.progress(progress.getProgress(), progress.getStatus());
+
       try {
         contributionInstaller = new ContributionInstaller(getPlatform(), gpgDetachedSignatureVerifier);
 
@@ -86,12 +92,15 @@ public class ArduinoConfiguration {
         packageIndexURLs.add("http://arduino.esp8266.com/stable/package_esp8266com_index.json");
         PreferencesData.setCollection(Constants.PREF_BOARDS_MANAGER_ADDITIONAL_URLS, packageIndexURLs);
 
-        List<String> downloadedPackageIndexFiles = contributionInstaller.updateIndex(new ConsoleProgressListener());
+
+        List<String> downloadedPackageIndexFiles = contributionInstaller.updateIndex(progressListener);
         contributionInstaller.deleteUnknownFiles(downloadedPackageIndexFiles);
         BaseNoGui.initPackages();
       } catch (Exception ex) {
         log.error("Error create ContributionInstaller", ex);
         throw new RuntimeException("Unable to create arduino ContributionInstaller");
+      } finally {
+        progressBar.done();
       }
     }
     return contributionInstaller;

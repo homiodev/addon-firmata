@@ -13,5 +13,6 @@
   "INSTALL_ERROR": "Error during installation",
   "BOARD_INFO": "Board info",
   "NO_BOARD_SELECTED": "No selected board",
-  "SKETCH_SAVED": "Sketch saved successfully"
+  "SKETCH_SAVED": "Sketch saved successfully",
+  "SELECT_PLATFORM": "Select platform first"
 }

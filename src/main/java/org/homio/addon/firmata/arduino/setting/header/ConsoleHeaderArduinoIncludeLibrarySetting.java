@@ -6,6 +6,7 @@ import org.homio.api.model.Icon;
 import org.homio.api.model.OptionModel;
 import org.homio.api.setting.SettingPluginOptions;
 import org.homio.api.setting.console.header.ConsoleHeaderSettingPlugin;
+import org.homio.api.util.Lang;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import processing.app.BaseNoGui;
@@ -19,6 +20,11 @@ import java.util.List;
 
 public class ConsoleHeaderArduinoIncludeLibrarySetting implements ConsoleHeaderSettingPlugin<String>,
   SettingPluginOptions<String> {
+
+  @Override
+  public boolean lazyLoad() {
+    return true;
+  }
 
   @Override
   public @NotNull Collection<OptionModel> getOptions(Context context, JSONObject params) {
@@ -38,6 +44,8 @@ public class ConsoleHeaderArduinoIncludeLibrarySetting implements ConsoleHeaderS
         }
         options.add(OptionModel.key(lib.getName()));
       }
+    } else {
+      options.add(OptionModel.error(Lang.getServerMessage("SELECT_PLATFORM")));
     }
 
     return options;

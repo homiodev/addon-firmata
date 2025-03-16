@@ -3,6 +3,7 @@ package org.homio.addon.firmata.arduino.setting.header;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.FileUtils;
 import org.homio.api.Context;
 import org.homio.api.model.OptionModel;
 import org.homio.api.setting.SettingPluginOptions;
@@ -14,9 +15,9 @@ import org.json.JSONObject;
 import processing.app.BaseNoGui;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,6 +29,11 @@ public class ConsoleHeaderArduinoSketchNameSetting implements
   SettingPluginOptions<String>,
   SettingPluginOptionsRemovable<String>,
   ConsoleHeaderSettingPlugin<String> {
+
+  @Override
+  public boolean lazyLoad() {
+    return true;
+  }
 
   public static OptionModel buildExamplePath(boolean includePath) {
     OptionModel examples = OptionModel.key("examples");
@@ -118,20 +124,21 @@ public class ConsoleHeaderArduinoSketchNameSetting implements
   @Override
   public @NotNull Collection<OptionModel> getOptions(Context context, JSONObject params) {
     var options = new ArrayList<OptionModel>();
-    OptionModel examples = buildExamplePath(false);
-    if (examples != null) {
-      options.add(OptionModel.separator());
-      options.add(examples);
-    }
     options.add(OptionModel.key(DEFAULT_SKETCH_NAME));
-    try (var paths = Files.walk(BaseNoGui.getSketchbookFolder().toPath())) {
-      paths
-        .filter(Files::isRegularFile)
-        .filter(path -> path.toString().endsWith(".ino"))
-        .filter(path -> !path.getFileName().toString().equals(DEFAULT_SKETCH_NAME))
-        .forEach(path -> options.add(OptionModel.of(path.getFileName().toString()).json(node ->
-          node.put("removable", true))));
+    try (var dirs = Files.list(BaseNoGui.getSketchbookFolder().toPath())) {
+      dirs
+        .filter(Files::isDirectory)
+        .forEach(dir -> {
+          try (var files = Files.list(dir)) {
+            files.filter(Files::isRegularFile)
+              .filter(path -> path.toString().endsWith(".ino"))
+              .filter(path -> !path.getFileName().toString().equals(DEFAULT_SKETCH_NAME))
+              .forEach(path -> options.add(OptionModel.of(path.getFileName().toString()).setRemovable(true)));
+          } catch (IOException ignored) {
+          }
+        });
     }
+
     options.sort((o1, o2) -> {
       if (o1.getTitleOrKey().equals(DEFAULT_SKETCH_NAME)) {
         return -1;
@@ -141,17 +148,17 @@ public class ConsoleHeaderArduinoSketchNameSetting implements
       }
       return o1.getTitleOrKey().compareTo(o2.getTitleOrKey());
     });
+    OptionModel examples = buildExamplePath(false);
+    if (examples != null) {
+      options.add(OptionModel.separator());
+      options.add(examples);
+    }
     return options;
   }
 
   @Override
   public @NotNull Class<String> getType() {
     return String.class;
-  }
-
-  @Override
-  public boolean rawInput() {
-    return true;
   }
 
   @Override
@@ -172,8 +179,13 @@ public class ConsoleHeaderArduinoSketchNameSetting implements
 
   @Override
   public void removeOption(Context context, String key) throws Exception {
-    Path path = Paths.get(key);
-    Files.delete(path);
-    context.setting().reloadSettings(getClass());
+    if (key.endsWith(".ino")) {
+      String folderName = key.substring(0, key.length() - 4);
+      Path dropFolder = BaseNoGui.getSketchbookFolder().toPath().resolve(folderName);
+      FileUtils.deleteDirectory(dropFolder.toFile());
+      context.setting().reloadSettings(getClass());
+    } else {
+      throw new Exception("Cannot remove sketch with name: " + key);
+    }
   }
 }

@@ -16,8 +16,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.homio.addon.firmata.arduino.ArduinoSketchService.PACKAGE_PLATFORM_DELIMITER;
+
 public class ConsoleHeaderArduinoGetBoardsSetting implements ConsoleHeaderSettingPlugin<String>,
   SettingPluginOptions<String> {
+
+  @Override
+  public boolean lazyLoad() {
+    return true;
+  }
 
   @Override
   public @NotNull Collection<OptionModel> getOptions(Context context, JSONObject params) {
@@ -39,7 +46,7 @@ public class ConsoleHeaderArduinoGetBoardsSetting implements ConsoleHeaderSettin
             platformLabel += " (in sketchbook)";
           }
 
-          OptionModel boardFamily = OptionModel.of(targetPackage.getId() + "~~~" + targetPlatform.getId(), platformLabel);
+          OptionModel boardFamily = OptionModel.of(targetPackage.getId() + PACKAGE_PLATFORM_DELIMITER + targetPlatform.getId(), platformLabel);
 
           for (TargetBoard board : targetPlatform.getBoards().values()) {
             if (board.getPreferences().get("hide") != null) {

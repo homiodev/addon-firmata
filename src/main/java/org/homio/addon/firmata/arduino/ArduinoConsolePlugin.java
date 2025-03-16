@@ -129,7 +129,11 @@ public class ArduinoConsolePlugin implements ConsolePluginEditor {
       arduinoSketchService::getBoardInfo);
 
     context.setting().listenValue(ConsoleHeaderArduinoPortSetting.class, "avr-select-port", serialPort -> {
-      BaseNoGui.selectSerialPort(serialPort.getSystemPortName());
+      if (serialPort != null) {
+        BaseNoGui.selectSerialPort(serialPort.getSystemPortName());
+      } else {
+        BaseNoGui.selectSerialPort("");
+      }
       BaseNoGui.onBoardOrPortChange();
     });
 

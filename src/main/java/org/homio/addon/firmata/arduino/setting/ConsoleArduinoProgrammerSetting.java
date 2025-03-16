@@ -3,10 +3,12 @@ package org.homio.addon.firmata.arduino.setting;
 import org.homio.addon.firmata.arduino.ArduinoConsolePlugin;
 import org.homio.api.Context;
 import org.homio.api.console.ConsolePlugin;
+import org.homio.api.model.Icon;
 import org.homio.api.model.OptionModel;
 import org.homio.api.setting.SettingPluginOptions;
 import org.homio.api.setting.console.ConsoleSettingPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import processing.app.BaseNoGui;
 import processing.app.debug.TargetBoard;
@@ -20,6 +22,16 @@ import java.util.Map;
 
 public class ConsoleArduinoProgrammerSetting implements ConsoleSettingPlugin<String>,
   SettingPluginOptions<String> {
+
+  @Override
+  public boolean lazyLoad() {
+    return true;
+  }
+
+  @Override
+  public @Nullable Icon getIcon() {
+    return new Icon("fas fa-square-binary");
+  }
 
   @Override
   public Integer getMaxWidth() {
