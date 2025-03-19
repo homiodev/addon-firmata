@@ -134,10 +134,9 @@ void initFirmata()
 void setup()
 {
   Firmata.setFirmwareNameAndVersion("ConfigurableFirmata", FIRMATA_FIRMWARE_MAJOR_VERSION, FIRMATA_FIRMWARE_MINOR_VERSION);
-  initTransport();
-  Firmata.sendString(F("Booting device. Stand by..."));
   initFirmata();
   homio.setup();
+  Firmata.sendString(F("Booting device. Stand by..."));
 
   Firmata.parse(SYSTEM_RESET);
 }

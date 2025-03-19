@@ -71,13 +71,18 @@
     "password_description": "Board password to upload a new sketch"
   },
   "CONSOLE": {
-    "firmata": "Arduino editor",
-    "st_ConsoleArduinoVerifyAfterUploadSetting": "Verify code after upload",
-    "st_ConsoleArduinoLibraryManagerSetting": "Library Manager",
-    "st_ConsoleArduinoBoardManagerSetting": "Boards Manager",
-    "st_ConsoleArduinoBoardPasswordSetting": "Board password",
-    "st_ConsoleArduinoUploadUsingProgrammerSetting": "Upload Using Programmer",
-    "st_ConsoleArduinoProgrammerSetting": "Programmer",
-    "st_ConsoleArduinoVerboseSetting": "Verbose"
+    "firmata": "Arduino editor"
+  },
+  "SETTING": {
+    "CONSOLE": {
+      "firmata": "Arduino editor",
+      "st_ConsoleArduinoVerifyAfterUploadSetting": "Verify code after upload",
+      "st_ConsoleArduinoLibraryManagerSetting": "Library Manager",
+      "st_ConsoleArduinoBoardManagerSetting": "Boards Manager",
+      "st_ConsoleArduinoBoardPasswordSetting": "Board password",
+      "st_ConsoleArduinoUploadUsingProgrammerSetting": "Upload Using Programmer",
+      "st_ConsoleArduinoProgrammerSetting": "Programmer",
+      "st_ConsoleArduinoVerboseSetting": "Verbose"
+    }
   }
 }

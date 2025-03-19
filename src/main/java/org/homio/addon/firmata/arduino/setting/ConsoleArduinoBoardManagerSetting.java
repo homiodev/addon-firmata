@@ -6,7 +6,9 @@ import cc.arduino.contributions.packages.ContributedPackage;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import org.homio.addon.firmata.arduino.ArduinoConfiguration;
 import org.homio.addon.firmata.arduino.ArduinoConsolePlugin;
+import org.homio.addon.firmata.arduino.setting.header.ConsoleHeaderArduinoGetBoardsSetting;
 import org.homio.api.Context;
+import org.homio.api.cache.CachedValue;
 import org.homio.api.console.ConsolePlugin;
 import org.homio.api.exception.ServerException;
 import org.homio.api.model.Icon;
@@ -17,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import processing.app.BaseNoGui;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +29,17 @@ import java.util.stream.Collectors;
 public class ConsoleArduinoBoardManagerSetting implements SettingPluginPackageInstall, ConsoleSettingPlugin<JSONObject> {
 
   private static List<ContributedPlatformReleases> contributions;
+  private static final CachedValue<PackageContext, Context> allPackagesCache =
+    new CachedValue<>(Duration.ofHours(24), context -> {
+      Collection<PackageModel> bundleEntities = new ArrayList<>();
+      if (BaseNoGui.packages != null) {
+        for (ContributedPlatformReleases release : getContributions(context)) {
+          bundleEntities.add(buildBundleEntity(release.getReleases().stream().map(ContributedPlatform::getVersion).collect(Collectors.toList()), release.getLatest()));
+        }
+      }
+
+      return new PackageContext(null, bundleEntities);
+    });
 
   public static List<ContributedPlatformReleases> getContributions(@NotNull Context context) {
     if (contributions == null) {
@@ -61,14 +75,7 @@ public class ConsoleArduinoBoardManagerSetting implements SettingPluginPackageIn
 
   @Override
   public PackageContext allPackages(@NotNull Context context) {
-    Collection<PackageModel> bundleEntities = new ArrayList<>();
-    if (BaseNoGui.packages != null) {
-      for (ContributedPlatformReleases release : getContributions(context)) {
-        bundleEntities.add(buildBundleEntity(release.getReleases().stream().map(ContributedPlatform::getVersion).collect(Collectors.toList()), release.getLatest()));
-      }
-    }
-
-    return new PackageContext(null, bundleEntities);
+    return allPackagesCache.getValue(context);
   }
 
   @Override
@@ -119,7 +126,7 @@ public class ConsoleArduinoBoardManagerSetting implements SettingPluginPackageIn
     return consolePlugin instanceof ArduinoConsolePlugin;
   }
 
-  private PackageModel buildBundleEntity(List<String> versions, ContributedPlatform latest) {
+  private static PackageModel buildBundleEntity(List<String> versions, ContributedPlatform latest) {
     String desc = versions == null ? "" : "<pre>Boards included in this package:<br/><br/>" +
                                           latest.getBoards().stream().map(ContributedBoard::getName).collect(Collectors.joining("<br/>")) +
                                           "</pre>";
@@ -143,7 +150,7 @@ public class ConsoleArduinoBoardManagerSetting implements SettingPluginPackageIn
   private void boardUpdated(Context context) throws Exception {
     BaseNoGui.initPackages();
     contributions = null;
-    context.ui().dialog().reloadWindow("Re-Initialize page after board installation");
+    context.setting().reloadSettings(ConsoleHeaderArduinoGetBoardsSetting.class);
   }
 
   private ContributedPlatform searchContributedPlatform(String name, String version, Context context) {

@@ -138,19 +138,22 @@ public class ArduinoConsolePlugin implements ConsolePluginEditor {
 
   @SneakyThrows
   @Override
-  public ActionResponseModel save(FileModel content) {
+  public ActionResponseModel save(FileModel fileModel) {
     if (BaseNoGui.packages == null) {
       return ActionResponseModel.showWarn("REQUIRE_UPDATES");
     }
-    if (content.getName() == null) {
-      content.setName(this.content.getName());
+    if (fileModel.getName() == null) {
+      fileModel.setName(this.content.getName());
     }
-    if (!content.getName().endsWith(".ino")) {
-      content.setName(content.getName() + ".ino");
+    if (!fileModel.getName().endsWith(".ino")) {
+      fileModel.setName(fileModel.getName() + ".ino");
     }
-    this.content = content;
-    this.updateSketch();
-    return ActionResponseModel.showSuccess(Lang.getServerMessage("SKETCH_SAVED"));
+    this.content = fileModel;
+    if(!this.content.equals(fileModel)) {
+      this.updateSketch();
+      return ActionResponseModel.showSuccess(Lang.getServerMessage("SKETCH_SAVED"));
+    }
+    return null;
   }
 
   public void updateSketch() throws IOException {

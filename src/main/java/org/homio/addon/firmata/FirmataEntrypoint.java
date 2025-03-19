@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.homio.addon.firmata.arduino.ArduinoConfiguration;
 import org.homio.addon.firmata.arduino.ArduinoConsolePlugin;
+import org.homio.addon.firmata.arduino.setting.ConsoleArduinoLibraryManagerSetting;
 import org.homio.addon.firmata.model.FirmataBaseEntity;
 import org.homio.addon.firmata.model.FirmataNetworkEntity;
 import org.homio.addon.firmata.provider.FirmataCommandPlugins;
@@ -14,6 +15,7 @@ import org.homio.api.AddonEntrypoint;
 import org.homio.api.Context;
 import org.homio.api.fs.archive.ArchiveUtil;
 import org.homio.api.model.Status;
+import org.homio.api.setting.SettingPluginPackageInstall;
 import org.homio.api.util.CommonUtils;
 import org.homio.api.util.Lang;
 import org.springframework.stereotype.Component;
@@ -110,6 +112,13 @@ public class FirmataEntrypoint implements AddonEntrypoint {
           null, false, progressBar, ArchiveUtil.UnzipFileIssueHandler.skip);
         ArchiveUtil.unzip(osFiles, "arduino-files-os.7z", arduinoInstallPath,
           null, false, progressBar, ArchiveUtil.UnzipFileIssueHandler.skip);
+
+        // fire install ConfigurableFirmata library
+        var firmataLib = new SettingPluginPackageInstall.PackageRequest();
+        firmataLib.setName("ConfigurableFirmata");
+        firmataLib.setVersion("3.3.0");
+        new ConsoleArduinoLibraryManagerSetting()
+          .installPackage(context, firmataLib, progressBar);
 
         initInternal();
       } catch (Exception e) {

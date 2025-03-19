@@ -7,7 +7,9 @@ import cc.arduino.contributions.libraries.LibraryInstaller;
 import lombok.SneakyThrows;
 import org.homio.addon.firmata.arduino.ArduinoConfiguration;
 import org.homio.addon.firmata.arduino.ArduinoConsolePlugin;
+import org.homio.addon.firmata.arduino.setting.header.ConsoleHeaderArduinoIncludeLibrarySetting;
 import org.homio.api.Context;
+import org.homio.api.cache.CachedValue;
 import org.homio.api.console.ConsolePlugin;
 import org.homio.api.model.Icon;
 import org.homio.api.setting.SettingPluginPackageInstall;
@@ -21,9 +23,9 @@ import processing.app.packages.UserLibrary;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,24 @@ import java.util.stream.Collectors;
 public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackageInstall, ConsoleSettingPlugin<JSONObject> {
 
   private static Map<String, ContributedLibraryReleases> releases;
+  private static final CachedValue<PackageContext, Context> allPackagesCache =
+    new CachedValue<>(Duration.ofHours(24), context -> {
+      releases = null;
+      AtomicReference<String> error = new AtomicReference<>();
+      Collection<PackageModel> bundleEntities = new ArrayList<>();
+      if (BaseNoGui.packages != null) {
+        var progress = context.ui().progress().createProgressBar("all-libs", false);
+        try {
+          for (ContributedLibraryReleases release : getReleases(progress, error).values()) {
+            ContributedLibrary latest = release.getLatest();
+            bundleEntities.add(buildBundleEntity(release.getReleases().stream().map(ContributedLibrary::getVersion).collect(Collectors.toList()), latest));
+          }
+        } finally {
+          progress.done();
+        }
+      }
+      return new PackageContext(error.get(), bundleEntities);
+    });
 
   @Override
   public Icon getIcon() {
@@ -63,18 +83,7 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
 
   @Override
   public PackageContext allPackages(@NotNull Context context) {
-    releases = null;
-    AtomicReference<String> error = new AtomicReference<>();
-    Collection<PackageModel> bundleEntities = new ArrayList<>();
-    if (BaseNoGui.packages != null) {
-      var progress = context.ui().progress().createProgressBar("all-packages", false);
-      for (ContributedLibraryReleases release : getReleases(progress, error).values()) {
-        ContributedLibrary latest = release.getLatest();
-        bundleEntities.add(buildBundleEntity(release.getReleases().stream().map(ContributedLibrary::getVersion).collect(Collectors.toList()), latest));
-      }
-    }
-
-    return new PackageContext(error.get(), bundleEntities);
+    return allPackagesCache.getValue(context);
   }
 
   @Override
@@ -146,7 +155,7 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
     return packageModel;
   }
 
-  private PackageModel buildBundleEntity(List<String> versions, ContributedLibrary library) {
+  private static PackageModel buildBundleEntity(List<String> versions, ContributedLibrary library) {
     PackageModel packageModel = new PackageModel()
       .setName(library.getName())
       .setTitle(library.getSentence())
@@ -168,11 +177,11 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
   private void reBuildLibraries(@NotNull Context context, @NotNull ProgressBar progressBar) {
     ConsoleArduinoLibraryManagerSetting.releases = null;
     getReleases(progressBar, null);
-    context.ui().dialog().reloadWindow("Re-Initialize page after library installation");
+    context.setting().reloadSettings(ConsoleHeaderArduinoIncludeLibrarySetting.class);
   }
 
   @SneakyThrows
-  private synchronized Map<String, ContributedLibraryReleases> getReleases(@NotNull ProgressBar progressBar, @Nullable AtomicReference<String> error) {
+  private static synchronized Map<String, ContributedLibraryReleases> getReleases(@NotNull ProgressBar progressBar, @Nullable AtomicReference<String> error) {
     if (releases == null) {
       releases = new HashMap<>();
 

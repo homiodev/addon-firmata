@@ -12,6 +12,7 @@ import org.homio.addon.firmata.provider.command.PendingRegistrationContext;
 import org.homio.api.Context;
 import org.homio.api.model.OptionModel;
 import org.homio.api.ui.field.UIField;
+import org.homio.api.ui.field.UIFieldType;
 import org.homio.api.ui.field.selection.UIFieldSelectConfig;
 import org.homio.api.ui.field.selection.dynamic.DynamicOptionLoader;
 import org.homio.api.ui.field.selection.dynamic.UIFieldDynamicSelection;
@@ -25,7 +26,6 @@ import java.util.stream.Collectors;
 public final class FirmataNetworkEntity extends FirmataBaseEntity<FirmataNetworkEntity> {
 
   @UIField(order = 22)
-  @Pattern(regexp = "(\\d{1,3}\\.){3}\\d{1,3}", message = "VALIDATION.HOST_PORT")
   @UIFieldDynamicSelection(value = SelectFirmataIpDeviceLoader.class, rawInput = true)
   @UIFieldSelectConfig(selectOnEmptyLabel = "SELECTION.selectIp", iconColor = "#A7D21E")
   public String getIp() {
