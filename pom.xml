@@ -35,7 +35,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>make-linux-jar</id>
+                        <id>make-linux-64-jar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
@@ -43,6 +43,19 @@
                         <configuration>
                             <descriptors>
                                 <descriptor>assemblies/linux-64.xml</descriptor>
+                            </descriptors>
+                            <finalName>${project.artifactId}</finalName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>make-linux-aarch64-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assemblies/linux-aarch64.xml</descriptor>
                             </descriptors>
                             <finalName>${project.artifactId}</finalName>
                         </configuration>
