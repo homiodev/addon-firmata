@@ -26,7 +26,7 @@ import java.io.FilenameFilter;
 
 public class OnlyFilesWithExtension implements FilenameFilter {
 
-  String extensions[];
+  String[] extensions;
 
   public OnlyFilesWithExtension(String... ext) {
     this.extensions = ext;

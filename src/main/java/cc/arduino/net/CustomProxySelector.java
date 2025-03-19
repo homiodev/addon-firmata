@@ -32,10 +32,24 @@ package cc.arduino.net;
 import cc.arduino.Constants;
 import org.apache.commons.compress.utils.IOUtils;
 
-import javax.script.*;
+import javax.script.Invocable;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.io.IOException;
-import java.net.*;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
+import java.net.ProxySelector;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -85,7 +99,7 @@ public class CustomProxySelector {
         throw new IOException("Unable to fetch PAC file at " + pac + ". Response code is " + responseCode);
       }
     }
-    String pacScript = new String(IOUtils.toByteArray(urlConnection.getInputStream()), Charset.forName("ASCII"));
+    String pacScript = new String(IOUtils.toByteArray(urlConnection.getInputStream()), StandardCharsets.US_ASCII);
 
     ScriptEngine nashorn = new ScriptEngineManager().getEngineByName("nashorn");
     nashorn.getBindings(ScriptContext.ENGINE_SCOPE).put("pac", new PACSupportMethods());

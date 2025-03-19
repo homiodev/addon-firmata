@@ -20,6 +20,7 @@ import org.homio.api.model.FileContentType;
 import org.homio.api.model.FileModel;
 import org.homio.api.model.OptionModel;
 import org.homio.api.model.Status;
+import org.homio.api.ui.UI;
 import org.homio.api.ui.field.UIField;
 import org.homio.api.ui.field.action.UIContextMenuAction;
 import org.homio.api.ui.field.color.UIFieldColorStatusMatch;
@@ -35,7 +36,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
-@SuppressWarnings({"JpaAttributeTypeInspection", "unused"})
+@SuppressWarnings({"JpaAttributeTypeInspection", "unused", "UnusedReturnValue"})
 @Entity
 @Accessors(chain = true)
 public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>> extends MicroControllerBaseEntity {
@@ -77,7 +78,7 @@ public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>> extends 
     return super.getIeeeAddress();
   }
 
-  @UIContextMenuAction("RESTART")
+  @UIContextMenuAction(value = "RESTART_COMMUNICATOR",icon = "fas fa-power-off", iconColor = UI.Color.RED)
   public ActionResponseModel restartCommunicator() {
     if (firmataDeviceCommunicator != null) {
       try {
@@ -90,12 +91,7 @@ public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>> extends 
     return ActionResponseModel.showWarn("action.communicator.not_found");
   }
 
-  @UIContextMenuAction("UPLOAD_SKETCH")
-  public void uploadSketch(Context context) {
-
-  }
-
-  @UIContextMenuAction("UPLOAD_SKETCH_MANUALLY")
+  @UIContextMenuAction(value = "UPLOAD_SKETCH_MANUALLY", icon = "fas fa-upload")
   public void uploadSketchManually(Context context) {
     ArduinoConsolePlugin arduinoConsolePlugin = context.getBean(ArduinoConsolePlugin.class);
     String content = CommonUtils.getResourceAsString("firmata", "arduino_firmata.ino");

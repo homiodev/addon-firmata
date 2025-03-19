@@ -35,8 +35,17 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.StringUtils;
-import processing.app.*;
-import processing.app.debug.*;
+import processing.app.BaseNoGui;
+import processing.app.I18n;
+import processing.app.PreferencesData;
+import processing.app.Sketch;
+import processing.app.SketchFile;
+import processing.app.debug.MessageConsumer;
+import processing.app.debug.MessageSiphon;
+import processing.app.debug.RunnerException;
+import processing.app.debug.TargetBoard;
+import processing.app.debug.TargetPackage;
+import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.PreferencesMapException;
 import processing.app.helpers.ProcessUtils;
@@ -44,7 +53,13 @@ import processing.app.helpers.StringReplacer;
 import processing.app.legacy.PApplet;
 import processing.app.tools.DoubleQuotedArgumentsOnWindowsCommandLine;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -60,6 +75,8 @@ import java.util.stream.Stream;
 import static processing.app.I18n.tr;
 
 public class Compiler implements MessageConsumer {
+
+  private static final Pattern ERROR_FORMAT = Pattern.compile("(.+\\.\\w+):(\\d+)(:\\d+)*:\\s*((fatal)?\\s*error:\\s*)(.*)\\s*", Pattern.MULTILINE | Pattern.DOTALL);
 
   //used by transifex integration
   static {
@@ -124,25 +141,12 @@ public class Compiler implements MessageConsumer {
     tr("Verifying and uploading...");
   }
 
-  enum BuilderAction {
-    COMPILE("-compile"), DUMP_PREFS("-dump-prefs");
-
-    final String value;
-
-    BuilderAction(String value) {
-      this.value = value;
-    }
-  }
-
-  private static final Pattern ERROR_FORMAT = Pattern.compile("(.+\\.\\w+):(\\d+)(:\\d+)*:\\s*((fatal)?\\s*error:\\s*)(.*)\\s*", Pattern.MULTILINE | Pattern.DOTALL);
-
   private final File pathToSketch;
   private final Sketch sketch;
+  private final boolean verbose;
   private String buildPath;
   private File buildCache;
-  private final boolean verbose;
   private RunnerException exception;
-
   public Compiler(Sketch data) {
     this(data.getPrimaryFile().getFile(), data);
   }
@@ -215,7 +219,7 @@ public class Compiler implements MessageConsumer {
     try {
       callArduinoBuilder(board, platform, aPackage, vidpid, BuilderAction.DUMP_PREFS, stdout, err);
     } catch (RunnerException e) {
-      System.err.println(new String(stderr.toByteArray()));
+      System.err.println(stderr.toString());
       throw e;
     }
     PreferencesMap prefs = new PreferencesMap();
@@ -261,7 +265,7 @@ public class Compiler implements MessageConsumer {
     cmd.add(buildPath);
     cmd.add("-warnings=" + PreferencesData.get("compiler.warning_level"));
 
-    if (PreferencesData.getBoolean("compiler.cache_core") == true && buildCache != null) {
+    if (PreferencesData.getBoolean("compiler.cache_core") && buildCache != null) {
       cmd.add("-build-cache");
       cmd.add(buildCache.getAbsolutePath());
     }
@@ -275,9 +279,9 @@ public class Compiler implements MessageConsumer {
     cmd.add("-prefs=build.warn_data_percentage=" + PreferencesData.get("build.warn_data_percentage"));
 
     for (Map.Entry<String, String> entry : BaseNoGui.getBoardPreferences().entrySet()) {
-        if (entry.getKey().startsWith("runtime.tools")) {
-          cmd.add("-prefs=" + entry.getKey() + "=" + entry.getValue());
-        }
+      if (entry.getKey().startsWith("runtime.tools")) {
+        cmd.add("-prefs=" + entry.getKey() + "=" + entry.getValue());
+      }
     }
 
     //commandLine.addArgument("-debug-level=10", false);
@@ -528,43 +532,43 @@ public class Compiler implements MessageConsumer {
       if (error.trim().equals("SPI.h: No such file or directory")) {
         error = tr("Please import the SPI library from the Sketch > Import Library menu.");
         msg = tr("\nAs of Arduino 0019, the Ethernet library depends on the SPI library." +
-          "\nYou appear to be using it or another library that depends on the SPI library.\n\n");
+                 "\nYou appear to be using it or another library that depends on the SPI library.\n\n");
       }
 
       if (error.trim().equals("'BYTE' was not declared in this scope")) {
         error = tr("The 'BYTE' keyword is no longer supported.");
         msg = tr("\nAs of Arduino 1.0, the 'BYTE' keyword is no longer supported." +
-          "\nPlease use Serial.write() instead.\n\n");
+                 "\nPlease use Serial.write() instead.\n\n");
       }
 
       if (error.trim().equals("no matching function for call to 'Server::Server(int)'")) {
         error = tr("The Server class has been renamed EthernetServer.");
         msg = tr("\nAs of Arduino 1.0, the Server class in the Ethernet library " +
-          "has been renamed to EthernetServer.\n\n");
+                 "has been renamed to EthernetServer.\n\n");
       }
 
       if (error.trim().equals("no matching function for call to 'Client::Client(byte [4], int)'")) {
         error = tr("The Client class has been renamed EthernetClient.");
         msg = tr("\nAs of Arduino 1.0, the Client class in the Ethernet library " +
-          "has been renamed to EthernetClient.\n\n");
+                 "has been renamed to EthernetClient.\n\n");
       }
 
       if (error.trim().equals("'Udp' was not declared in this scope")) {
         error = tr("The Udp class has been renamed EthernetUdp.");
         msg = tr("\nAs of Arduino 1.0, the Udp class in the Ethernet library " +
-          "has been renamed to EthernetUdp.\n\n");
+                 "has been renamed to EthernetUdp.\n\n");
       }
 
       if (error.trim().equals("'class TwoWire' has no member named 'send'")) {
         error = tr("Wire.send() has been renamed Wire.write().");
         msg = tr("\nAs of Arduino 1.0, the Wire.send() function was renamed " +
-          "to Wire.write() for consistency with other libraries.\n\n");
+                 "to Wire.write() for consistency with other libraries.\n\n");
       }
 
       if (error.trim().equals("'class TwoWire' has no member named 'receive'")) {
         error = tr("Wire.receive() has been renamed Wire.read().");
         msg = tr("\nAs of Arduino 1.0, the Wire.receive() function was renamed " +
-          "to Wire.read() for consistency with other libraries.\n\n");
+                 "to Wire.read() for consistency with other libraries.\n\n");
       }
 
       if (error.trim().equals("'Mouse' was not declared in this scope")) {
@@ -596,13 +600,13 @@ public class Compiler implements MessageConsumer {
     }
 
     if (s.contains("undefined reference to `SPIClass::begin()'") &&
-      s.contains("libraries/Robot_Control")) {
+        s.contains("libraries/Robot_Control")) {
       String error = tr("Please import the SPI library from the Sketch > Import Library menu.");
       exception = new RunnerException(error);
     }
 
     if (s.contains("undefined reference to `Wire'") &&
-      s.contains("libraries/Robot_Control")) {
+        s.contains("libraries/Robot_Control")) {
       String error = tr("Please import the Wire library from the Sketch > Import Library menu.");
       exception = new RunnerException(error);
     }
@@ -617,5 +621,15 @@ public class Compiler implements MessageConsumer {
       }
     }
     return null;
+  }
+
+  enum BuilderAction {
+    COMPILE("-compile"), DUMP_PREFS("-dump-prefs");
+
+    final String value;
+
+    BuilderAction(String value) {
+      this.value = value;
+    }
   }
 }

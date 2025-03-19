@@ -41,17 +41,29 @@ public class HostDependentDownloadableContribution extends DownloadableContribut
   private String archiveFileName;
   private String host;
 
-  public String getUrl() { return url; }
+  public String getUrl() {
+    return url;
+  }
 
-  public String getVersion() { return version; }
+  public String getVersion() {
+    return version;
+  }
 
-  public String getChecksum() { return checksum; }
+  public String getChecksum() {
+    return checksum;
+  }
 
-  public long getSize() { return size; }
+  public long getSize() {
+    return size;
+  }
 
-  public String getArchiveFileName() { return archiveFileName; }
+  public String getArchiveFileName() {
+    return archiveFileName;
+  }
 
-  public String getHost() { return host; }
+  public String getHost() {
+    return host;
+  }
 
   @Override
   public String toString() {

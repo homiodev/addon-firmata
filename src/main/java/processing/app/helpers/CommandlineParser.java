@@ -9,28 +9,20 @@ import processing.app.debug.TargetPlatform;
 import processing.app.legacy.PApplet;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import static processing.app.I18n.tr;
 
 public class CommandlineParser {
 
-  private enum ACTION {
-    GUI, NOOP, VERIFY("--verify"), UPLOAD("--upload"), GET_PREF("--get-pref"), INSTALL_BOARD("--install-boards"), INSTALL_LIBRARY("--install-library"), VERSION("--version");
-
-    final String value;
-
-    ACTION() {
-      this.value = null;
-    }
-
-    ACTION(String value) {
-      this.value = value;
-    }
-  }
-
   private final String[] args;
   private final Map<String, ACTION> actions;
+  private final List<String> filenames = new LinkedList<>();
   private ACTION action = ACTION.GUI;
   private boolean doVerboseBuild = false;
   private boolean doVerboseUpload = false;
@@ -42,8 +34,6 @@ public class CommandlineParser {
   private String boardToInstall;
   private String libraryToInstall;
   private Optional<String> uploadPort = Optional.empty();
-  private final List<String> filenames = new LinkedList<>();
-
   public CommandlineParser(String[] args) {
     this.args = args;
 
@@ -360,5 +350,19 @@ public class CommandlineParser {
 
   public Optional<String> getUploadPort() {
     return uploadPort;
+  }
+
+  private enum ACTION {
+    GUI, NOOP, VERIFY("--verify"), UPLOAD("--upload"), GET_PREF("--get-pref"), INSTALL_BOARD("--install-boards"), INSTALL_LIBRARY("--install-library"), VERSION("--version");
+
+    final String value;
+
+    ACTION() {
+      this.value = null;
+    }
+
+    ACTION(String value) {
+      this.value = value;
+    }
   }
 }

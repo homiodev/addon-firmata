@@ -63,8 +63,8 @@
   },
   "CONTEXT": {
     "ACTION": {
-      "upload_sketch": "Upload sketch automatically",
-      "upload_sketch_manually": "Upload sketch manually"
+      "RESTART_COMMUNICATOR": "Restart communicator",
+      "UPLOAD_SKETCH_MANUALLY": "Upload sketch"
     }
   },
   "arduino": {
@@ -72,7 +72,7 @@
   },
   "CONSOLE": {
     "firmata": "Arduino editor",
-    "st_ConsoleArduinoFetchEsp8266PackagesSetting": "Download esp8266 boards",
+    "st_ConsoleArduinoVerifyAfterUploadSetting": "Verify code after upload",
     "st_ConsoleArduinoLibraryManagerSetting": "Library Manager",
     "st_ConsoleArduinoBoardManagerSetting": "Boards Manager",
     "st_ConsoleArduinoBoardPasswordSetting": "Board password",

@@ -37,13 +37,13 @@ import processing.app.helpers.PreferencesMap;
 
 public class BoardPort {
 
+  private final PreferencesMap identificationPrefs; // data to match with boards.txt
+  private final PreferencesMap prefs; // "vendorId", "productId", "serialNumber"
   private String address;   // unique name for this port, used by Preferences
   private String protocol;  // how to communicate, used for Ports menu sections
   private String protocolLabel; // protocol extended name to display on GUI
   private String boardName;
   private String label;     // friendly name shown in Ports menu
-  private final PreferencesMap identificationPrefs; // data to match with boards.txt
-  private final PreferencesMap prefs; // "vendorId", "productId", "serialNumber"
   private boolean online;   // used by SerialBoardsLister (during upload??)
 
   public BoardPort() {
@@ -101,12 +101,12 @@ public class BoardPort {
     return identificationPrefs;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
   public String getLabel() {
     return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   public void setOnlineStatus(boolean online) {
@@ -174,7 +174,7 @@ public class BoardPort {
     // so we must search starting from suffix ".0" and increasing until we
     // found a match or the board has no more identification properties defined
 
-    for (int suffix = 0;; suffix++) {
+    for (int suffix = 0; ; suffix++) {
       boolean found = true;
       for (String prop : identificationProps.keySet()) {
         String value = identificationProps.get(prop);

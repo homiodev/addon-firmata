@@ -229,23 +229,6 @@ public class FileUtils {
   }
 
   /**
-   * The result of a splitFilename call.
-   */
-  public static class SplitFile {
-    public SplitFile(String basename, String extension) {
-      this.basename = basename;
-      this.extension = extension;
-    }
-
-    public String basename;
-    public String extension;
-
-    public String join() {
-      return addExtension(basename, extension);
-    }
-  }
-
-  /**
    * Splits the given filename into a basename (everything up to the
    * last dot) and an extension (everything from the last dot). The dot
    * is not included in either part.
@@ -307,6 +290,22 @@ public class FileUtils {
         result.add(file);
     }
     return result;
+  }
+
+  /**
+   * The result of a splitFilename call.
+   */
+  public static class SplitFile {
+    public String basename;
+    public String extension;
+    public SplitFile(String basename, String extension) {
+      this.basename = basename;
+      this.extension = extension;
+    }
+
+    public String join() {
+      return addExtension(basename, extension);
+    }
   }
 
 }

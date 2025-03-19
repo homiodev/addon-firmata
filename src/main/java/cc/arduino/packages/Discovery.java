@@ -51,6 +51,7 @@ public interface Discovery extends Runnable {
    * @return
    */
   List<BoardPort> listDiscoveredBoards();
+
   List<BoardPort> listDiscoveredBoards(boolean complete);
 
 }

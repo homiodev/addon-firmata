@@ -23,6 +23,11 @@
 package processing.app.windows;
 
 import cc.arduino.os.windows.Win32KnownFolders;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+import com.sun.jna.platform.win32.Shell32;
+import com.sun.jna.win32.StdCallLibrary;
+import com.sun.jna.win32.W32APIOptions;
 import processing.app.PreferencesData;
 import processing.app.legacy.PApplet;
 import processing.app.legacy.PConstants;
@@ -35,16 +40,30 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.Shell32;
-import com.sun.jna.win32.StdCallLibrary;
-import com.sun.jna.win32.W32APIOptions;
-
 public class Platform extends processing.app.Platform {
 
+  private static final int detected = detectSystemDPI();
   private File settingsFolder;
   private File defaultSketchbookFolder = null;
+
+  public static int detectSystemDPI() {
+    try {
+      ExtUser32.INSTANCE.SetProcessDpiAwareness(ExtUser32.DPI_AWARENESS_SYSTEM_AWARE);
+    } catch (Throwable e) {
+      // Ignore error
+    }
+    try {
+      ExtUser32.INSTANCE.SetThreadDpiAwarenessContext(ExtUser32.DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
+    } catch (Throwable e) {
+      // Ignore error (call valid only on Windows 10)
+    }
+    try {
+      return ExtUser32.INSTANCE.GetDpiForSystem();
+    } catch (Throwable e) {
+      // DPI detection failed, fall back with default
+      return -1;
+    }
+  }
 
   @Override
   public void init() throws Exception {
@@ -115,7 +134,6 @@ public class Platform extends processing.app.Platform {
     return settingsFolder;
   }
 
-
   @Override
   public File getDefaultSketchbookFolder() throws Exception {
     recoverDefaultSketchbookFolder();
@@ -164,11 +182,12 @@ public class Platform extends processing.app.Platform {
   }
 
 
+  // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
   @Override
   public boolean openFolderAvailable() {
     return true;
   }
-
 
   @Override
   public void openFolder(File file) throws Exception {
@@ -183,10 +202,6 @@ public class Platform extends processing.app.Platform {
     // not tested
     //Runtime.getRuntime().exec("start explorer \"" + folder + "\"");
   }
-
-
-  // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 
   @Override
   public String getName() {
@@ -244,29 +259,6 @@ public class Platform extends processing.app.Platform {
     Files.move(oldSettingsFolder, settingsFolder.toPath());
   }
 
-  // Need to extend com.sun.jna.platform.win32.User32 to access
-  // Win32 function GetDpiForSystem()
-  interface ExtUser32 extends StdCallLibrary, com.sun.jna.platform.win32.User32 {
-    ExtUser32 INSTANCE = (ExtUser32) Native.loadLibrary("user32", ExtUser32.class, W32APIOptions.DEFAULT_OPTIONS);
-
-    public int GetDpiForSystem();
-
-    public int SetProcessDpiAwareness(int value);
-
-    public final int DPI_AWARENESS_INVALID = -1;
-    public final int DPI_AWARENESS_UNAWARE = 0;
-    public final int DPI_AWARENESS_SYSTEM_AWARE = 1;
-    public final int DPI_AWARENESS_PER_MONITOR_AWARE = 2;
-
-    public Pointer SetThreadDpiAwarenessContext(Pointer dpiContext);
-
-    public final Pointer DPI_AWARENESS_CONTEXT_UNAWARE = new Pointer(-1);
-    public final Pointer DPI_AWARENESS_CONTEXT_SYSTEM_AWARE = new Pointer(-2);
-    public final Pointer DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE = new Pointer(-3);
-  }
-
-  private static int detected = detectSystemDPI();
-
   @Override
   public int getSystemDPI() {
     if (detected == -1)
@@ -274,22 +266,22 @@ public class Platform extends processing.app.Platform {
     return detected;
   }
 
-  public static int detectSystemDPI() {
-    try {
-      ExtUser32.INSTANCE.SetProcessDpiAwareness(ExtUser32.DPI_AWARENESS_SYSTEM_AWARE);
-    } catch (Throwable e) {
-      // Ignore error
-    }
-    try {
-      ExtUser32.INSTANCE.SetThreadDpiAwarenessContext(ExtUser32.DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
-    } catch (Throwable e) {
-      // Ignore error (call valid only on Windows 10)
-    }
-    try {
-      return ExtUser32.INSTANCE.GetDpiForSystem();
-    } catch (Throwable e) {
-      // DPI detection failed, fall back with default
-      return -1;
-    }
+  // Need to extend com.sun.jna.platform.win32.User32 to access
+  // Win32 function GetDpiForSystem()
+  interface ExtUser32 extends StdCallLibrary, com.sun.jna.platform.win32.User32 {
+    ExtUser32 INSTANCE = Native.loadLibrary("user32", ExtUser32.class, W32APIOptions.DEFAULT_OPTIONS);
+    int DPI_AWARENESS_INVALID = -1;
+    int DPI_AWARENESS_UNAWARE = 0;
+    int DPI_AWARENESS_SYSTEM_AWARE = 1;
+    int DPI_AWARENESS_PER_MONITOR_AWARE = 2;
+    Pointer DPI_AWARENESS_CONTEXT_UNAWARE = new Pointer(-1);
+    Pointer DPI_AWARENESS_CONTEXT_SYSTEM_AWARE = new Pointer(-2);
+    Pointer DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE = new Pointer(-3);
+
+    int GetDpiForSystem();
+
+    int SetProcessDpiAwareness(int value);
+
+    Pointer SetThreadDpiAwarenessContext(Pointer dpiContext);
   }
 }

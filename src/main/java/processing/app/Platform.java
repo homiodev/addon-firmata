@@ -32,7 +32,9 @@ import processing.app.legacy.PConstants;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,6 +60,24 @@ public class Platform {
   private static boolean libraryLoaded;
   // DO NOT USE log4j here otherwise the root path of the logs will no be initialize correctly
 
+  public Platform() {
+    tryLoadLibrary();
+  }
+
+  public static boolean tryLoadLibrary() {
+    if (!libraryLoaded) {
+      try {
+        File lib = new File(BaseNoGui.getContentFile("lib"), System.mapLibraryName("listSerialsj"));
+        if (lib.exists()) {
+          System.load(lib.getAbsolutePath());
+          libraryLoaded = true;
+        }
+      } catch (UnsatisfiedLinkError ex) {
+      }
+    }
+    return libraryLoaded;
+  }
+
   /**
    * Set the default L & F. While I enjoy the bounty of the sixteen possible
    * exception types that this UIManager method might throw, I feel that in
@@ -74,10 +94,8 @@ public class Platform {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
   }
 
-
   public void init() throws Exception {
   }
-
 
   public File getSettingsFolder() throws Exception {
     // otherwise make a .processing directory int the user's home dir
@@ -100,7 +118,6 @@ public class Platform {
     }
     */
   }
-
 
   /**
    * @return null if not overridden, which will cause a prompt to show instead.
@@ -129,11 +146,9 @@ public class Platform {
     }
   }
 
-
   public boolean openFolderAvailable() {
     return PreferencesData.get("launcher") != null;
   }
-
 
   public void openFolder(File file) throws Exception {
     String launcher = PreferencesData.get("launcher");
@@ -145,24 +160,6 @@ public class Platform {
     }
   }
 
-  public Platform() {
-    tryLoadLibrary();
-  }
-
-  public static boolean tryLoadLibrary() {
-    if (!libraryLoaded) {
-      try {
-        File lib = new File(BaseNoGui.getContentFile("lib"), System.mapLibraryName("listSerialsj"));
-        if (lib.exists()) {
-          System.load(lib.getAbsolutePath());
-          libraryLoaded = true;
-        }
-      } catch (UnsatisfiedLinkError ex) {
-      }
-    }
-    return libraryLoaded;
-  }
-
   private native String resolveDeviceAttachedToNative(String serial);
 
   // private native String[] listSerialsNative();
@@ -172,7 +169,7 @@ public class Platform {
   }
 
   public List<String> listSerials() {
-    return Stream.of(SerialPort.getCommPorts()).map(sp->sp.getSystemPortName()).collect(Collectors.toList());
+    return Stream.of(SerialPort.getCommPorts()).map(sp -> sp.getSystemPortName()).collect(Collectors.toList());
     // return new ArrayList<>(Arrays.asList(listSerialsNative()));
   }
 

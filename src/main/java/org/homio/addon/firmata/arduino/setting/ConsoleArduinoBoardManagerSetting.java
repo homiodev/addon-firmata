@@ -19,8 +19,8 @@ import processing.app.BaseNoGui;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ConsoleArduinoBoardManagerSetting implements SettingPluginPackageInstall, ConsoleSettingPlugin<JSONObject> {
@@ -134,8 +134,8 @@ public class ConsoleArduinoBoardManagerSetting implements SettingPluginPackageIn
       .setCategory(latest.getCategory())
       .setReadme(desc);
     if (latest.isBuiltIn()) {
+      packageModel.setTags(Set.of(BUILT_IN_TAG));
       packageModel.setDisableRemovable(true);
-      packageModel.setTags(Collections.singleton("Built-In"));
     }
     return packageModel;
   }

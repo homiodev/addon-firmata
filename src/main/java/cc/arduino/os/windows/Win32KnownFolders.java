@@ -29,18 +29,17 @@
 
 package cc.arduino.os.windows;
 
-import static com.sun.jna.platform.win32.KnownFolders.FOLDERID_Documents;
-import static com.sun.jna.platform.win32.KnownFolders.FOLDERID_LocalAppData;
-import static com.sun.jna.platform.win32.KnownFolders.FOLDERID_RoamingAppData;
+import com.sun.jna.platform.win32.Shell32Util;
+import com.sun.jna.platform.win32.ShlObj;
+import processing.app.PreferencesData;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Paths;
 
-import com.sun.jna.platform.win32.Shell32Util;
-import com.sun.jna.platform.win32.ShlObj;
-
-import processing.app.PreferencesData;
+import static com.sun.jna.platform.win32.KnownFolders.FOLDERID_Documents;
+import static com.sun.jna.platform.win32.KnownFolders.FOLDERID_LocalAppData;
+import static com.sun.jna.platform.win32.KnownFolders.FOLDERID_RoamingAppData;
 
 public class Win32KnownFolders {
 
@@ -64,7 +63,7 @@ public class Win32KnownFolders {
 
   public static File getDocumentsFolder() {
     try {
-    return new File(Shell32Util.getKnownFolderPath(FOLDERID_Documents));
+      return new File(Shell32Util.getKnownFolderPath(FOLDERID_Documents));
     } catch (Throwable t) {
       // Ignore error if API call is not available
     }

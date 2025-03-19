@@ -50,33 +50,40 @@ import java.util.Observable;
 import java.util.Optional;
 
 public class FileDownloader extends Observable {
-  private static Logger log = LogManager.getLogger(FileDownloader.class);
-
-  public enum Status {
-    CONNECTING, //
-    CONNECTION_TIMEOUT_ERROR, //
-    DOWNLOADING, //
-    COMPLETE, //
-    CANCELLED, //
-    ERROR, //
-  }
-
+  private static final Logger log = LogManager.getLogger(FileDownloader.class);
+  private final URL downloadUrl;
+  private final File outputFile;
+  private final boolean allowCache;
   private Status status;
   private long initialSize;
   private Long downloadSize = null;
   private long downloaded;
-  private final URL downloadUrl;
-
-  private final File outputFile;
-  private final boolean allowCache;
   private Exception error;
-
   public FileDownloader(URL url, File file, boolean allowCache) {
     this.downloadUrl = url;
     this.outputFile = file;
     this.allowCache = allowCache;
     this.downloaded = 0;
     this.initialSize = 0;
+  }
+
+  public static void invalidateFiles(URL... filesUrl) {
+    // For each file delete the file cached if exist
+    Arrays.stream(filesUrl).forEach(url -> {
+      try {
+        FileDownloaderCache.getFileCached(url).ifPresent(fileCached -> {
+          try {
+            log.info("Invalidate this file {} that comes from {}", fileCached.getLocalPath(), fileCached.getRemoteURL());
+            fileCached.invalidateCache();
+          } catch (Exception e) {
+            log.warn("Fail to invalidate cache", e);
+          }
+        });
+      } catch (URISyntaxException | NoSuchMethodException | ScriptException | IOException e) {
+        log.warn("Fail to get the file cached during the file invalidation", e);
+      }
+    });
+
   }
 
   public long getInitialSize() {
@@ -138,25 +145,6 @@ public class FileDownloader extends Observable {
       setStatus(Status.ERROR);
       setError(e);
     }
-  }
-
-  public static void invalidateFiles(URL... filesUrl) {
-    // For each file delete the file cached if exist
-    Arrays.stream(filesUrl).forEach(url -> {
-      try {
-        FileDownloaderCache.getFileCached(url).ifPresent(fileCached -> {
-          try {
-            log.info("Invalidate this file {} that comes from {}", fileCached.getLocalPath(), fileCached.getRemoteURL());
-            fileCached.invalidateCache();
-          } catch (Exception e) {
-            log.warn("Fail to invalidate cache", e);
-          }
-        });
-      } catch (URISyntaxException | NoSuchMethodException | ScriptException | IOException e) {
-        log.warn("Fail to get the file cached during the file invalidation", e);
-      }
-    });
-
   }
 
   private void downloadFile(boolean noResume) throws InterruptedException {
@@ -287,15 +275,24 @@ public class FileDownloader extends Observable {
     }
   }
 
-  private void setError(Exception e) {
-    error = e;
-  }
-
   public Exception getError() {
     return error;
   }
 
+  private void setError(Exception e) {
+    error = e;
+  }
+
   public boolean isCompleted() {
     return status == Status.COMPLETE;
+  }
+
+  public enum Status {
+    CONNECTING, //
+    CONNECTION_TIMEOUT_ERROR, //
+    DOWNLOADING, //
+    COMPLETE, //
+    CANCELLED, //
+    ERROR, //
   }
 }

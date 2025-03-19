@@ -31,7 +31,13 @@ package cc.arduino.i18n;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -74,11 +80,7 @@ public class ExternalProcessOutputParser {
     List<String> additionalArgs = addAsManyEmptyArgsAsEndingSpaces(argsAsString, args);
 
     for (int i = 0; i < args.size(); i++) {
-      try {
-        args.set(i, URLDecoder.decode(args.get(i), "UTF-8"));
-      } catch (UnsupportedEncodingException e) {
-        throw new RuntimeException(e);
-      }
+      args.set(i, URLDecoder.decode(args.get(i), StandardCharsets.UTF_8));
     }
 
     args.addAll(additionalArgs);

@@ -32,6 +32,7 @@
 
 package cc.arduino.packages;
 
+import org.apache.commons.lang3.StringUtils;
 import processing.app.I18n;
 import processing.app.PreferencesData;
 import processing.app.debug.MessageConsumer;
@@ -43,37 +44,36 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
-
 import static processing.app.I18n.tr;
 
 public abstract class Uploader implements MessageConsumer {
 
   private static final String[] STRINGS_TO_SUPPRESS;
   private static final String[] AVRDUDE_PROBLEMS;
+  // static field for last executed programmer process ID
+  static public Process programmerPid;
 
   static {
-    STRINGS_TO_SUPPRESS = new String[] {"Connecting to programmer:",
-            "Found programmer: Id = \"CATERIN\"; type = S",
-            "Software Version = 1.0; No Hardware Version given.",
-            "Programmer supports auto addr increment.",
-            "Programmer supports buffered memory access with buffersize=128 bytes.",
-            "Programmer supports the following devices:", "Device code: 0x44"};
+    STRINGS_TO_SUPPRESS = new String[]{"Connecting to programmer:",
+      "Found programmer: Id = \"CATERIN\"; type = S",
+      "Software Version = 1.0; No Hardware Version given.",
+      "Programmer supports auto addr increment.",
+      "Programmer supports buffered memory access with buffersize=128 bytes.",
+      "Programmer supports the following devices:", "Device code: 0x44"};
 
-    AVRDUDE_PROBLEMS = new String[] {"Programmer is not responding",
-            "programmer is not responding",
-            "protocol error", "avrdude: ser_open(): can't open device",
-            "avrdude: ser_drain(): read error",
-            "avrdude: ser_send(): write error",
-            "avrdude: error: buffered memory access not supported."};
+    AVRDUDE_PROBLEMS = new String[]{"Programmer is not responding",
+      "programmer is not responding",
+      "protocol error", "avrdude: ser_open(): can't open device",
+      "avrdude: ser_drain(): read error",
+      "avrdude: ser_send(): write error",
+      "avrdude: error: buffered memory access not supported."};
   }
 
   protected final boolean verbose;
   protected final boolean verifyUpload;
-
-  private String error;
   protected boolean notFoundError;
   protected boolean noUploadPort;
+  private String error;
 
   protected Uploader() {
     this.verbose = PreferencesData.getBoolean("upload.verbose");
@@ -105,14 +105,11 @@ public abstract class Uploader implements MessageConsumer {
     return null;
   }
 
-  // static field for last executed programmer process ID
-  static public Process programmerPid;
-
   protected boolean executeUploadCommand(Collection<String> command) throws Exception {
     return executeUploadCommand(command.toArray(new String[command.size()]));
   }
 
-  protected boolean executeUploadCommand(String command[]) throws Exception {
+  protected boolean executeUploadCommand(String[] command) throws Exception {
     // Skip empty commands
     if (command == null || command.length == 0)
       return true;
@@ -159,6 +156,7 @@ public abstract class Uploader implements MessageConsumer {
       s = "";
     }
 
+
     System.err.print(s);
 
     // ignore cautions
@@ -181,7 +179,6 @@ public abstract class Uploader implements MessageConsumer {
     }
     if (s.contains("Expected signature")) {
       error = tr("Wrong microcontroller found.  Did you select the right board from the Tools > Board menu?");
-      return;
     }
   }
 }

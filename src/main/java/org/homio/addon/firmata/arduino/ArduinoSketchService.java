@@ -15,16 +15,10 @@ import org.homio.addon.firmata.arduino.setting.header.ConsoleHeaderArduinoInclud
 import org.homio.addon.firmata.arduino.setting.header.ConsoleHeaderArduinoPortSetting;
 import org.homio.addon.firmata.arduino.setting.header.ConsoleHeaderGetBoardsDynamicSetting;
 import org.homio.api.Context;
-import org.homio.api.console.InlineLogsConsolePlugin;
 import org.homio.api.exception.ServerException;
 import org.homio.api.model.FileModel;
-import org.homio.api.model.Icon;
-import org.homio.api.model.OptionModel;
-import org.homio.api.setting.SettingPluginOptions;
-import org.homio.api.setting.console.header.dynamic.DynamicConsoleHeaderSettingPlugin;
+import org.homio.api.util.Lang;
 import org.homio.hquery.ProgressBar;
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 import processing.app.BaseNoGui;
 import processing.app.PreferencesData;
@@ -33,18 +27,14 @@ import processing.app.debug.RunnerException;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
-import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.PreferencesMapException;
 import processing.app.packages.UserLibrary;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import static org.homio.api.entity.HasJsonData.LEVEL_DELIMITER;
 
@@ -54,7 +44,6 @@ public class ArduinoSketchService {
 
   public static final String PACKAGE_PLATFORM_DELIMITER = "@@@";
   private final Context context;
-  private final InlineLogsConsolePlugin inlineLogsConsolePlugin;
 
   @Setter
   private Sketch sketch;
@@ -65,7 +54,8 @@ public class ArduinoSketchService {
     }
     ProgressBar progressBar = (progress, message, error) ->
       context.ui().progress().update("avr-build", progress, message, false);
-    return inlineLogsConsolePlugin.consoleLogUsingStdout(() -> compileSketch(progressBar), progressBar::done);
+    return context.ui().console().streamInlineConsole("Build sketch",
+      () -> compileSketch(progressBar), progressBar::done);
   }
 
   public void upload(boolean usingProgrammer) {
@@ -92,7 +82,7 @@ public class ArduinoSketchService {
       if (!PreferencesData.has("serial.port")) {
         throw new ServerException("W.ERROR.NO_PORT_SELECTED");
       }
-      success = inlineLogsConsolePlugin.consoleLogUsingStdout(
+      success = context.ui().console().streamInlineConsole("Deploy sketch",
         () -> {
           String fileName = compileSketch(progressBar);
           System.out.println("Uploading sketch...");
@@ -118,6 +108,8 @@ public class ArduinoSketchService {
       BoardPort boardPort = ports.stream().filter(p -> p.getAddress().equals(serialPort.getSystemPortName())).findAny().orElse(null);
       if (boardPort != null) {
         context.ui().sendJsonMessage("BOARD_INFO", boardPort);
+      } else {
+        context.ui().toastr().warn(Lang.getServerMessage("NO_BOARD_INFO"));
       }
     } else {
       context.ui().toastr().error("W.ERROR.NO_PORT_SELECTED");
@@ -141,25 +133,7 @@ public class ArduinoSketchService {
       BaseNoGui.selectBoard(targetBoard);
       BaseNoGui.onBoardOrPortChange();
 
-      List<DynamicConsoleHeaderSettingPlugin<?>> dynamicSettings = new ArrayList<>();
-      if (!targetBoard.getMenuIds().isEmpty()) {
-        for (Map.Entry<String, String> customMenuEntry : targetPlatform.getCustomMenus().entrySet()) {
-          if (targetBoard.getMenuIds().contains(customMenuEntry.getKey())) {
-            PreferencesMap preferencesMap = targetBoard.getMenuLabels(customMenuEntry.getKey());
-            if (!preferencesMap.isEmpty()) {
-              dynamicSettings.add(new BoardDynamicSettings(customMenuEntry.getKey(), customMenuEntry.getValue(), preferencesMap));
-              var firstKey = preferencesMap.keySet().iterator().next();
-              var keyValue = targetBoard.getMenuPreferences(customMenuEntry.getKey(), firstKey);
-              if(keyValue != null) {
-                for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-                  PreferencesData.set(entry.getKey(), entry.getValue());
-                }
-              }
-            }
-          }
-        }
-      }
-      context.setting().reloadSettings(ConsoleHeaderGetBoardsDynamicSetting.class, dynamicSettings);
+      context.setting().reloadDynamicSettings(ConsoleHeaderGetBoardsDynamicSetting.class);
       context.setting().reloadSettings(ConsoleArduinoProgrammerSetting.class);
       context.setting().reloadSettings(ConsoleHeaderArduinoIncludeLibrarySetting.class);
     }
@@ -203,62 +177,5 @@ public class ArduinoSketchService {
       System.out.println("Done compiling.");
     }
     return result;
-  }
-
-  @RequiredArgsConstructor
-  private static class BoardDynamicSettings implements DynamicConsoleHeaderSettingPlugin<String>, SettingPluginOptions<String> {
-
-    private final String key;
-    private final String title;
-    private final PreferencesMap preferencesMap;
-
-    @Override
-    public String getKey() {
-      return key;
-    }
-
-    @Override
-    public Icon getIcon() {
-      return new Icon(switch (key) {
-        case "cpu" -> "fas fa-microchip";
-        case "baud" -> "fas fa-tachometer-alt";
-        case "xtal", "CrystalFreq" -> "fas fa-wave-square";
-        case "eesz" -> "fas fa-flask";
-        case "ResetMethod" -> "fas fa-trash-restore-alt";
-        case "dbg" -> "fab fa-hubspot";
-        case "lvl" -> "fas fa-level-up-alt";
-        case "ip" -> "fas fa-superscript";
-        case "vt" -> "fas fa-table";
-        case "exception" -> "fas fa-exclamation-circle";
-        case "wipe" -> "fas fa-eraser";
-        case "ssl" -> "fab fa-expeditedssl";
-        default -> "fas fa-wrench";
-      });
-    }
-
-    @Override
-    public String getTitle() {
-      return title;
-    }
-
-    @Override
-    public @NotNull Class<String> getType() {
-      return String.class;
-    }
-
-    @Override
-    public @NotNull String getDefaultValue() {
-      return preferencesMap.keySet().iterator().next();
-    }
-
-    @Override
-    public @NotNull Collection<OptionModel> getOptions(Context context, JSONObject params) {
-      return OptionModel.list(preferencesMap);
-    }
-
-    @Override
-    public int order() {
-      return 0;
-    }
   }
 }

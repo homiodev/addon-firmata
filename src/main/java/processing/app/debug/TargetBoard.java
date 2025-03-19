@@ -20,78 +20,78 @@
  */
 package processing.app.debug;
 
-import java.util.Set;
-
 import processing.app.helpers.PreferencesMap;
+
+import java.util.Set;
 
 public interface TargetBoard {
 
   /**
    * Get the name of the board.
-   * 
+   *
    * @return
    */
-  public String getName();
+  String getName();
 
   /**
    * Get the identifier of the board
-   * 
+   *
    * @return
    */
-  public String getId();
+  String getId();
 
   /**
    * Get the full preferences map of the board
-   * 
+   *
    * @return
    */
-  public PreferencesMap getPreferences();
+  PreferencesMap getPreferences();
 
   /**
    * Check if the board has a sub menu.
-   * 
+   *
    * @param menuId
    *          The menu ID to check
    * @return
    */
-  public boolean hasMenu(String menuId);
+  boolean hasMenu(String menuId);
 
   /**
    * Returns the options available on a specific menu
-   * 
+   *
    * @param menuId
    *          The menu ID
    * @return
    */
-  public PreferencesMap getMenuLabels(String menuId);
+  PreferencesMap getMenuLabels(String menuId);
 
   /**
    * Returns the label of the specified option in the specified menu
-   * 
+   *
    * @param menuId
    *          The menu ID
    * @param selectionId
    *          The option ID
    * @return
    */
-  public String getMenuLabel(String menuId, String selectionId);
+  String getMenuLabel(String menuId, String selectionId);
 
-  public Set<String> getMenuIds();
+  Set<String> getMenuIds();
 
   /**
    * Returns the configuration parameters to override (as a PreferenceMap) when
    * the specified option in the specified menu is selected
-   * 
+   *
    * @param menuId
    *          The menu ID
    * @param selectionId
    *          The option ID
    * @return
    */
-  public PreferencesMap getMenuPreferences(String menuId, String selectionId);
+  PreferencesMap getMenuPreferences(String menuId, String selectionId);
 
-  public TargetPlatform getContainerPlatform();
+  TargetPlatform getContainerPlatform();
 
-  public String getFQBN();
+  String getFQBN();
 
 }

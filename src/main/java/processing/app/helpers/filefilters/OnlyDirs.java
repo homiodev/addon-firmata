@@ -27,10 +27,15 @@ import java.io.FilenameFilter;
 /**
  * This filter accepts only directories (excluding .DS_Store files, .svn
  * folders, etc)
- * 
+ *
  * @author Cristian Maglie
  */
 public class OnlyDirs implements FilenameFilter {
+
+  /**
+   * An handy pre-instantiated object
+   */
+  public static final OnlyDirs ONLY_DIRS = new OnlyDirs();
 
   @Override
   public boolean accept(File dir, String name) {
@@ -40,10 +45,5 @@ public class OnlyDirs implements FilenameFilter {
       return false;
     return new File(dir, name).isDirectory();
   }
-  
-  /**
-   * An handy pre-instantiated object 
-   */
-  public static final OnlyDirs ONLY_DIRS = new OnlyDirs();
-  
+
 }

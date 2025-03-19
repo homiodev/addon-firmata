@@ -29,6 +29,8 @@
 
 package cc.arduino.contributions.libraries;
 
+import cc.arduino.contributions.VersionComparator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,11 +40,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import cc.arduino.contributions.VersionComparator;
-
 public class LibrariesIndex {
 
-  private ArrayList<ContributedLibrary> list = new ArrayList<>();
+  private final ArrayList<ContributedLibrary> list = new ArrayList<>();
 
   public List<ContributedLibrary> getLibraries() {
     return list;
@@ -50,8 +50,8 @@ public class LibrariesIndex {
 
   public List<ContributedLibrary> find(final String name) {
     return getLibraries().stream() //
-        .filter(l -> name.equals(l.getName())) //
-        .collect(Collectors.toList());
+      .filter(l -> name.equals(l.getName())) //
+      .collect(Collectors.toList());
   }
 
   public ContributedLibrary find(String name, String version) {
@@ -128,7 +128,7 @@ public class LibrariesIndex {
 
       // If the current solution already contains this dependency, skip over
       boolean alreadyInSolution = solution.stream()
-          .anyMatch(l -> l.getName().equals(dep.getName()));
+        .anyMatch(l -> l.getName().equals(dep.getName()));
       if (alreadyInSolution)
         continue;
 
@@ -144,7 +144,7 @@ public class LibrariesIndex {
       // Pick the installed version if available
       ContributedLibrary selected;
       Optional<ContributedLibrary> installed = possibleDeps.stream()
-          .filter(l -> l.getInstalledLibrary().isPresent()).findAny();
+        .filter(l -> l.getInstalledLibrary().isPresent()).findAny();
       if (installed.isPresent()) {
         selected = installed.get();
       } else {

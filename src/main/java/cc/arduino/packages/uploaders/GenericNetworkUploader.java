@@ -29,7 +29,8 @@ package cc.arduino.packages.uploaders;
 
 import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
-import processing.app.*;
+import processing.app.BaseNoGui;
+import processing.app.PreferencesData;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
@@ -71,15 +72,15 @@ public class GenericNetworkUploader extends Uploader {
       tool = split[1];
     }
     prefs.putAll(targetPlatform.getTool(tool));
-    
+
     String password = "";
-    if(requiresAuthorization()){
+    if (requiresAuthorization()) {
       password = prefs.getOrExcept(getAuthorizationKey());
     }
     prefs.put("network.password", password);
 
     prefs.put("network.port", this.port.getPrefs().get("port"));
-    
+
     prefs.put("build.path", buildPath);
     prefs.put("build.project_name", className);
     if (verbose) {
@@ -87,13 +88,13 @@ public class GenericNetworkUploader extends Uploader {
     } else {
       prefs.put("upload.verbose", prefs.getOrExcept("upload.params.quiet"));
     }
-    
+
     boolean uploadResult;
     try {
       String pattern;
       //check if there is a separate pattern for network uploads
       pattern = prefs.get("upload.network_pattern");
-      if(pattern == null)
+      if (pattern == null)
         pattern = prefs.getOrExcept("upload.pattern");
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs);
       uploadResult = executeUploadCommand(cmd);

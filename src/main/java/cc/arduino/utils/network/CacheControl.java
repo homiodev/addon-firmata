@@ -75,12 +75,12 @@ public class CacheControl {
     return cc;
   }
 
-  public void setMaxAge(int maxAge) {
-    this.maxAge = maxAge;
-  }
-
   public int getMaxAge() {
     return maxAge;
+  }
+
+  public void setMaxAge(int maxAge) {
+    this.maxAge = maxAge;
   }
 
   public boolean isMustRevalidate() {
@@ -110,10 +110,10 @@ public class CacheControl {
   @Override
   public String toString() {
     return "CacheControl{" +
-      "maxAge=" + maxAge +
-      ", isMustRevalidate=" + isMustRevalidate +
-      ", isNoCache=" + isNoCache +
-      ", isNoStore=" + isNoStore +
-      '}';
+           "maxAge=" + maxAge +
+           ", isMustRevalidate=" + isMustRevalidate +
+           ", isNoCache=" + isNoCache +
+           ", isNoStore=" + isNoStore +
+           '}';
   }
 }

@@ -29,17 +29,17 @@
 
 package cc.arduino;
 
-import java.util.List;
-import java.util.Map;
-
 import cc.arduino.i18n.ExternalProcessOutputParser;
 import processing.app.debug.MessageConsumer;
+
+import java.util.List;
+import java.util.Map;
 
 public class ProgressAwareMessageConsumer implements MessageConsumer {
 
   private final MessageConsumer parent;
-  private List<CompilerProgressListener> progressListeners;
   private final ExternalProcessOutputParser parser;
+  private final List<CompilerProgressListener> progressListeners;
 
   public ProgressAwareMessageConsumer(MessageConsumer parent, List<CompilerProgressListener> progressListeners) {
     this.parent = parent;
@@ -52,7 +52,7 @@ public class ProgressAwareMessageConsumer implements MessageConsumer {
     if (s.startsWith("===info ||| Progress") || s.startsWith("===Progress")) {
       Map<String, Object> parsedMessage = parser.parse(s);
       Object[] args = (Object[]) parsedMessage.get("args");
-      for (CompilerProgressListener progressListener : progressListeners){
+      for (CompilerProgressListener progressListener : progressListeners) {
         progressListener.progress(Double.valueOf(args[0].toString()).intValue());
       }
       return;

@@ -20,84 +20,84 @@
  */
 package processing.app.debug;
 
+import processing.app.helpers.PreferencesMap;
+
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
-import processing.app.helpers.PreferencesMap;
-
 public interface TargetPlatform {
 
-  public String getId();
+  String getId();
 
-  public File getFolder();
+  File getFolder();
 
   /**
    * Get TargetBoards under this TargetPlatform into a Map that maps the board
    * id with the corresponding TargetBoard
-   * 
+   *
    * @return a Map<String, TargetBoard>
    */
-  public Map<String, TargetBoard> getBoards();
+  Map<String, TargetBoard> getBoards();
 
-  public PreferencesMap getCustomMenus();
+  PreferencesMap getCustomMenus();
 
   /**
    * Return ids for top level menus
-   * 
+   *
    * @return a Set<String> with the ids of the top level custom menus
    */
-  public Set<String> getCustomMenuIds();
+  Set<String> getCustomMenuIds();
 
   /**
    * Get preferences for all programmers
-   * 
+   *
    * @return
    */
-  public Map<String, PreferencesMap> getProgrammers();
+  Map<String, PreferencesMap> getProgrammers();
 
   /**
    * Get preferences for a specific programmer
-   * 
+   *
    * @param programmer
    * @return
    */
-  public PreferencesMap getProgrammer(String programmer);
+  PreferencesMap getProgrammer(String programmer);
 
   /**
    * Get preferences for a specific tool
-   * 
+   *
    * @param tool
    * @return
    */
-  public PreferencesMap getTool(String tool);
+  PreferencesMap getTool(String tool);
 
   /**
    * Return TargetPlatform preferences
-   * 
+   *
    * @return
    */
-  public PreferencesMap getPreferences();
+  PreferencesMap getPreferences();
 
   /**
    * Get a target board
-   * 
+   *
    * @param boardId
    * @return
    */
-  public TargetBoard getBoard(String boardId);
+  TargetBoard getBoard(String boardId);
 
   /**
    * Get the TargetPackage that contains this TargetPlatform
-   * 
+   *
    * @return
    */
-  public TargetPackage getContainerPackage();
+  TargetPackage getContainerPackage();
 
   /**
    * Returns true if the platform is installed in a subfolder of the sketchbook
    *
    * @return
    */
-  public boolean isInSketchbook();
+  boolean isInSketchbook();
 }

@@ -31,23 +31,28 @@ package cc.arduino.packages.discoverers.serial;
 
 import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Discovery;
+import lombok.Setter;
 import processing.app.BaseNoGui;
 import processing.app.Platform;
 import processing.app.debug.TargetBoard;
 import processing.app.helpers.BoardCloudResolver;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SerialDiscovery implements Discovery, Runnable {
 
-  private Timer serialBoardsListerTimer;
   private final List<BoardPort> serialBoardPorts = new ArrayList<>();
   private final List<BoardPort> boardPorts = new ArrayList<>();
   private final List<String> oldPorts = new ArrayList<>();
+  private final BoardCloudResolver boardCloudResolver = new BoardCloudResolver();
+  @Setter
   public boolean uploadInProgress = false;
   public boolean pausePolling = false;
-  private final BoardCloudResolver boardCloudResolver = new BoardCloudResolver();
-
+  private Timer serialBoardsListerTimer;
 
   @Override
   public List<BoardPort> listDiscoveredBoards() {
@@ -56,25 +61,21 @@ public class SerialDiscovery implements Discovery, Runnable {
 
   @Override
   public synchronized List<BoardPort> listDiscoveredBoards(boolean complete) {
-      if (complete) {
-        return new ArrayList<>(serialBoardPorts);
+    if (complete) {
+      return new ArrayList<>(serialBoardPorts);
+    }
+    List<BoardPort> onlineBoardPorts = new ArrayList<>();
+    for (BoardPort port : serialBoardPorts) {
+      if (port.isOnline()) {
+        onlineBoardPorts.add(port);
       }
-      List<BoardPort> onlineBoardPorts = new ArrayList<>();
-      for (BoardPort port : serialBoardPorts) {
-        if (port.isOnline() == true) {
-          onlineBoardPorts.add(port);
-        }
-      }
-      return onlineBoardPorts;
+    }
+    return onlineBoardPorts;
   }
 
   public synchronized void setSerialBoardPorts(List<BoardPort> newSerialBoardPorts) {
-      serialBoardPorts.clear();
-      serialBoardPorts.addAll(newSerialBoardPorts);
-  }
-
-  public void setUploadInProgress(boolean param) {
-    uploadInProgress = param;
+    serialBoardPorts.clear();
+    serialBoardPorts.addAll(newSerialBoardPorts);
   }
 
   public void pausePolling(boolean param) {
@@ -96,7 +97,7 @@ public class SerialDiscovery implements Discovery, Runnable {
           forceRefresh();
         }
       }
-    }, 0, 1000);
+    }, 0, 10_000);
   }
 
   @Override
@@ -130,8 +131,8 @@ public class SerialDiscovery implements Discovery, Runnable {
 
       // if port has been already discovered bring it back online
       BoardPort oldBoardPort = boardPorts.stream() //
-          .filter(bp -> bp.toCompleteString().equalsIgnoreCase(newPort)) //
-          .findAny().orElse(null);
+        .filter(bp -> bp.toCompleteString().equalsIgnoreCase(newPort)) //
+        .findAny().orElse(null);
       if (oldBoardPort != null) {
         oldBoardPort.setOnlineStatus(true);
         continue;
@@ -147,11 +148,11 @@ public class SerialDiscovery implements Discovery, Runnable {
       }
       if (parts.length > 3) {
         // port name with _ in it (like CP2102 on OSX)
-        for (int i = 1; i < (parts.length-2); i++) {
+        for (int i = 1; i < (parts.length - 2); i++) {
           parts[0] += "_" + parts[i];
         }
-        parts[1] = parts[parts.length-2];
-        parts[2] = parts[parts.length-1];
+        parts[1] = parts[parts.length - 2];
+        parts[2] = parts[parts.length - 1];
       }
 
       String port = parts[0];

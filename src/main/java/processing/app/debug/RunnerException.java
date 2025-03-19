@@ -37,7 +37,7 @@ public class RunnerException extends Exception {
   protected int codeColumn;
   protected boolean showStackTrace;
 
-  
+
   public RunnerException(String message) {
     this(message, true);
   }
@@ -50,13 +50,13 @@ public class RunnerException extends Exception {
     this(message, file, line, -1, true);
   }
 
-  
+
   public RunnerException(String message, SketchFile file, int line, int column) {
     this(message, file, line, column, true);
   }
-  
-  
-  public RunnerException(String message, SketchFile file, int line, int column, 
+
+
+  public RunnerException(String message, SketchFile file, int line, int column,
                          boolean showStackTrace) {
     this.message = message;
     this.codeFile = file;
@@ -64,14 +64,14 @@ public class RunnerException extends Exception {
     this.codeColumn = column;
     this.showStackTrace = showStackTrace;
   }
-  
-  
+
+
   public RunnerException(Exception e) {
     super(e);
     this.showStackTrace = true;
   }
 
-  /** 
+  /**
    * Override getMessage() in Throwable, so that I can set 
    * the message text outside the constructor.
    */
@@ -79,18 +79,18 @@ public class RunnerException extends Exception {
   public String getMessage() {
     return message;
   }
-  
-  
+
+
   public void setMessage(String message) {
     this.message = message;
   }
-  
-  
+
+
   public SketchFile getCodeFile() {
     return codeFile;
   }
-  
-  
+
+
   public void setCodeFile(SketchFile file) {
     codeFile = file;
   }
@@ -98,13 +98,13 @@ public class RunnerException extends Exception {
   public boolean hasCodeFile() {
     return codeFile != null;
   }
-  
-  
+
+
   public int getCodeLine() {
     return codeLine;
   }
-  
-  
+
+
   public void setCodeLine(int line) {
     this.codeLine = line;
   }
@@ -112,26 +112,24 @@ public class RunnerException extends Exception {
   public boolean hasCodeLine() {
     return codeLine != -1;
   }
-  
-  
-  public void setCodeColumn(int column) {
-    this.codeColumn = column;
-  }
 
   public int getCodeColumn() {
     return codeColumn;
   }
 
-  
+  public void setCodeColumn(int column) {
+    this.codeColumn = column;
+  }
+
   public void showStackTrace() {
     showStackTrace = true;
   }
-  
-  
+
+
   public void hideStackTrace() {
     showStackTrace = false;
   }
-  
+
 
   /**
    * Nix the java.lang crap out of an exception message
@@ -150,8 +148,6 @@ public class RunnerException extends Exception {
     //return (dot == -1) ? msg : msg.substring(dot+1);
   }
   */
-
-
   @Override
   public void printStackTrace() {
     if (showStackTrace) {

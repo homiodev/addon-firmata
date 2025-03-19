@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.homio.addon.firmata.arduino.setting.ConsoleArduinoUploadUsingProgrammerSetting;
 import org.homio.addon.firmata.arduino.setting.ConsoleArduinoVerboseSetting;
+import org.homio.addon.firmata.arduino.setting.ConsoleArduinoVerifyAfterUploadSetting;
 import org.homio.addon.firmata.arduino.setting.header.ConsoleHeaderArduinoBuildSketchSetting;
 import org.homio.addon.firmata.arduino.setting.header.ConsoleHeaderArduinoDeploySketchSetting;
 import org.homio.addon.firmata.arduino.setting.header.ConsoleHeaderArduinoGetBoardsSetting;
@@ -21,7 +22,6 @@ import org.homio.api.model.FileContentType;
 import org.homio.api.model.FileModel;
 import org.homio.api.model.OptionModel;
 import org.homio.api.setting.console.header.ConsoleHeaderSettingPlugin;
-import org.homio.api.setting.console.header.ShowInlineReadOnlyConsoleConsoleHeaderSetting;
 import org.homio.api.util.CommonUtils;
 import org.homio.api.util.Lang;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +32,7 @@ import processing.app.Sketch;
 import processing.app.TextStorage;
 import processing.app.packages.UserLibrary;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,7 +56,6 @@ public class ArduinoConsolePlugin implements ConsolePluginEditor {
 
   static {
     System.setProperty("APP_DIR", CommonUtils.getInstallPath().resolve("arduino").toString());
-    ArduinoConfiguration.getPlatform();
   }
 
   private final Context context;
@@ -64,37 +64,8 @@ public class ArduinoConsolePlugin implements ConsolePluginEditor {
   private FileModel content = new FileModel(DEFAULT_SKETCH_NAME, "", FileContentType.cpp);
   private String prevContent = "";
 
-  /*@Override
-  public Path getRootPath() {
-    return Paths.get(System.getProperty("APP_DIR"));
-  }*/
-
-  /*@Override
-  public void afterDependencyInstalled() {
-    // try to initialise platform
-    if (ArduinoConfiguration.getPlatform() != null) {
-      this.init();
-      context.ui().dialog().reloadWindow("Re-Initialize page after install dependencies");
-    }
-  }*/
-
-  /*@Override
-  public String getDependencyURL() {
-    return String.format("%s/arduino-ide-setup-%s.7z", context.setting().getEnv("artifactoryFilesURL"),
-        SystemUtils.IS_OS_LINUX ? "linux" : "win");
-  }*/
-
-  /*@Override
-  public String dependencyName() {
-    return "arduino-dependencies.7z";
-  }*/
-
   @SneakyThrows
   public void init() {
-    /*if (requireInstallDependencies()) {
-      log.info("Skip init arduino");
-      return;
-    }*/
     this.open(this.content.getName(), true);
 
     context.setting().listenValueAndGet(ConsoleHeaderArduinoGetBoardsSetting.class, "avr-board",
@@ -115,6 +86,9 @@ public class ArduinoConsolePlugin implements ConsolePluginEditor {
         PreferencesData.setBoolean("upload.verbose", value);
         PreferencesData.setBoolean("build.verbose", value);
       });
+
+    context.setting().listenValueAndGet(ConsoleArduinoVerifyAfterUploadSetting.class, "avr-verify",
+      value -> PreferencesData.setBoolean("upload.verify", value));
 
     context.setting().listenValue(ConsoleHeaderArduinoBuildSketchSetting.class, "avr-build",
       arduinoSketchService::build);
@@ -159,7 +133,6 @@ public class ArduinoConsolePlugin implements ConsolePluginEditor {
     headerActions.put("boards", ConsoleHeaderArduinoGetBoardsSetting.class);
     headerActions.put("dynamicBoardsInfo", ConsoleHeaderGetBoardsDynamicSetting.class);
     headerActions.put("incl_library", ConsoleHeaderArduinoIncludeLibrarySetting.class);
-    headerActions.put("console", ShowInlineReadOnlyConsoleConsoleHeaderSetting.class);
     return headerActions;
   }
 
@@ -280,7 +253,8 @@ public class ArduinoConsolePlugin implements ConsolePluginEditor {
     if (!Files.exists(sketchFile)) {
       if (createIfNotExists) {
         Files.createDirectories(sketchFile.getParent());
-        Files.copy(BaseNoGui.getPortableFolder().toPath().resolve("default_sketch.txt"), sketchFile);
+        var stream = new ByteArrayInputStream(defaultSketch.getBytes());
+        Files.copy(stream, sketchFile);
       } else {
         throw new ServerException("Unable to find file: " + sketchFile);
       }
@@ -311,4 +285,16 @@ public class ArduinoConsolePlugin implements ConsolePluginEditor {
   public FileModel getValue() {
     return content;
   }
+
+  private static final String defaultSketch = """
+    void setup() {
+      // put your setup code here, to run once:
+    
+    }
+    
+    void loop() {
+      // put your main code here, to run repeatedly:
+    
+    }
+    """;
 }

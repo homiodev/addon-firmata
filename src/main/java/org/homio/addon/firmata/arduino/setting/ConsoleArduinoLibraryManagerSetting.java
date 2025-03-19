@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -138,7 +139,8 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
     }
 
     if (library.isIDEBuiltIn()) {
-      packageModel.setTags(Collections.singleton("Built-In"));
+      packageModel.setTags(Set.of(BUILT_IN_TAG));
+      packageModel.setDisableRemovable(true);
     }
 
     return packageModel;
@@ -156,7 +158,8 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
       .setCategory(library.getCategory())
       .setReadme(library.getParagraph());
     if (library.isIDEBuiltIn()) {
-      packageModel.setTags(Collections.singleton("Built-In"));
+      packageModel.setTags(Set.of(BUILT_IN_TAG));
+      packageModel.setDisableRemovable(true);
     }
 
     return packageModel;

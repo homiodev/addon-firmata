@@ -34,8 +34,8 @@ import java.util.List;
 
 public class UnavailableContributedLibrary extends ContributedLibrary {
 
-  private String name;
-  private String version;
+  private final String name;
+  private final String version;
 
   public UnavailableContributedLibrary(ContributedLibraryDependency dependency) {
     this(dependency.getName(), dependency.getVersion());

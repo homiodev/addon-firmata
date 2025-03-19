@@ -55,7 +55,7 @@ public class FileHash {
     FileInputStream in = null;
     try {
       in = new FileInputStream(file);
-      byte buff[] = new byte[10240];
+      byte[] buff = new byte[10240];
       MessageDigest digest = MessageDigest.getInstance(algorithm);
       while (in.available() > 0) {
         int read = in.read(buff);

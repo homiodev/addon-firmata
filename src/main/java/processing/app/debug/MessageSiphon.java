@@ -41,7 +41,7 @@ public class MessageSiphon implements Runnable {
   // Data is processed line-by-line if possible, but if this is non-zero
   // then a partial line is also processed if no line end is received
   // within this many milliseconds.
-  private int lineTimeout;
+  private final int lineTimeout;
 
   public MessageSiphon(InputStream stream, MessageConsumer consumer) {
     this(stream, consumer, 0);
@@ -89,7 +89,7 @@ public class MessageSiphon implements Runnable {
             lineStartTime = System.nanoTime();
 
           // Store the character line
-          currentLine.append((char)c);
+          currentLine.append((char) c);
 
           if (c == '\n') {
             // We read a full line, pass it on
@@ -122,7 +122,7 @@ public class MessageSiphon implements Runnable {
       // That message just gets supressed here..
       String mess = e.getMessage();
       if ((mess != null) &&
-              (mess.indexOf("Bad file descriptor") != -1)) {
+          (mess.indexOf("Bad file descriptor") != -1)) {
         //if (e.getMessage().indexOf("Bad file descriptor") == -1) {
         //System.err.println("MessageSiphon err " + e);
         //e.printStackTrace();

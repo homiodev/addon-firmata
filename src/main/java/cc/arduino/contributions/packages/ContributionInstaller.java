@@ -58,14 +58,20 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static processing.app.I18n.format;
 import static processing.app.I18n.tr;
 
 public class ContributionInstaller {
-  private static Logger log = LogManager.getLogger(ContributionInstaller.class);
+  private static final Logger log = LogManager.getLogger(ContributionInstaller.class);
 
   private final Platform platform;
   private final SignatureVerifier signatureVerifier;
@@ -128,8 +134,8 @@ public class ContributionInstaller {
     List<Map.Entry<ContributedToolReference, ContributedTool>> resolvedToolReferences = contributedPlatform
       .getResolvedToolReferences().entrySet().stream()
       .filter((entry) -> !entry.getValue().isInstalled()
-        || entry.getValue().isBuiltIn())
-      .collect(Collectors.toList());
+                         || entry.getValue().isBuiltIn())
+      .toList();
 
     int i = 1;
     for (Map.Entry<ContributedToolReference, ContributedTool> entry : resolvedToolReferences) {
@@ -273,7 +279,7 @@ public class ContributionInstaller {
       } catch (Exception e) {
         // ignore
         log.info("The directory is not empty there is another version installed. directory {}",
-          destFolder.getParentFile().toPath(),  e);
+          destFolder.getParentFile().toPath(), e);
       }
     }
 

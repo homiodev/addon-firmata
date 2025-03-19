@@ -20,6 +20,16 @@ import java.util.ResourceBundle;
 
 public class I18n {
 
+  public static String PROMPT_YES;
+  public static String PROMPT_NO;
+
+  // prompt text stuff
+  public static String PROMPT_CANCEL;
+  public static String PROMPT_OK;
+  public static String PROMPT_BROWSE;
+  // start using current locale but still allow using the dropdown list later
+  private static ResourceBundle i18n;
+
   static {
     tr("Arduino");
     tr("Partner");
@@ -38,17 +48,6 @@ public class I18n {
     tr("Other");
     tr("Uncategorized");
   }
-
-  // start using current locale but still allow using the dropdown list later
-  private static ResourceBundle i18n;
-
-  // prompt text stuff
-
-  public static String PROMPT_YES;
-  public static String PROMPT_NO;
-  public static String PROMPT_CANCEL;
-  public static String PROMPT_OK;
-  public static String PROMPT_BROWSE;
 
   static protected void init(String language) throws MissingResourceException {
     String[] languageParts = language.split("_");

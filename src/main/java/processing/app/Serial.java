@@ -51,13 +51,12 @@ public class Serial implements SerialPortEventListener {
   // for the classloading problem.. because if code ran again,
   // the static class would have an object that could be closed
 
-  private SerialPort port;
-
-  private CharsetDecoder bytesToStrings;
   private static final int IN_BUFFER_CAPACITY = 128;
   private static final int OUT_BUFFER_CAPACITY = 128;
-  private ByteBuffer inFromSerial = ByteBuffer.allocate(IN_BUFFER_CAPACITY);
-  private CharBuffer outToMessage = CharBuffer.allocate(OUT_BUFFER_CAPACITY);
+  private SerialPort port;
+  private CharsetDecoder bytesToStrings;
+  private final ByteBuffer inFromSerial = ByteBuffer.allocate(IN_BUFFER_CAPACITY);
+  private final CharBuffer outToMessage = CharBuffer.allocate(OUT_BUFFER_CAPACITY);
 
   public Serial() throws SerialException {
     this(PreferencesData.get("serial.port"),
@@ -95,27 +94,6 @@ public class Serial implements SerialPortEventListener {
       !BaseNoGui.getBoardPreferences().getBoolean("serial.disableDTR"));
   }
 
-  public static boolean touchForCDCReset(String iname) throws SerialException {
-    SerialPort serialPort = new SerialPort(iname);
-    try {
-      serialPort.openPort();
-      serialPort.setParams(1200, 8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-      serialPort.setDTR(false);
-      serialPort.closePort();
-      return true;
-    } catch (SerialPortException e) {
-      throw new SerialException(format(tr("Error touching serial port ''{0}''."), iname), e);
-    } finally {
-      if (serialPort.isOpened()) {
-        try {
-          serialPort.closePort();
-        } catch (SerialPortException e) {
-          // noop
-        }
-      }
-    }
-  }
-
   protected Serial(String iname, int irate, char iparity, int idatabits, float istopbits, boolean setRTS, boolean setDTR) throws SerialException {
     //if (port != null) port.close();
     //this.parent = parent;
@@ -142,7 +120,7 @@ public class Serial implements SerialPortEventListener {
       boolean res = port.setParams(irate, idatabits, stopbits, parity, setRTS, setDTR);
       if (!res) {
         System.err.println(format(tr("Error while setting serial port parameters: {0} {1} {2} {3}"),
-                                  irate, iparity, idatabits, istopbits));
+          irate, iparity, idatabits, istopbits));
       }
       port.addEventListener(this);
     } catch (SerialPortException e) {
@@ -155,6 +133,40 @@ public class Serial implements SerialPortEventListener {
     if (port == null) {
       throw new SerialNotFoundException(format(tr("Serial port ''{0}'' not found. Did you select the right one from the Tools > Serial Port menu?"), iname));
     }
+  }
+
+  public static boolean touchForCDCReset(String iname) throws SerialException {
+    SerialPort serialPort = new SerialPort(iname);
+    try {
+      serialPort.openPort();
+      serialPort.setParams(1200, 8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+      serialPort.setDTR(false);
+      serialPort.closePort();
+      return true;
+    } catch (SerialPortException e) {
+      throw new SerialException(format(tr("Error touching serial port ''{0}''."), iname), e);
+    } finally {
+      if (serialPort.isOpened()) {
+        try {
+          serialPort.closePort();
+        } catch (SerialPortException e) {
+          // noop
+        }
+      }
+    }
+  }
+
+  static public List<String> list() {
+    return Arrays.asList(SerialPortList.getPortNames());
+  }
+
+  /**
+   * General error reporting, all corraled here just in case
+   * I think of something slightly more intelligent to do.
+   */
+  private static void errorMessage(String where, Throwable e) {
+    System.err.println(format(tr("Error inside Serial.{0}()"), where));
+    e.printStackTrace();
   }
 
   public void setup() {
@@ -236,7 +248,6 @@ public class Serial implements SerialPortEventListener {
     // Empty
   }
 
-
   /**
    * This will handle both ints, bytes and chars transparently.
    */
@@ -248,15 +259,13 @@ public class Serial implements SerialPortEventListener {
     }
   }
 
-
-  public void write(byte bytes[]) {
+  public void write(byte[] bytes) {
     try {
       port.writeBytes(bytes);
     } catch (SerialPortException e) {
       errorMessage("write", e);
     }
   }
-
 
   /**
    * Write a String to the output. Note that this doesn't account
@@ -296,22 +305,8 @@ public class Serial implements SerialPortEventListener {
    */
   public synchronized void resetDecoding(Charset charset) {
     bytesToStrings = charset.newDecoder()
-                      .onMalformedInput(CodingErrorAction.REPLACE)
-                      .onUnmappableCharacter(CodingErrorAction.REPLACE)
-                      .replaceWith("\u2e2e");
-  }
-
-  static public List<String> list() {
-    return Arrays.asList(SerialPortList.getPortNames());
-  }
-
-
-  /**
-   * General error reporting, all corraled here just in case
-   * I think of something slightly more intelligent to do.
-   */
-  private static void errorMessage(String where, Throwable e) {
-    System.err.println(format(tr("Error inside Serial.{0}()"), where));
-    e.printStackTrace();
+      .onMalformedInput(CodingErrorAction.REPLACE)
+      .onUnmappableCharacter(CodingErrorAction.REPLACE)
+      .replaceWith("\u2e2e");
   }
 }

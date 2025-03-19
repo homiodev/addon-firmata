@@ -32,10 +32,16 @@ package cc.arduino.packages.uploaders;
 import cc.arduino.CompilerUtils;
 import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
-import cc.arduino.packages.ssh.*;
+import cc.arduino.packages.ssh.NoInteractionUserInfo;
+import cc.arduino.packages.ssh.SCP;
+import cc.arduino.packages.ssh.SSH;
+import cc.arduino.packages.ssh.SSHClientSetupChainRing;
+import cc.arduino.packages.ssh.SSHConfigFileSetup;
+import cc.arduino.packages.ssh.SSHPwdSetup;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import org.apache.commons.lang3.StringUtils;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.PreferencesData;
@@ -53,14 +59,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-
 import static processing.app.I18n.tr;
 
 public class SSHUploader extends Uploader {
 
   private static final Set<String> FILES_NOT_TO_COPY =
-      Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(".DS_Store", ".Trash", "Thumbs.db", "__MACOSX")));
+    Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(".DS_Store", ".Trash", "Thumbs.db", "__MACOSX")));
 
   private final BoardPort port;
 

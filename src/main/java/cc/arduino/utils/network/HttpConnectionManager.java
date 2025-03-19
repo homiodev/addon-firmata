@@ -47,13 +47,10 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class HttpConnectionManager {
-  private static Logger log = LogManager.getLogger(HttpConnectionManager.class);
   private static final String userAgent;
   private static final int connectTimeout;
   private static final int maxRedirectNumber;
-  private final URL requestURL;
-  private final String id;
-
+  private static final Logger log = LogManager.getLogger(HttpConnectionManager.class);
 
   static {
     final String defaultUserAgent = String.format(
@@ -89,6 +86,9 @@ public class HttpConnectionManager {
     }
     maxRedirectNumber = maxRedirectNumberConfig;
   }
+
+  private final URL requestURL;
+  private final String id;
 
   public HttpConnectionManager(URL requestURL) {
     this.requestURL = requestURL;
@@ -158,7 +158,7 @@ public class HttpConnectionManager {
       requestURL, connection.getRequestMethod(), resp, requestId, StringUtils.join(connection.getHeaderFields()));
 
     if (resp == HttpURLConnection.HTTP_MOVED_PERM
-      || resp == HttpURLConnection.HTTP_MOVED_TEMP) {
+        || resp == HttpURLConnection.HTTP_MOVED_TEMP) {
 
       URL newUrl = new URL(connection.getHeaderField("Location"));
       log.info("The response code was a 301,302 so try again with the new URL " + newUrl);

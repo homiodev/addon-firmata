@@ -1,7 +1,6 @@
 package processing.app.helpers;
 
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 
 public abstract class PreferencesHelper {
 
@@ -58,7 +57,7 @@ public abstract class PreferencesHelper {
 
   /**
    * Set the value of the specified key based on the Color passed as parameter.
-   * 
+   *
    * @param attr
    * @param color
    */

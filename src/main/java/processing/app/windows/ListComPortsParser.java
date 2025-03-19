@@ -55,7 +55,7 @@ public class ListComPortsParser {
     String line;
     while ((line = reader.readLine()) != null) {
       String[] lineParts = line.split(" ");
-      if (lineParts.length > 0 && lineParts[0].toUpperCase().equals(serial.toUpperCase())) {
+      if (lineParts.length > 0 && lineParts[0].equalsIgnoreCase(serial)) {
         String vidPidPart = lineParts[lineParts.length - 1];
         Matcher vidMatcher = vidRegExp.matcher(vidPidPart);
         Matcher pidMatcher = pidRegExp.matcher(vidPidPart);

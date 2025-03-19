@@ -35,9 +35,14 @@
 package cc.arduino.packages.uploaders;
 
 import cc.arduino.LoadVIDPIDSpecificPreferences;
-import cc.arduino.packages.Uploader;
-import processing.app.*;
 import cc.arduino.packages.BoardPort;
+import cc.arduino.packages.Uploader;
+import processing.app.BaseNoGui;
+import processing.app.I18n;
+import processing.app.PreferencesData;
+import processing.app.Serial;
+import processing.app.SerialException;
+import processing.app.SerialNotFoundException;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
@@ -52,13 +57,11 @@ import static processing.app.I18n.tr;
 
 public class SerialUploader extends Uploader {
 
-  public SerialUploader()
-  {
+  public SerialUploader() {
     super();
   }
 
-  public SerialUploader(boolean noUploadPort)
-  {
+  public SerialUploader(boolean noUploadPort) {
     super(noUploadPort);
   }
 
@@ -92,8 +95,7 @@ public class SerialUploader extends Uploader {
 
     BaseNoGui.getDiscoveryManager().getSerialDiscoverer().pausePolling(true);
 
-    if (noUploadPort)
-    {
+    if (noUploadPort) {
       prefs.put("build.path", buildPath);
       prefs.put("build.project_name", className);
       if (verbose)
@@ -143,10 +145,10 @@ public class SerialUploader extends Uploader {
           // have already occurred before we start scanning.
           actualUploadPort = waitForUploadPort(userSelectedUploadPort, before);
 
-    	  // on OS X, if the port is opened too quickly after it is detected,
-    	  // a "Resource busy" error occurs, add a delay to workaround this,
+          // on OS X, if the port is opened too quickly after it is detected,
+          // a "Resource busy" error occurs, add a delay to workaround this,
           // apply to other platforms as well.
-    	  Thread.sleep(250);
+          Thread.sleep(250);
         }
       } catch (SerialException e) {
         throw new RunnerException(e);
@@ -229,7 +231,7 @@ public class SerialUploader extends Uploader {
   }
 
   private String waitForUploadPort(String uploadPort, List<String> before) throws InterruptedException, RunnerException {
-	  return waitForUploadPort(uploadPort, before, verbose, 10000);
+    return waitForUploadPort(uploadPort, before, verbose, 10000);
   }
 
   private String waitForUploadPort(String uploadPort, List<String> before, boolean verbose, int timeout) throws InterruptedException, RunnerException {
@@ -295,7 +297,7 @@ public class SerialUploader extends Uploader {
     PreferencesMap programmerPrefs = targetPlatform.getProgrammer(programmer);
     if (programmerPrefs == null)
       throw new RunnerException(
-          tr("Please select a programmer from Tools->Programmer menu"));
+        tr("Please select a programmer from Tools->Programmer menu"));
     prefs.putAll(targetPlatform.getTool(programmerPrefs.getOrExcept("program.tool")));
     prefs.putAll(programmerPrefs);
 
@@ -332,7 +334,7 @@ public class SerialUploader extends Uploader {
     }
     if (programmerPrefs == null)
       throw new RunnerException(
-          tr("Please select a programmer from Tools->Programmer menu"));
+        tr("Please select a programmer from Tools->Programmer menu"));
 
     // Build configuration for the current programmer
     PreferencesMap prefs = PreferencesData.getMap();
@@ -375,7 +377,7 @@ public class SerialUploader extends Uploader {
     return runCommand("bootloader.pattern", prefs);
   }
 
-  private boolean runCommand(String patternKey, PreferencesMap prefs) throws Exception, RunnerException {
+  private boolean runCommand(String patternKey, PreferencesMap prefs) throws Exception {
     try {
       String pattern = prefs.getOrExcept(patternKey);
       StringReplacer.checkIfRequiredKeyIsMissingOrExcept("serial.port", pattern, prefs);

@@ -41,7 +41,7 @@ public class LegacyUserLibrary extends UserLibrary {
     res.installedFolder = folderDesc.folder;
     res.layout = LibraryLayout.FLAT;
     res.name = folderDesc.folder.getName();
-    res.setTypes(Arrays.asList("Contributed"));
+    res.setTypes(List.of("Contributed"));
     res.setCategory("Uncategorized");
     res.location = folderDesc.location;
     return res;
@@ -54,7 +54,7 @@ public class LegacyUserLibrary extends UserLibrary {
 
   @Override
   public List<String> getArchitectures() {
-    return Arrays.asList("*");
+    return List.of("*");
   }
 
   @Override

@@ -32,6 +32,9 @@ package cc.arduino.contributions.packages;
 public class ContributedBoard {
 
   private String name;
-  public String getName() { return name; }
+
+  public String getName() {
+    return name;
+  }
 
 }

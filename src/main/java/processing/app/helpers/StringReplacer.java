@@ -42,9 +42,9 @@ public class StringReplacer {
       tag = UUID.randomUUID().toString();
       if (src.contains(tag))
         continue;
-      if (dict.values().contains(tag))
+      if (dict.containsValue(tag))
         continue;
-      if (dict.keySet().contains(tag))
+      if (dict.containsKey(tag))
         continue;
       break;
     }
@@ -86,7 +86,7 @@ public class StringReplacer {
 
   public static String[] quotedSplit(String src, String quoteChars,
                                      boolean acceptEmptyArguments)
-      throws Exception {
+    throws Exception {
     List<String> res = new ArrayList<>();
     String escapedArg = null;
     String escapingChar = null;
@@ -119,7 +119,7 @@ public class StringReplacer {
     }
     if (escapingChar != null)
       throw new Exception("Invalid quoting: no closing [" + escapingChar +
-          "] char found.");
+                          "] char found.");
     return res.toArray(new String[0]);
   }
 
@@ -133,7 +133,7 @@ public class StringReplacer {
     for (Map.Entry<String, String> entry : map.entrySet()) {
       String keyword = leftDelimiter + entry.getKey() + rightDelimiter;
       if (entry.getValue() != null && keyword != null) {
-          src = src.replace(keyword, entry.getValue());
+        src = src.replace(keyword, entry.getValue());
       }
     }
     return src;

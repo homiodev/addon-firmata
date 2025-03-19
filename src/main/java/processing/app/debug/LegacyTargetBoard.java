@@ -30,8 +30,8 @@ public class LegacyTargetBoard implements TargetBoard {
 
   private final String id;
   private final PreferencesMap prefs;
-  private Map<String, PreferencesMap> menuOptions = new LinkedHashMap<>();
   private final TargetPlatform containerPlatform;
+  private Map<String, PreferencesMap> menuOptions = new LinkedHashMap<>();
 
   /**
    * Create a TargetBoard based on preferences passed as argument.

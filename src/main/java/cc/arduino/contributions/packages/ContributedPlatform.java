@@ -35,12 +35,23 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
 public class ContributedPlatform extends DownloadableContribution {
 
+  public static final Comparator<ContributedPlatform> BUILTIN_AS_LAST = (x, y) -> {
+    int px = x.isBuiltIn() ? 1 : -1;
+    int py = y.isBuiltIn() ? 1 : -1;
+    return px - py;
+  };
   private String url;
   private String version;
   private long size;
@@ -58,12 +69,6 @@ public class ContributedPlatform extends DownloadableContribution {
   private Map<ContributedToolReference, ContributedTool> resolvedToolReferences;
   private ContributedPackage parentPackage;
   private boolean deprecated;
-
-  public static final Comparator<ContributedPlatform> BUILTIN_AS_LAST = (x, y) -> {
-    int px = x.isBuiltIn() ? 1 : -1;
-    int py = y.isBuiltIn() ? 1 : -1;
-    return px - py;
-  };
 
   public List<ContributedTool> getResolvedTools() {
     return new LinkedList<>(resolvedToolReferences.values());
@@ -112,11 +117,9 @@ public class ContributedPlatform extends DownloadableContribution {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof ContributedPlatform)) {
+    if (!(obj instanceof ContributedPlatform obj1)) {
       return false;
     }
-
-    ContributedPlatform obj1 = (ContributedPlatform) obj;
 
     ContributedPackage parent = getParentPackage();
     ContributedPackage parent1 = obj1.getParentPackage();

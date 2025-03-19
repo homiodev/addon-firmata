@@ -40,8 +40,12 @@ import java.util.stream.Collectors;
 
 public class ContributionsIndex {
 
-  private ArrayList<ContributedPackage> packages = new ArrayList<ContributedPackage>();
-  public List<ContributedPackage> getPackages() { return packages; }
+  private final List<String> categories = new ArrayList<>();
+  private final ArrayList<ContributedPackage> packages = new ArrayList<ContributedPackage>();
+
+  public List<ContributedPackage> getPackages() {
+    return packages;
+  }
 
   public ContributedPackage findPackage(String packageName) {
     for (ContributedPackage pack : getPackages()) {
@@ -84,8 +88,8 @@ public class ContributionsIndex {
 
   public List<ContributedPlatform> getInstalledPlatforms() {
     return getPlatforms().stream() //
-        .filter(p -> p.isInstalled()) //
-        .collect(Collectors.toList());
+      .filter(p -> p.isInstalled()) //
+      .collect(Collectors.toList());
   }
 
   public ContributedPlatform getInstalledPlatform(String packageName, String platformArch) {
@@ -94,8 +98,8 @@ public class ContributionsIndex {
       return null;
     }
     List<ContributedPlatform> installedPlatforms = platforms.stream() //
-        .filter(p -> p.isInstalled()) //
-        .collect(Collectors.toList());
+      .filter(p -> p.isInstalled()) //
+      .collect(Collectors.toList());
     Collections.sort(installedPlatforms, ContributedPlatform.BUILTIN_AS_LAST);
 
     if (installedPlatforms.isEmpty()) {
@@ -108,8 +112,6 @@ public class ContributionsIndex {
   private List<ContributedPlatform> getPlatforms() {
     return getPackages().stream().map(ContributedPackage::getPlatforms).flatMap(Collection::stream).collect(Collectors.toList());
   }
-
-  private final List<String> categories = new ArrayList<>();
 
   public List<String> getCategories() {
     return categories;

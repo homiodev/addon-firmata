@@ -32,6 +32,9 @@ package cc.arduino.contributions.packages;
 public class ContributedHelp {
 
   private String online;
-  public String getOnline() { return online; }
+
+  public String getOnline() {
+    return online;
+  }
 
 }

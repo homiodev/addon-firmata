@@ -29,22 +29,22 @@
 
 package cc.arduino.packages;
 
-import static processing.app.I18n.format;
-import static processing.app.I18n.tr;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.io.File;
-
+import cc.arduino.packages.discoverers.NetworkDiscovery;
 import cc.arduino.packages.discoverers.PluggableDiscovery;
 import cc.arduino.packages.discoverers.serial.SerialDiscovery;
-import cc.arduino.packages.discoverers.NetworkDiscovery;
 import processing.app.PreferencesData;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.StringReplacer;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static processing.app.I18n.format;
+import static processing.app.I18n.tr;
 
 public class DiscoveryManager {
 
@@ -63,7 +63,7 @@ public class DiscoveryManager {
 
     // Search for discoveries in installed packages
     for (TargetPackage targetPackage : packages.values()) {
-      for (TargetPlatform platform: targetPackage.getPlatforms().values()) {
+      for (TargetPlatform platform : targetPackage.getPlatforms().values()) {
         //System.out.println("installed: "+platform);
         PreferencesMap prefs = platform.getPreferences().subTree("discovery");
         PreferencesMap pathPrefs = new PreferencesMap();
@@ -75,7 +75,7 @@ public class DiscoveryManager {
 
           String pattern = discoveryPrefs.get("pattern");
           if (pattern == null) {
-            System.out.println(format(tr("No recipes defined for discovery '{0}'"),discoveryName));
+            System.out.println(format(tr("No recipes defined for discovery '{0}'"), discoveryName));
             continue;
           }
           try {

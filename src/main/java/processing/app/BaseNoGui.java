@@ -12,6 +12,7 @@ import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.DiscoveryManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import processing.app.debug.LegacyTargetPackage;
 import processing.app.debug.LegacyTargetPlatform;
@@ -495,12 +496,10 @@ public class BaseNoGui {
     }
   }
 
+  @SneakyThrows
   static public void initPortableFolder() {
-    // Portable folder
     portableFolder = getContentFile("portable");
-    if (!portableFolder.exists()) {
-      portableFolder = null;
-    }
+    Files.createDirectories(portableFolder.toPath());
   }
 
   static public void initVersion() {

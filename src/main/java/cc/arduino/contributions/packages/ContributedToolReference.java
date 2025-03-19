@@ -37,11 +37,17 @@ public class ContributedToolReference {
   private String version;
   private String packager;
 
-  public String getName() { return name; }
+  public String getName() {
+    return name;
+  }
 
-  public String getVersion() { return version; }
+  public String getVersion() {
+    return version;
+  }
 
-  public String getPackager() { return packager; }
+  public String getPackager() {
+    return packager;
+  }
 
   public ContributedTool resolve(Collection<ContributedPackage> packages) {
     for (ContributedPackage pack : packages) {
@@ -58,6 +64,6 @@ public class ContributedToolReference {
   @Override
   public String toString() {
     return "name=" + getName() + " version=" + getVersion() + " packager=" +
-        getPackager();
+           getPackager();
   }
 }

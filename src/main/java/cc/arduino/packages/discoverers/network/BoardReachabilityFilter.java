@@ -35,7 +35,11 @@ import processing.app.helpers.NetUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class BoardReachabilityFilter extends TimerTask {
 

@@ -41,7 +41,11 @@ import org.apache.commons.compress.utils.IOUtils;
 import processing.app.I18n;
 import processing.app.Platform;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +58,35 @@ public class ArchiveExtractor {
   public ArchiveExtractor(Platform platform) {
     assert platform != null;
     this.platform = platform;
+  }
+
+  private static void copyStreamToFile(InputStream in, long size, File outputFile) throws IOException {
+    FileOutputStream fos = null;
+    try {
+      fos = new FileOutputStream(outputFile);
+      // if size is not available, copy until EOF...
+      if (size == -1) {
+        byte[] buffer = new byte[4096];
+        int length;
+        while ((length = in.read(buffer)) != -1) {
+          fos.write(buffer, 0, length);
+        }
+        return;
+      }
+
+      // ...else copy just the needed amount of bytes
+      byte[] buffer = new byte[4096];
+      while (size > 0) {
+        int length = in.read(buffer);
+        if (length <= 0) {
+          throw new IOException("Error while extracting file " + outputFile.getAbsolutePath());
+        }
+        fos.write(buffer, 0, length);
+        size -= length;
+      }
+    } finally {
+      IOUtils.closeQuietly(fos);
+    }
   }
 
   /**
@@ -81,7 +114,6 @@ public class ArchiveExtractor {
   public void extract(File archiveFile, File destFolder, int stripPath) throws IOException, InterruptedException {
     extract(archiveFile, destFolder, stripPath, false);
   }
-
 
   public void extract(File archiveFile, File destFolder, int stripPath, boolean overwrite) throws IOException, InterruptedException {
 
@@ -152,8 +184,7 @@ public class ArchiveExtractor {
           continue;
         }
 
-        if (entry instanceof TarArchiveEntry) {
-          TarArchiveEntry tarEntry = (TarArchiveEntry) entry;
+        if (entry instanceof TarArchiveEntry tarEntry) {
           mode = tarEntry.getMode();
           isLink = tarEntry.isLink();
           isSymLink = tarEntry.isSymbolicLink();
@@ -269,35 +300,6 @@ public class ArchiveExtractor {
     // Set folders timestamps
     for (File folder : foldersTimestamps.keySet()) {
       folder.setLastModified(foldersTimestamps.get(folder));
-    }
-  }
-
-  private static void copyStreamToFile(InputStream in, long size, File outputFile) throws IOException {
-    FileOutputStream fos = null;
-    try {
-      fos = new FileOutputStream(outputFile);
-      // if size is not available, copy until EOF...
-      if (size == -1) {
-        byte buffer[] = new byte[4096];
-        int length;
-        while ((length = in.read(buffer)) != -1) {
-          fos.write(buffer, 0, length);
-        }
-        return;
-      }
-
-      // ...else copy just the needed amount of bytes
-      byte buffer[] = new byte[4096];
-      while (size > 0) {
-        int length = in.read(buffer);
-        if (length <= 0) {
-          throw new IOException("Error while extracting file " + outputFile.getAbsolutePath());
-        }
-        fos.write(buffer, 0, length);
-        size -= length;
-      }
-    } finally {
-      IOUtils.closeQuietly(fos);
     }
   }
 

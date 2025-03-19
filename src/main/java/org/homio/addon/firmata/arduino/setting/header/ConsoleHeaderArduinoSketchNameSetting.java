@@ -30,11 +30,6 @@ public class ConsoleHeaderArduinoSketchNameSetting implements
   SettingPluginOptionsRemovable<String>,
   ConsoleHeaderSettingPlugin<String> {
 
-  @Override
-  public boolean lazyLoad() {
-    return true;
-  }
-
   public static OptionModel buildExamplePath(boolean includePath) {
     OptionModel examples = OptionModel.key("examples");
     addSketches(examples, BaseNoGui.getExamplesFolder(), includePath);
@@ -83,6 +78,11 @@ public class ConsoleHeaderArduinoSketchNameSetting implements
       addSketches(submenu, folder, includePath);
       menu.addChildIfHasSubChildren(submenu);
     }
+  }
+
+  @Override
+  public boolean lazyLoad() {
+    return true;
   }
 
   @Override

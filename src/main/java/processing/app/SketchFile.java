@@ -48,12 +48,12 @@ public class SketchFile {
   /**
    * The sketch this file belongs to.
    */
-  private Sketch sketch;
+  private final Sketch sketch;
 
   /**
    * Is this the primary file in the sketch?
    */
-  private boolean primary;
+  private final boolean primary;
 
   /**
    * A storage for this file's text. This can be set by a GUI, so we can
@@ -74,7 +74,7 @@ public class SketchFile {
     this.file = file;
     FileUtils.SplitFile split = FileUtils.splitFilename(file);
     this.primary = split.basename.equals(sketch.getFolder().getName())
-      && Sketch.SKETCH_EXTENSIONS.contains(split.extension);
+                   && Sketch.SKETCH_EXTENSIONS.contains(split.extension);
   }
 
   /**
@@ -239,10 +239,10 @@ public class SketchFile {
       System.err.println(
         I18n.format(
           tr("\"{0}\" contains unrecognized characters. " +
-            "If this code was created with an older version of Arduino, " +
-            "you may need to use Tools -> Fix Encoding & Reload to update " +
-            "the sketch to use UTF-8 encoding. If not, you may need to " +
-            "delete the bad characters to get rid of this warning."),
+             "If this code was created with an older version of Arduino, " +
+             "you may need to use Tools -> Fix Encoding & Reload to update " +
+             "the sketch to use UTF-8 encoding. If not, you may need to " +
+             "delete the bad characters to get rid of this warning."),
           file.getName()
         )
       );

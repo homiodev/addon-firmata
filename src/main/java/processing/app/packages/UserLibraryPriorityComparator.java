@@ -28,15 +28,16 @@
  */
 package processing.app.packages;
 
+import processing.app.packages.UserLibraryFolder.Location;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import processing.app.packages.UserLibraryFolder.Location;
-
 public class UserLibraryPriorityComparator implements Comparator<UserLibrary> {
 
   private final static Map<Location, Integer> priorities = new HashMap<>();
+
   static {
     priorities.put(Location.SKETCHBOOK, 4);
     priorities.put(Location.CORE, 3);
@@ -44,7 +45,7 @@ public class UserLibraryPriorityComparator implements Comparator<UserLibrary> {
     priorities.put(Location.IDE_BUILTIN, 1);
   }
 
-  private String arch;
+  private final String arch;
 
   public UserLibraryPriorityComparator(String currentArch) {
     arch = currentArch;

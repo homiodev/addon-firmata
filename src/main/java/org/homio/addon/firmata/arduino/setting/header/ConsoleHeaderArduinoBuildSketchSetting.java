@@ -19,6 +19,6 @@ public class ConsoleHeaderArduinoBuildSketchSetting implements ConsoleHeaderSett
 
   @Override
   public String[] fireActionsBeforeChange() {
-    return new String[]{"st_ShowInlineReadOnlyConsoleHeaderSetting/true", "SAVE"};
+    return new String[]{"save"};
   }
 }

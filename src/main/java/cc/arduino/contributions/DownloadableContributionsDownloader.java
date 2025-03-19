@@ -41,14 +41,18 @@ import processing.app.PreferencesData;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 
 import static processing.app.I18n.format;
 import static processing.app.I18n.tr;
 
 public class DownloadableContributionsDownloader {
-  private static Logger log = LogManager.getLogger(DownloadableContributionsDownloader.class);
+  private static final Logger log = LogManager.getLogger(DownloadableContributionsDownloader.class);
 
   private final File stagingFolder;
 
@@ -163,7 +167,7 @@ public class DownloadableContributionsDownloader {
     try {
       // Download package index
       download(packageIndexUrl, packageIndexTemp, progress, statusText, progressListener, true, true);
-      final URL signatureUrl = new URL(packageIndexUrl.toString() + ".sig");
+      final URL signatureUrl = new URL(packageIndexUrl + ".sig");
 
       if (verifyDomain(packageIndexUrl)) {
         if (checkSignature(progress, signatureUrl, progressListener, signatureVerifier, statusText, packageIndexTemp)) {
@@ -217,7 +221,7 @@ public class DownloadableContributionsDownloader {
       if (PreferencesData.areInsecurePackagesAllowed()) {
         Files.move(packageIndexSignatureTemp.toPath(), packageIndexSignature.toPath(), StandardCopyOption.REPLACE_EXISTING);
         log.info("Allowing insecure packages because allow_insecure_packages is set to true in preferences.txt" +
-          " but the signature was download");
+                 " but the signature was download");
         return true;
       }
 

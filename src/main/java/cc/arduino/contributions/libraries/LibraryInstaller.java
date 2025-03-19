@@ -57,7 +57,7 @@ import java.util.Optional;
 import static processing.app.I18n.tr;
 
 public class LibraryInstaller {
-  private static Logger log = LogManager.getLogger(LibraryInstaller.class);
+  private static final Logger log = LogManager.getLogger(LibraryInstaller.class);
 
   private final Platform platform;
   private final GPGDetachedSignatureVerifier signatureVerifier;
@@ -88,7 +88,7 @@ public class LibraryInstaller {
     }
     progress.stepDone();
 
-    URL signatureUrl = new URL(libraryURL.toString() + ".sig");
+    URL signatureUrl = new URL(libraryURL + ".sig");
     if (downloader.verifyDomain(signatureUrl)) {
       if (downloader.checkSignature(progress, signatureUrl, progressListener, signatureVerifier, statusText, libraryIndexTemp)) {
         // Replace old index with the updated one
@@ -141,9 +141,9 @@ public class LibraryInstaller {
     // Check if we are replacing an already installed lib
     LibrariesIndex index = BaseNoGui.librariesIndexer.getIndex();
     Optional<ContributedLibrary> replacedLib = index.find(lib.getName()).stream() //
-        .filter(l -> l.getInstalledLibrary().isPresent()) //
-        .filter(l -> l.getInstalledLibrary().get().getInstalledFolder().equals(destFolder)) //
-        .findAny();
+      .filter(l -> l.getInstalledLibrary().isPresent()) //
+      .filter(l -> l.getInstalledLibrary().get().getInstalledFolder().equals(destFolder)) //
+      .findAny();
     if (!replacedLib.isPresent() && destFolder.exists()) {
       System.out.println(I18n.format(tr("Library {0} is already installed in: {1}"), lib.getName(), destFolder));
       return;

@@ -179,8 +179,8 @@ void homio::setup()
     }
     else {
         config.deviceID = abs(int(random(99, 32767)));
-		//String ssid = "Ruslan";
-		//String pwd = "RusMas2018";
+		//String ssid = "wifi-ssid";
+		//String pwd = "wifi-pwd";
 		//ssid.toCharArray(config.ssid, 20);
 		//pwd.toCharArray(config.pwd, 20);
 
@@ -229,7 +229,7 @@ bool homio::loop(unsigned long currentMillis) {
 				Udp.write(udpPayload, udpPayloadLength);
                 Udp.endPacket();
 			#endif
-			sendhomioCommand(SYSEX_REGISTER, 0, sizeof(BOARD), (byte*)BOARD);
+			sendHomioCommand(SYSEX_REGISTER, 0, sizeof(BOARD), (byte*)BOARD);
         }
     }
 #ifdef COMM_ESP8266_WIFI
@@ -238,7 +238,7 @@ bool homio::loop(unsigned long currentMillis) {
     return uniqueID != 0;
 }
 
-void homio::sendhomioCommand(byte command, byte messageID, byte argc, byte argv[])
+void homio::sendHomioCommand(byte command, byte messageID, byte argc, byte argv[])
 {
     byte payload[3 + argc];
     payload[0] = messageID;
@@ -274,7 +274,7 @@ boolean homio::handleSysex(byte command, byte argc, byte *argv)
                 union longConvertor data {
                 };
                 data.whole = millis();
-                sendhomioCommand(SYSEX_GET_TIME_COMMAND, messageID, 8, data.nybble.buff);
+                sendHomioCommand(SYSEX_GET_TIME_COMMAND, messageID, 8, data.nybble.buff);
                 break;
             }
         }

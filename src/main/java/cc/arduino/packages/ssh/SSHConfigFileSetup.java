@@ -30,7 +30,11 @@
 package cc.arduino.packages.ssh;
 
 import cc.arduino.packages.BoardPort;
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.ConfigRepository;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.OpenSSHConfig;
+import com.jcraft.jsch.Session;
 
 import java.io.File;
 import java.io.IOException;

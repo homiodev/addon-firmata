@@ -18,7 +18,7 @@ public abstract class NetUtils {
   }
 
   public static boolean isReachable(InetAddress address, int port) {
-    return isReachable(address, Arrays.asList(port));
+    return isReachable(address, List.of(port));
   }
 
   public static boolean isReachable(InetAddress address, List<Integer> ports) {

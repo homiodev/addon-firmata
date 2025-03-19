@@ -24,7 +24,11 @@ package processing.app.helpers;
 import org.apache.commons.compress.utils.IOUtils;
 import processing.app.legacy.PApplet;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SortedSet;
@@ -40,14 +44,14 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
   /**
    * Create a PreferencesMap and load the content of the file passed as
    * argument.
-   * 
+   *
    * Is equivalent to:
-   * 
+   *
    * <pre>
    * PreferencesMap map = new PreferencesMap();
    * map.load(file);
    * </pre>
-   * 
+   *
    * @param file
    * @throws IOException
    */
@@ -62,7 +66,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
 
   /**
    * Parse a property list file and put kev/value pairs into the Map
-   * 
+   *
    * @param file
    * @throws FileNotFoundException
    * @throws IOException
@@ -92,7 +96,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
 
   /**
    * Parse a property list stream and put key/value pairs into the Map
-   * 
+   *
    * @param input
    * @throws IOException
    */
@@ -120,7 +124,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
   /**
    * Create a new PreferenceMap that contains all the top level pairs of the
    * current mapping. E.g. the folowing mapping:<br />
-   * 
+   *
    * <pre>
    * Map (
    *     alpha = Alpha
@@ -130,16 +134,16 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    *     beta.some.keys = v3
    *   )
    * </pre>
-   * 
+   *
    * will generate the following result:
-   * 
+   *
    * <pre>
    * Map (
    *     alpha = Alpha
    *     beta = Beta
    *   )
    * </pre>
-   * 
+   *
    * @return
    */
   public PreferencesMap topLevelMap() {
@@ -156,7 +160,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    * Create a new Map<String, PreferenceMap> where keys are the first level of
    * the current mapping. Top level pairs are discarded. E.g. the folowing
    * mapping:<br />
-   * 
+   *
    * <pre>
    * Map (
    *     alpha = Alpha
@@ -166,9 +170,9 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    *     beta.some.keys = v3
    *   )
    * </pre>
-   * 
+   *
    * will generate the following result:
-   * 
+   *
    * <pre>
    * alpha = Map(
    *     some.keys = v1
@@ -178,7 +182,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    *     some.keys = v3
    *   )
    * </pre>
-   * 
+   *
    * @return
    */
   public Map<String, PreferencesMap> firstLevelMap() {
@@ -201,7 +205,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
   /**
    * Create a new PreferenceMap using a subtree of the current mapping. Top
    * level pairs are ignored. E.g. with the following mapping:<br />
-   * 
+   *
    * <pre>
    * Map (
    *     alpha = Alpha
@@ -211,16 +215,16 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    *     beta.some.keys = v3
    *   )
    * </pre>
-   * 
+   *
    * a call to createSubTree("alpha") will generate the following result:
-   * 
+   *
    * <pre>
    * Map(
    *     some.keys = v1
    *     other.keys = v2
    *   )
    * </pre>
-   * 
+   *
    * @param parent
    * @return
    */
@@ -256,7 +260,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
   /**
    * Returns the value to which the specified key is mapped, or throws a
    * PreferencesMapException if not found
-   * 
+   *
    * @param k
    *          the key whose associated value is to be returned
    * @return the value to which the specified key is mapped
@@ -278,7 +282,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    * Creates a new File instance by converting the value of the key into an
    * abstract pathname. If the the given key doesn't exists or his value is the
    * empty string, the result is <b>null</b>.
-   * 
+   *
    * @param key
    * @return
    */
@@ -295,7 +299,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    * Creates a new File instance by converting the value of the key into an
    * abstract pathname with the specified sub folder. If the the given key
    * doesn't exists or his value is the empty string, the result is <b>null</b>.
-   * 
+   *
    * @param key
    * @param subFolder
    * @return
@@ -309,7 +313,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
 
   /**
    * Return the value of the specified key as boolean.
-   * 
+   *
    * @param key
    * @return <b>true</b> if the value of the key is the string "true" (case
    *         insensitive compared), <b>false</b> in any other case
@@ -321,7 +325,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
   /**
    * Sets the value of the specified key to the string <b>"true"</b> or
    * <b>"false"</b> based on value of the boolean parameter
-   * 
+   *
    * @param key
    * @param value
    * @return <b>true</b> if the previous value of the key was the string "true"
@@ -329,7 +333,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    */
   public boolean putBoolean(String key, boolean value) {
     String prev = put(key, value ? "true" : "false");
-    return new Boolean(prev);
+    return Boolean.valueOf(prev);
   }
 
   public String get(String key, String defaultValue) {

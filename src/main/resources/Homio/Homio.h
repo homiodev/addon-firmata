@@ -139,7 +139,7 @@ public:
 
     void setup();
 
-    void sendhomioCommand(byte command, byte messageID, byte argc, byte argv[]);
+    void sendHomioCommand(byte command, byte messageID, byte argc, byte argv[]);
 
     bool loop(unsigned long currentMillis);
 

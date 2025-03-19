@@ -1,14 +1,20 @@
 package processing.app;
 
+import cc.arduino.files.DeleteFilesOnShutdown;
+import lombok.Getter;
+import processing.app.helpers.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import cc.arduino.files.DeleteFilesOnShutdown;
-import processing.app.helpers.FileUtils;
 
 import static processing.app.I18n.tr;
 
@@ -17,30 +23,24 @@ import static processing.app.I18n.tr;
  */
 public class Sketch {
   public static final String DEFAULT_SKETCH_EXTENSION = "ino";
-  public static final List<String> OLD_SKETCH_EXTENSIONS = Arrays.asList("pde");
+  public static final List<String> OLD_SKETCH_EXTENSIONS = List.of("pde");
   public static final List<String> SKETCH_EXTENSIONS = Stream.concat(Stream.of(DEFAULT_SKETCH_EXTENSION), OLD_SKETCH_EXTENSIONS.stream()).collect(Collectors.toList());
   public static final List<String> OTHER_ALLOWED_EXTENSIONS = Arrays.asList("c", "cpp", "h", "hh", "hpp", "s");
   public static final List<String> EXTENSIONS = Stream.concat(SKETCH_EXTENSIONS.stream(), OTHER_ALLOWED_EXTENSIONS.stream()).collect(Collectors.toList());
-
+  public static final Comparator<SketchFile> CODE_DOCS_COMPARATOR = (x, y) -> {
+    if (x.isPrimary() && !y.isPrimary())
+      return -1;
+    if (y.isPrimary() && !x.isPrimary())
+      return 1;
+    return x.getFileName().compareTo(y.getFileName());
+  };
   /**
    * folder that contains this sketch
    */
+  @Getter
   private File folder;
-
-  private List<SketchFile> files = new ArrayList<>();
-
+  private List<SketchFile> files;
   private File buildPath;
-
-  public static final Comparator<SketchFile> CODE_DOCS_COMPARATOR = new Comparator<SketchFile>() {
-    @Override
-    public int compare(SketchFile x, SketchFile y) {
-      if (x.isPrimary() && !y.isPrimary())
-        return -1;
-      if (y.isPrimary() && !x.isPrimary())
-        return 1;
-      return x.getFileName().compareTo(y.getFileName());
-    }
-  };
 
   /**
    * Create a new SketchData object, and looks at the sketch directory
@@ -113,7 +113,7 @@ public class Sketch {
       }
     }
 
-    if (result.size() == 0)
+    if (result.isEmpty())
       throw new IOException(tr("No valid code files found"));
 
     return new ArrayList<>(result);
@@ -169,7 +169,7 @@ public class Sketch {
    * Gets the build path for this sketch. The first time this is called,
    * a build path is generated and created and the same path is returned
    * on all subsequent calls.
-   *
+   * <p>
    * This takes into account the build.path preference. If it is set,
    * that path is always returned, and the directory is *not* deleted on
    * shutdown. If the preference is not set, a random pathname in a
@@ -197,10 +197,6 @@ public class Sketch {
 
   public String getName() {
     return folder.getName();
-  }
-
-  public File getFolder() {
-    return folder;
   }
 
   public File getDataFolder() {
@@ -316,7 +312,7 @@ public class Sketch {
     // Add a new sketchFile
     SketchFile sketchFile = new SketchFile(this, newFile);
     files.add(sketchFile);
-    Collections.sort(files, CODE_DOCS_COMPARATOR);
+    files.sort(CODE_DOCS_COMPARATOR);
 
     return sketchFile;
   }

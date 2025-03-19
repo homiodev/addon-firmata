@@ -24,24 +24,24 @@
 
 package processing.app.debug;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.ProcessUtils;
 import processing.app.helpers.StringReplacer;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Sizer implements MessageConsumer {
   private long textSize;
   private long dataSize;
   private long eepromSize;
   private RunnerException exception;
-  private PreferencesMap prefs;
+  private final PreferencesMap prefs;
   private String firstLine;
-  private Pattern textPattern;
+  private final Pattern textPattern;
   private Pattern dataPattern;
   private Pattern eepromPattern;
-  
+
   public Sizer(PreferencesMap _prefs) {
     prefs = _prefs;
     textPattern = Pattern.compile(prefs.get("recipe.size.regex"));
@@ -54,13 +54,13 @@ public class Sizer implements MessageConsumer {
     if (pref != null)
       eepromPattern = Pattern.compile(pref);
   }
-  
+
   public long[] computeSize() throws RunnerException {
 
     int r = 0;
     try {
       String pattern = prefs.get("recipe.size.pattern");
-      String cmd[] = StringReplacer.formatAndSplit(pattern, prefs);
+      String[] cmd = StringReplacer.formatAndSplit(pattern, prefs);
 
       exception = null;
       textSize = -1;
@@ -71,13 +71,14 @@ public class Sizer implements MessageConsumer {
       MessageSiphon err = new MessageSiphon(process.getErrorStream(), this);
 
       boolean running = true;
-      while(running) {
+      while (running) {
         try {
           in.join();
           err.join();
           r = process.waitFor();
           running = false;
-        } catch (InterruptedException intExc) { }
+        } catch (InterruptedException intExc) {
+        }
       }
     } catch (Exception e) {
       // The default Throwable.toString() never returns null, but apparently
@@ -86,16 +87,16 @@ public class Sizer implements MessageConsumer {
       exception = new RunnerException(
         (e.toString() == null) ? e.getClass().getName() + r : e.toString() + r);
     }
-    
+
     if (exception != null)
       throw exception;
-      
+
     if (textSize == -1)
       throw new RunnerException(firstLine);
-      
-    return new long[] { textSize, dataSize, eepromSize };
+
+    return new long[]{textSize, dataSize, eepromSize};
   }
-  
+
   @Override
   public void message(String s) {
     if (firstLine == null)
@@ -106,7 +107,7 @@ public class Sizer implements MessageConsumer {
         textSize = 0;
       textSize += Long.parseLong(textMatcher.group(1));
     }
-    if(dataPattern != null) {
+    if (dataPattern != null) {
       Matcher dataMatcher = dataPattern.matcher(s.trim());
       if (dataMatcher.matches()) {
         if (dataSize < 0)
@@ -114,7 +115,7 @@ public class Sizer implements MessageConsumer {
         dataSize += Long.parseLong(dataMatcher.group(1));
       }
     }
-    if(eepromPattern != null) {
+    if (eepromPattern != null) {
       Matcher eepromMatcher = eepromPattern.matcher(s.trim());
       if (eepromMatcher.matches()) {
         if (eepromSize < 0)

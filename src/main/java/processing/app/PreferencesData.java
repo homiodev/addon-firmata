@@ -59,7 +59,7 @@ public class PreferencesData {
       prefs.load(new File(BaseNoGui.getContentFile("lib"), PREFS_FILE));
     } catch (IOException e) {
       BaseNoGui.showError(null, tr("Could not read default settings.\n" +
-        "You'll need to reinstall Arduino."), e);
+                                   "You'll need to reinstall Arduino."), e);
     }
 
     // set some runtime constants (not saved on preferences file)
@@ -77,8 +77,8 @@ public class PreferencesData {
       } catch (IOException ex) {
         BaseNoGui.showError(tr("Error reading preferences"),
           I18n.format(tr("Error reading the preferences file. "
-              + "Please delete (or move)\n"
-              + "{0} and restart Arduino."),
+                         + "Please delete (or move)\n"
+                         + "{0} and restart Arduino."),
             preferencesFile.getAbsolutePath()), ex);
       }
     }

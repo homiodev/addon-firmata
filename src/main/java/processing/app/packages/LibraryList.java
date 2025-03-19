@@ -28,6 +28,8 @@
  */
 package processing.app.packages;
 
+import processing.app.helpers.FileUtils;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -39,8 +41,6 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
-
-import processing.app.helpers.FileUtils;
 
 @SuppressWarnings("serial")
 public class LibraryList extends LinkedList<UserLibrary> {
@@ -55,33 +55,6 @@ public class LibraryList extends LinkedList<UserLibrary> {
 
   public LibraryList(List<UserLibrary> ideLibs) {
     super(ideLibs);
-  }
-
-  public synchronized UserLibrary getByName(String name) {
-    for (UserLibrary l : this)
-      if (l.getName().equals(name))
-        return l;
-    return null;
-  }
-
-  public synchronized void sort() {
-    Collections.sort(this, (x, y) -> x.getName().compareToIgnoreCase(y.getName()));
-  }
-
-  public synchronized LibraryList filterLibrariesInSubfolder(File subFolder) {
-    LibraryList res = new LibraryList();
-    for (UserLibrary lib : this) {
-      if (FileUtils.isSubDirectory(subFolder, lib.getInstalledFolder())) {
-        res.add(lib);
-      }
-    }
-    return res;
-  }
-
-  public synchronized boolean hasLibrary(UserLibrary lib) {
-    for (UserLibrary l : this)
-      if (l == lib) return true;
-    return false;
   }
 
   public static Collector<UserLibrary, LibraryList, LibraryList> collector() {
@@ -114,5 +87,32 @@ public class LibraryList extends LinkedList<UserLibrary> {
         return EnumSet.noneOf(Characteristics.class);
       }
     };
+  }
+
+  public synchronized UserLibrary getByName(String name) {
+    for (UserLibrary l : this)
+      if (l.getName().equals(name))
+        return l;
+    return null;
+  }
+
+  public synchronized void sort() {
+    Collections.sort(this, (x, y) -> x.getName().compareToIgnoreCase(y.getName()));
+  }
+
+  public synchronized LibraryList filterLibrariesInSubfolder(File subFolder) {
+    LibraryList res = new LibraryList();
+    for (UserLibrary lib : this) {
+      if (FileUtils.isSubDirectory(subFolder, lib.getInstalledFolder())) {
+        res.add(lib);
+      }
+    }
+    return res;
+  }
+
+  public synchronized boolean hasLibrary(UserLibrary lib) {
+    for (UserLibrary l : this)
+      if (l == lib) return true;
+    return false;
   }
 }

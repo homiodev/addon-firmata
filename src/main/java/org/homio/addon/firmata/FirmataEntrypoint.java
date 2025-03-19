@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.homio.addon.firmata.arduino.ArduinoConfiguration;
 import org.homio.addon.firmata.arduino.ArduinoConsolePlugin;
 import org.homio.addon.firmata.model.FirmataBaseEntity;
 import org.homio.addon.firmata.model.FirmataNetworkEntity;
@@ -11,6 +12,7 @@ import org.homio.addon.firmata.provider.FirmataCommandPlugins;
 import org.homio.api.AddonConfiguration;
 import org.homio.api.AddonEntrypoint;
 import org.homio.api.Context;
+import org.homio.api.fs.archive.ArchiveUtil;
 import org.homio.api.model.Status;
 import org.homio.api.util.CommonUtils;
 import org.homio.api.util.Lang;
@@ -93,21 +95,32 @@ public class FirmataEntrypoint implements AddonEntrypoint {
   }
 
   public void init() {
-    String arduinoInstallPath = CommonUtils.getFilesPath().resolve("arduino").toString();
-    /*ArchiveUtil.downloadAndExtract("url", "arduino-dependencies.7z", new ProgressBar() {
-      @Override
-      public void progress(double progress, @Nullable String message, boolean error) {
+    var commonFiles = getClass().getResource("/arduino-files-common.7z");
+    if (commonFiles == null) {
+      throw new IllegalStateException("Could not find arduino-files-common.7z");
+    }
+    var osFiles = getClass().getResource("/arduino-files-os.7z");
+    if (osFiles == null) {
+      throw new IllegalStateException("Could not find arduino-files-os.7z");
+    }
+    var arduinoInstallPath = CommonUtils.getInstallPath().resolve("arduino");
+    context.bgp().runWithProgress("arduino-install").execute(progressBar -> {
+      try {
+        ArchiveUtil.unzip(commonFiles, "arduino-files-common.7z", arduinoInstallPath,
+          null, false, progressBar, ArchiveUtil.UnzipFileIssueHandler.skip);
+        ArchiveUtil.unzip(osFiles, "arduino-files-os.7z", arduinoInstallPath,
+          null, false, progressBar, ArchiveUtil.UnzipFileIssueHandler.skip);
 
+        initInternal();
+      } catch (Exception e) {
+        log.error("Could not initialize arduino", e);
+        throw new RuntimeException(e);
       }
-    });*/
-//    return String.format("%s/arduino-ide-setup-%s.7z", context.setting().getEnv("artifactoryFilesURL"),
-//      SystemUtils.IS_OS_LINUX ? "linux" : "win");
-    // try to initialise platform
-    /*if (ArduinoConfiguration.getPlatform() != null) {
-      this.init();
-      context.ui().dialog().reloadWindow("Re-Initialize page after install dependencies");
-    }*/
+    });
+  }
 
+  private void initInternal() {
+    ArduinoConfiguration.getPlatform();
     arduinoConsolePlugin.init();
     restartFirmataProviders();
     this.context.event().addEntityUpdateListener(FirmataBaseEntity.class, "firmata-restart-comm-listen", FirmataBaseEntity::restartCommunicator);

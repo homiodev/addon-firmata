@@ -29,15 +29,8 @@
 
 package cc.arduino.packages.discoverers;
 
-import static processing.app.I18n.format;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
+import cc.arduino.packages.BoardPort;
+import cc.arduino.packages.Discovery;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -46,27 +39,32 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import cc.arduino.packages.BoardPort;
-import cc.arduino.packages.Discovery;
+import org.apache.commons.lang3.StringUtils;
 import processing.app.PreferencesData;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import static processing.app.I18n.format;
 
 public class PluggableDiscovery implements Discovery {
 
   private final String discoveryName;
   private final String[] cmd;
   private final List<BoardPort> portList = new ArrayList<>();
-  private Process program=null;
+  private Process program = null;
   private Thread pollingThread;
-
-  private void debug(String x) {
-    if (PreferencesData.getBoolean("discovery.debug"))
-      System.out.println(discoveryName + ": " + x);
-  }
 
   public PluggableDiscovery(String discoveryName, String[] cmd) {
     this.cmd = cmd;
     this.discoveryName = discoveryName;
+  }
+
+  private void debug(String x) {
+    if (PreferencesData.getBoolean("discovery.debug"))
+      System.out.println(discoveryName + ": " + x);
   }
 
   @Override
@@ -117,59 +115,58 @@ public class PluggableDiscovery implements Discovery {
     }
 
     switch (eventTypeNode.asText()) {
-    case "error":
-      try {
-        PluggableDiscoveryMessage msg = mapper.treeToValue(node, PluggableDiscoveryMessage.class);
-        debug("error: " + msg.getMessage());
-        if (msg.getMessage().contains("START_SYNC")) {
-          startPolling();
+      case "error":
+        try {
+          PluggableDiscoveryMessage msg = mapper.treeToValue(node, PluggableDiscoveryMessage.class);
+          debug("error: " + msg.getMessage());
+          if (msg.getMessage().contains("START_SYNC")) {
+            startPolling();
+          }
+        } catch (JsonProcessingException e) {
+          e.printStackTrace();
         }
-      } catch (JsonProcessingException e) {
-        e.printStackTrace();
-      }
-      return;
-
-    case "list":
-      JsonNode portsNode = node.get("ports");
-      if (portsNode == null) {
-        System.err.println(format("{0}: Invalid message, missing ports list", discoveryName));
         return;
-      }
-      if (!portsNode.isArray()) {
-        System.err.println(format("{0}: Invalid message, ports list should be an array", discoveryName));
-        return;
-      }
 
-      synchronized (portList) {
-        portList.clear();
-      }
-      portsNode.forEach(portNode -> {
-        BoardPort port = mapJsonNodeToBoardPort(mapper, node);
-        if (port != null) {
-          addOrUpdate(port);
+      case "list":
+        JsonNode portsNode = node.get("ports");
+        if (portsNode == null) {
+          System.err.println(format("{0}: Invalid message, missing ports list", discoveryName));
+          return;
         }
-      });
-      return;
+        if (!portsNode.isArray()) {
+          System.err.println(format("{0}: Invalid message, ports list should be an array", discoveryName));
+          return;
+        }
 
-    // Messages for SYNC updates
+        synchronized (portList) {
+          portList.clear();
+        }
+        portsNode.forEach(portNode -> {
+          BoardPort port = mapJsonNodeToBoardPort(mapper, node);
+          if (port != null) {
+            addOrUpdate(port);
+          }
+        });
+        return;
 
-    case "add":
-      BoardPort addedPort = mapJsonNodeToBoardPort(mapper, node);
-      if (addedPort != null) {
-        addOrUpdate(addedPort);
-      }
-      return;
+      // Messages for SYNC updates
 
-    case "remove":
-      BoardPort removedPort = mapJsonNodeToBoardPort(mapper, node);
-      if (removedPort != null) {
-        remove(removedPort);
-      }
-      return;
+      case "add":
+        BoardPort addedPort = mapJsonNodeToBoardPort(mapper, node);
+        if (addedPort != null) {
+          addOrUpdate(addedPort);
+        }
+        return;
 
-    default:
-      debug("Invalid event: " + eventTypeNode.asText());
-      return;
+      case "remove":
+        BoardPort removedPort = mapJsonNodeToBoardPort(mapper, node);
+        if (removedPort != null) {
+          remove(removedPort);
+        }
+        return;
+
+      default:
+        debug("Invalid event: " + eventTypeNode.asText());
     }
   }
 

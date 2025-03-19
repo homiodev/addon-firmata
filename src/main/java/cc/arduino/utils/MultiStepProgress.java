@@ -32,11 +32,9 @@ package cc.arduino.utils;
 public class MultiStepProgress implements Progress {
 
   private final double steps;
-
+  String status;
   private double step;
   private double stepProgress;
-
-  String status;
 
   public MultiStepProgress(int _steps) {
     steps = _steps;
@@ -54,22 +52,22 @@ public class MultiStepProgress implements Progress {
   }
 
   @Override
-  public void setProgress(double progress) {
-    stepProgress = progress;
-  }
-
-  @Override
-  public void setStatus(String _status) {
-    status = _status;
-  }
-
-  @Override
   public double getProgress() {
     return getGlobalProgress();
   }
 
   @Override
+  public void setProgress(double progress) {
+    stepProgress = progress;
+  }
+
+  @Override
   public String getStatus() {
     return status;
+  }
+
+  @Override
+  public void setStatus(String _status) {
+    status = _status;
   }
 }

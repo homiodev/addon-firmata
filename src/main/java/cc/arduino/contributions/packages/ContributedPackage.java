@@ -38,24 +38,38 @@ public class ContributedPackage {
   private String maintainer;
   private String websiteURL;
   private String email;
-  private ArrayList<ContributedPlatform> platforms = new ArrayList<ContributedPlatform>();
-  private ArrayList<ContributedTool> tools = new ArrayList<ContributedTool>();
+  private final ArrayList<ContributedPlatform> platforms = new ArrayList<ContributedPlatform>();
+  private final ArrayList<ContributedTool> tools = new ArrayList<ContributedTool>();
   private ContributedHelp help;
   private boolean trusted;
 
-  public String getName() { return name; }
+  public String getName() {
+    return name;
+  }
 
-  public String getMaintainer() { return maintainer; }
+  public String getMaintainer() {
+    return maintainer;
+  }
 
-  public String getWebsiteURL() { return websiteURL; }
+  public String getWebsiteURL() {
+    return websiteURL;
+  }
 
-  public String getEmail() { return email; }
+  public String getEmail() {
+    return email;
+  }
 
-  public List<ContributedPlatform> getPlatforms() { return platforms; }
+  public List<ContributedPlatform> getPlatforms() {
+    return platforms;
+  }
 
-  public List<ContributedTool> getTools() { return tools; }
+  public List<ContributedTool> getTools() {
+    return tools;
+  }
 
-  public ContributedHelp getHelp() { return help; }
+  public ContributedHelp getHelp() {
+    return help;
+  }
 
   public ContributedPlatform findPlatform(String architecture, String version) {
     if (architecture == null || version == null) {
@@ -111,16 +125,16 @@ public class ContributedPackage {
         }
         res += "\n                    category     : " + plat.getCategory();
         res += "\n                    architecture : " +
-          plat.getArchitecture() + " " + plat.getParsedVersion() + "\n";
+               plat.getArchitecture() + " " + plat.getParsedVersion() + "\n";
         if (plat.getToolsDependencies() != null)
           for (ContributedToolReference t : plat.getToolsDependencies()) {
             res += "                    tool dep     : " + t.getName() + " " +
-              t.getVersion() + "\n";
+                   t.getVersion() + "\n";
           }
         if (plat.getBoards() != null)
           for (ContributedBoard board : plat.getBoards())
             res += "                    board        : " + board.getName() +
-              "\n";
+                   "\n";
       }
     }
     if (getTools() != null) {

@@ -57,7 +57,15 @@ import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -415,14 +423,14 @@ public class FileDownloaderCache {
     @Override
     public String toString() {
       return "FileCached{" +
-        "eTag='" + eTag + '\'' +
-        ", lastETag='" + lastETag + '\'' +
-        ", remoteURL='" + remoteURL + '\'' +
-        ", localPath='" + localPath + '\'' +
-        ", md5='" + md5 + '\'' +
-        ", createdAt='" + createdAt + '\'' +
-        ", cacheControl=" + cacheControl +
-        '}';
+             "eTag='" + eTag + '\'' +
+             ", lastETag='" + lastETag + '\'' +
+             ", remoteURL='" + remoteURL + '\'' +
+             ", localPath='" + localPath + '\'' +
+             ", md5='" + md5 + '\'' +
+             ", createdAt='" + createdAt + '\'' +
+             ", cacheControl=" + cacheControl +
+             '}';
     }
   }
 }

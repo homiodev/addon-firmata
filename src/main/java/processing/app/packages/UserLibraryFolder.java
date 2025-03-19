@@ -33,17 +33,16 @@ import java.io.File;
 
 public class UserLibraryFolder {
 
-  public enum Location {
-    SKETCHBOOK, CORE, REFERENCED_CORE, IDE_BUILTIN,
-  }
-
   public File folder;
-
   public Location location;
 
   public UserLibraryFolder(File folder, Location location) {
     this.folder = folder;
     this.location = location;
+  }
+
+  public enum Location {
+    SKETCHBOOK, CORE, REFERENCED_CORE, IDE_BUILTIN,
   }
 
 }

@@ -34,7 +34,11 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.Session;
 import org.apache.commons.compress.utils.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class SCP extends SSH {
 

@@ -48,7 +48,7 @@ import java.util.Map;
 import static processing.app.I18n.tr;
 
 public class BoardCloudResolver {
-  private static Logger log = LogManager.getLogger(BoardCloudResolver.class);
+  private static final Logger log = LogManager.getLogger(BoardCloudResolver.class);
 
   public synchronized void getBoardBy(String vid, String pid) {
     // this method is less useful in Windows < WIN10 since you need drivers to be already installed
@@ -138,11 +138,11 @@ public class BoardCloudResolver {
     @Override
     public String toString() {
       return "BoardCloudAPIid{" +
-        "name='" + name + '\'' +
-        ", fqbn='" + fqbn + '\'' +
-        ", architecture='" + architecture + '\'' +
-        ", id='" + id + '\'' +
-        '}';
+             "name='" + name + '\'' +
+             ", fqbn='" + fqbn + '\'' +
+             ", architecture='" + architecture + '\'' +
+             ", id='" + id + '\'' +
+             '}';
     }
   }
 

@@ -36,7 +36,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.compress.utils.IOUtils;
-
 import processing.app.BaseNoGui;
 import processing.app.Platform;
 import processing.app.PreferencesData;
@@ -50,7 +49,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static processing.app.I18n.format;
@@ -93,13 +100,13 @@ public class ContributionsIndexer {
         mergeContributions(defaultIndexFile);
       } else {
         BaseNoGui
-            .showWarning(Constants.DEFAULT_INDEX_FILE_NAME,
-                              tr("A package index has an invalid signature and needs to be updated.\n"
-                                 + "Please open the Board Manager from the menu\n"
-                                 + "\n" //
-                                 + "      Tools -> Board -> Board Manager\n"
-                                 + "\nto update it"),
-                              null);
+          .showWarning(Constants.DEFAULT_INDEX_FILE_NAME,
+            tr("A package index has an invalid signature and needs to be updated.\n"
+               + "Please open the Board Manager from the menu\n"
+               + "\n" //
+               + "      Tools -> Board -> Board Manager\n"
+               + "\nto update it"),
+            null);
       }
     }
 
@@ -355,8 +362,8 @@ public class ContributionsIndexer {
       ContributedTargetPackage targetPackage = new ContributedTargetPackage(aPackage.getName());
 
       List<ContributedPlatform> platforms = aPackage.getPlatforms().stream() //
-          .filter(p -> p.isInstalled()) //
-          .collect(Collectors.toList());
+        .filter(p -> p.isInstalled()) //
+        .collect(Collectors.toList());
       Collections.sort(platforms, ContributedPlatform.BUILTIN_AS_LAST);
 
       for (ContributedPlatform p : platforms) {
@@ -411,15 +418,15 @@ public class ContributionsIndexer {
     }
     for (ContributedPackage pack : index.getPackages()) {
       Collection<ContributedPlatform> platforms = pack.getPlatforms().stream() //
-          .filter(p -> p.isInstalled()) //
-          .collect(Collectors.toList());
+        .filter(p -> p.isInstalled()) //
+        .collect(Collectors.toList());
       Map<String, List<ContributedPlatform>> platformsByName = platforms.stream().collect(Collectors.groupingBy(ContributedPlatform::getName));
 
       platformsByName.forEach((platformName, platformsWithName) -> {
         if (platformsWithName.size() > 1) {
           platformsWithName = platformsWithName.stream() //
-              .filter(p -> !p.isBuiltIn()) //
-              .collect(Collectors.toList());
+            .filter(p -> !p.isBuiltIn()) //
+            .collect(Collectors.toList());
         }
         for (ContributedPlatform p : platformsWithName) {
           tools.addAll(p.getResolvedTools());

@@ -30,19 +30,20 @@
 package cc.arduino.contributions.libraries;
 
 import cc.arduino.contributions.DownloadableContribution;
+import cc.arduino.contributions.VersionHelper;
 import processing.app.I18n;
 import processing.app.packages.UserLibrary;
-import static processing.app.I18n.tr;
 
-import java.util.Comparator;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import cc.arduino.contributions.VersionHelper;
+import static processing.app.I18n.tr;
 
 public class ContributedLibrary extends DownloadableContribution {
 
+  public static final Comparator<ContributedLibrary> CASE_INSENSITIVE_ORDER = (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName());
   private String url;
   private String version;
   private String checksum;
@@ -60,46 +61,79 @@ public class ContributedLibrary extends DownloadableContribution {
   private ArrayList<String> types;
   private ArrayList<ContributedLibraryDependency> dependencies;
   private ArrayList<String> providesIncludes;
-
-  public String getUrl() { return url; }
-
-  public String getVersion() { return version; }
-
-  public String getChecksum() { return checksum; }
-
-  public long getSize() { return size; }
-
-  public String getArchiveFileName() { return archiveFileName; }
-
-  public String getName() { return name; }
-
-  public String getMaintainer() { return maintainer; }
-
-  public String getAuthor() { return author; }
-
-  public String getWebsite() { return website; }
-
-  public String getCategory() { return category; }
-
-  public void setCategory(String category) { this.category = category; }
-
-  public String getLicense() { return licence; }
-
-  public String getParagraph() { return paragraph; }
-
-  public String getSentence() { return sentence; }
-
-  public List<String> getArchitectures() { return architectures; }
-
-  public List<String> getTypes() { return types; }
-
-  public List<ContributedLibraryDependency> getDependencies() { return dependencies; }
-
-  public List<String> getProvidesIncludes() { return providesIncludes; }
-
-  public static final Comparator<ContributedLibrary> CASE_INSENSITIVE_ORDER = (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName());
-
   private Optional<UserLibrary> installedLib = Optional.empty();
+
+  public String getUrl() {
+    return url;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public String getChecksum() {
+    return checksum;
+  }
+
+  public long getSize() {
+    return size;
+  }
+
+  public String getArchiveFileName() {
+    return archiveFileName;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getMaintainer() {
+    return maintainer;
+  }
+
+  public String getAuthor() {
+    return author;
+  }
+
+  public String getWebsite() {
+    return website;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
+  }
+
+  public String getLicense() {
+    return licence;
+  }
+
+  public String getParagraph() {
+    return paragraph;
+  }
+
+  public String getSentence() {
+    return sentence;
+  }
+
+  public List<String> getArchitectures() {
+    return architectures;
+  }
+
+  public List<String> getTypes() {
+    return types;
+  }
+
+  public List<ContributedLibraryDependency> getDependencies() {
+    return dependencies;
+  }
+
+  public List<String> getProvidesIncludes() {
+    return providesIncludes;
+  }
 
   public Optional<UserLibrary> getInstalledLibrary() {
     return installedLib;
@@ -189,10 +223,9 @@ public class ContributedLibrary extends DownloadableContribution {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ContributedLibrary)) {
+    if (!(obj instanceof ContributedLibrary other)) {
       return false;
     }
-    ContributedLibrary other = (ContributedLibrary) obj;
     String thisVersion = getParsedVersion();
     String otherVersion = other.getParsedVersion();
 

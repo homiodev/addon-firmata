@@ -1,4 +1,5 @@
 {
+  "NO_BOARD_INFO": "No board info found",
   "FIRMATA": {
     "EVENT": {
       "FIRMATA_WRONG_DEVICE_TYPE": "Got UDP event with deviceID <{{ID}}> but attached device <{{NAME}}> has not type FirmataNetworkEntity",

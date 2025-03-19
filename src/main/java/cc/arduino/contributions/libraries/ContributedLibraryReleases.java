@@ -38,8 +38,8 @@ import java.util.Optional;
 
 public class ContributedLibraryReleases {
 
-  private List<ContributedLibrary> releases = new LinkedList<>();
-  private List<String> versions = new LinkedList<>();
+  private final List<ContributedLibrary> releases = new LinkedList<>();
+  private final List<String> versions = new LinkedList<>();
   private ContributedLibrary latest = null;
   private ContributedLibrary selected = null;
 
@@ -79,15 +79,15 @@ public class ContributedLibraryReleases {
 
   public Optional<ContributedLibrary> getInstalled() {
     return releases.stream() //
-        .filter(ContributedLibrary::isLibraryInstalled) //
-        .reduce((x, y) -> {
-          Location lx = x.getInstalledLibrary().get().getLocation();
-          Location ly = y.getInstalledLibrary().get().getLocation();
-          if (lx == ly) {
-            return VersionComparator.max(x, y);
-          }
-          return lx == Location.SKETCHBOOK ? x : y;
-        });
+      .filter(ContributedLibrary::isLibraryInstalled) //
+      .reduce((x, y) -> {
+        Location lx = x.getInstalledLibrary().get().getLocation();
+        Location ly = y.getInstalledLibrary().get().getLocation();
+        if (lx == ly) {
+          return VersionComparator.max(x, y);
+        }
+        return lx == Location.SKETCHBOOK ? x : y;
+      });
   }
 
   public ContributedLibrary getLatest() {

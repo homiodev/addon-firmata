@@ -33,15 +33,24 @@ import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Discovery;
 import processing.app.BaseNoGui;
 
-import javax.jmdns.*;
+import javax.jmdns.JmmDNS;
+import javax.jmdns.ServiceEvent;
+import javax.jmdns.ServiceInfo;
+import javax.jmdns.ServiceListener;
 import java.net.InetAddress;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class NetworkDiscovery implements Discovery, ServiceListener, Runnable {
 
   private final List<BoardPort> reachableBoardPorts = new LinkedList<>();
   private final List<BoardPort> boardPortsDiscoveredWithJmDNS = new LinkedList<>();
   private JmmDNS jmdns = null;
+
+  public NetworkDiscovery() {
+
+  }
 
   private void removeDuplicateBoards(BoardPort newBoard) {
     synchronized (boardPortsDiscoveredWithJmDNS) {
@@ -102,9 +111,9 @@ public class NetworkDiscovery implements Discovery, ServiceListener, Runnable {
         String useSSH = info.getPropertyString("ssh_upload");
         String checkTCP = info.getPropertyString("tcp_check");
         String useAuth = info.getPropertyString("auth_upload");
-        if(useSSH == null || !useSSH.contentEquals("no")) useSSH = "yes";
-        if(checkTCP == null || !checkTCP.contentEquals("no")) checkTCP = "yes";
-        if(useAuth == null || !useAuth.contentEquals("yes")) useAuth = "no";
+        if (useSSH == null || !useSSH.contentEquals("no")) useSSH = "yes";
+        if (checkTCP == null || !checkTCP.contentEquals("no")) checkTCP = "yes";
+        if (useAuth == null || !useAuth.contentEquals("yes")) useAuth = "no";
         port.getPrefs().put("ssh_upload", useSSH);
         port.getPrefs().put("tcp_check", checkTCP);
         port.getPrefs().put("auth_upload", useAuth);
@@ -127,10 +136,6 @@ public class NetworkDiscovery implements Discovery, ServiceListener, Runnable {
         boardPortsDiscoveredWithJmDNS.add(port);
       }
     }
-  }
-
-  public NetworkDiscovery() {
-
   }
 
   @Override

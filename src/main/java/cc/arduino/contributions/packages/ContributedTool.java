@@ -40,17 +40,23 @@ public class ContributedTool {
 
   private String name;
   private String version;
-  private ArrayList<HostDependentDownloadableContribution> systems = new ArrayList<HostDependentDownloadableContribution>();
+  private final ArrayList<HostDependentDownloadableContribution> systems = new ArrayList<HostDependentDownloadableContribution>();
   private boolean installed;
   private File installedFolder;
   private boolean builtIn;
   private ContributedPackage contributedPackage;
 
-  public String getName() { return name; }
+  public String getName() {
+    return name;
+  }
 
-  public String getVersion() { return version; }
+  public String getVersion() {
+    return version;
+  }
 
-  public List<HostDependentDownloadableContribution> getSystems() { return systems; }
+  public List<HostDependentDownloadableContribution> getSystems() {
+    return systems;
+  }
 
   public boolean isInstalled() {
     return installed;
@@ -119,11 +125,10 @@ public class ContributedTool {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof ContributedTool)) {
+    if (!(obj instanceof ContributedTool obj1)) {
       return false;
     }
 
-    ContributedTool obj1 = (ContributedTool) obj;
     return getName().equals(obj1.getName()) && getVersion().equals(obj1.getVersion());
   }
 }

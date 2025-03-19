@@ -54,7 +54,7 @@ public class LegacyTargetPlatform implements TargetPlatform {
   private PreferencesMap customMenus = new PreferencesMap();
 
   public LegacyTargetPlatform(String _name, File _folder, TargetPackage parent)
-      throws TargetPlatformException {
+    throws TargetPlatformException {
 
     id = _name;
     folder = _folder;
@@ -64,13 +64,13 @@ public class LegacyTargetPlatform implements TargetPlatform {
     File boardsFile = new File(folder, "boards.txt");
     if (!boardsFile.exists() || !boardsFile.canRead())
       throw new TargetPlatformException(
-          format(tr("Could not find boards.txt in {0}. Is it pre-1.5?"),
-                 folder.getAbsolutePath()));
+        format(tr("Could not find boards.txt in {0}. Is it pre-1.5?"),
+          folder.getAbsolutePath()));
 
     // Load boards
     try {
       PreferencesMap bPrefs = new PreferencesMap(
-          boardsFile);
+        boardsFile);
 
       // Allow overriding values in boards.txt. This allows changing
       // boards.txt (e.g. to add user-specific items to a menu), without
@@ -83,7 +83,7 @@ public class LegacyTargetPlatform implements TargetPlatform {
         }
       } catch (IOException e) {
         throw new TargetPlatformException(
-            format(tr("Error loading {0}"), localboardsFile.getAbsolutePath()), e);
+          format(tr("Error loading {0}"), localboardsFile.getAbsolutePath()), e);
       }
       Map<String, PreferencesMap> boardsPreferences = bPrefs.firstLevelMap();
 
@@ -106,7 +106,7 @@ public class LegacyTargetPlatform implements TargetPlatform {
       }
     } catch (IOException e) {
       throw new TargetPlatformException(format(tr("Error loading {0}"),
-                                               boardsFile.getAbsolutePath()), e);
+        boardsFile.getAbsolutePath()), e);
     }
 
     File platformsFile = new File(folder, "platform.txt");
@@ -116,7 +116,7 @@ public class LegacyTargetPlatform implements TargetPlatform {
       }
     } catch (IOException e) {
       throw new TargetPlatformException(
-          format(tr("Error loading {0}"), platformsFile.getAbsolutePath()), e);
+        format(tr("Error loading {0}"), platformsFile.getAbsolutePath()), e);
     }
 
     // Allow overriding values in platform.txt. This allows changing
@@ -130,7 +130,7 @@ public class LegacyTargetPlatform implements TargetPlatform {
       }
     } catch (IOException e) {
       throw new TargetPlatformException(
-          format(tr("Error loading {0}"), localPlatformsFile.getAbsolutePath()), e);
+        format(tr("Error loading {0}"), localPlatformsFile.getAbsolutePath()), e);
     }
 
     if (!preferences.containsKey("rewriting") || !"disabled".equals(preferences.get("rewriting"))) {
@@ -150,7 +150,7 @@ public class LegacyTargetPlatform implements TargetPlatform {
       }
     } catch (IOException e) {
       throw new TargetPlatformException(format(tr("Error loading {0}"),
-                                               progFile.getAbsolutePath()), e);
+        progFile.getAbsolutePath()), e);
     }
   }
 
@@ -248,6 +248,6 @@ public class LegacyTargetPlatform implements TargetPlatform {
 
   @Override
   public boolean isInSketchbook() {
-	return getFolder().getAbsolutePath().startsWith(BaseNoGui.getSketchbookHardwareFolder().getAbsolutePath());
+    return getFolder().getAbsolutePath().startsWith(BaseNoGui.getSketchbookHardwareFolder().getAbsolutePath());
   }
 }

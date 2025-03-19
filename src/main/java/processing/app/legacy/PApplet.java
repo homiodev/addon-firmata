@@ -2,7 +2,18 @@ package processing.app.legacy;
 
 import org.apache.commons.compress.utils.IOUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -13,14 +24,18 @@ import java.util.zip.GZIPOutputStream;
 
 public class PApplet {
 
-  /** Path to sketch folder */
-  public String sketchPath; //folder;
-
   /**
    * Current platform in use, one of the
    * PConstants WINDOWS, MACOSX, MACOS9, LINUX or OTHER.
    */
   static public int platform;
+  static String openLauncher;
+  /**
+   * Integer number formatter.
+   */
+  static private NumberFormat int_nf;
+  static private int int_nf_digits;
+  static private boolean int_nf_commas;
 
   /**
    * Name associated with the current 'platform' (see PConstants.platformNames)
@@ -44,6 +59,9 @@ public class PApplet {
     }
   }
 
+  /** Path to sketch folder */
+  public String sketchPath; //folder;
+
   /**
    * Split the provided String at wherever whitespace occurs. Multiple
    * whitespace (extra spaces or tabs or whatever) between items will count as a
@@ -53,7 +71,7 @@ public class PApplet {
    * java.util.StringTokenizer, plus the unicode non-breaking space character,
    * which is found commonly on files created by or used in conjunction with Mac
    * OS X (character 160, or 0x00A0 in hex).
-   * 
+   *
    * <PRE>
    * i.e. splitTokens("a b") -> { "a", "b" }
    *      splitTokens("a    b") -> { "a", "b" }
@@ -70,21 +88,21 @@ public class PApplet {
    * as separator characters. For instance, in addition to white space, you
    * might want to treat commas as a separator. The delimeter characters won't
    * appear in the returned String array.
-   * 
+   *
    * <PRE>
    * i.e. splitTokens("a, b", " ,") -> { "a", "b" }
    * </PRE>
-   * 
+   *
    * To include all the whitespace possibilities, use the variable WHITESPACE,
    * found in PConstants:
-   * 
+   *
    * <PRE>
    * i.e. splitTokens("a   | b", WHITESPACE + "|");  ->  { "a", "b" }
    * </PRE>
    */
   static public String[] splitTokens(String what, String delim) {
     StringTokenizer toker = new StringTokenizer(what, delim);
-    String pieces[] = new String[toker.countTokens()];
+    String[] pieces = new String[toker.countTokens()];
 
     int index = 0;
     while (toker.hasMoreTokens()) {
@@ -108,18 +126,18 @@ public class PApplet {
     if (what == null)
       return null;
 
-    char chars[] = what.toCharArray();
+    char[] chars = what.toCharArray();
     int splitCount = 0; // 1;
     for (int i = 0; i < chars.length; i++) {
       if (chars[i] == delim)
         splitCount++;
     }
     if (splitCount == 0) {
-      String splits[] = new String[1];
-      splits[0] = new String(what);
+      String[] splits = new String[1];
+      splits[0] = what;
       return splits;
     }
-    String splits[] = new String[splitCount + 1];
+    String[] splits = new String[splitCount + 1];
     int splitIndex = 0;
     int startIndex = 0;
     for (int i = 0; i < chars.length; i++) {
@@ -133,21 +151,19 @@ public class PApplet {
     return splits;
   }
 
-  static public String[] subset(String list[], int start, int count) {
-    String output[] = new String[count];
+  static public String[] subset(String[] list, int start, int count) {
+    String[] output = new String[count];
     System.arraycopy(list, start, output, 0, count);
     return output;
   }
-
 
   /**
    * Join an array of Strings together as a single String,
    * separated by the whatever's passed in for the separator.
    */
-  static public String join(String str[], char separator) {
+  static public String join(String[] str, char separator) {
     return join(str, String.valueOf(separator));
   }
-
 
   /**
    * Join an array of Strings together as a single String,
@@ -160,7 +176,7 @@ public class PApplet {
    *      String list = join(stuff, ", ");
    *      // list is now "apple, bear, cat"</PRE>
    */
-  static public String join(String str[], String separator) {
+  static public String join(String[] str, String separator) {
     StringBuffer buffer = new StringBuffer();
     for (int i = 0; i < str.length; i++) {
       if (i != 0) buffer.append(separator);
@@ -188,7 +204,8 @@ public class PApplet {
       } else {
         return Integer.parseInt(what.substring(0, offset));
       }
-    } catch (NumberFormatException e) { }
+    } catch (NumberFormatException e) {
+    }
     return otherwise;
   }
 
@@ -201,7 +218,7 @@ public class PApplet {
    *
    * numbers will contain { 1, 300, 44 }
    */
-  static public int[] parseInt(String what[]) {
+  static public int[] parseInt(String[] what) {
     return parseInt(what, 0);
   }
 
@@ -215,8 +232,8 @@ public class PApplet {
    *
    * numbers will contain { 1, 300, 9999, 44 }
    */
-  static public int[] parseInt(String what[], int missing) {
-    int output[] = new int[what.length];
+  static public int[] parseInt(String[] what, int missing) {
+    int[] output = new int[what.length];
     for (int i = 0; i < what.length; i++) {
       try {
         output[i] = Integer.parseInt(what[i]);
@@ -241,14 +258,14 @@ public class PApplet {
   static public String[] loadStrings(InputStream input) {
     BufferedReader reader = null;
     try {
-      reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
+      reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
 
-      String lines[] = new String[100];
+      String[] lines = new String[100];
       int lineCount = 0;
       String line = null;
       while ((line = reader.readLine()) != null) {
         if (lineCount == lines.length) {
-          String temp[] = new String[lineCount << 1];
+          String[] temp = new String[lineCount << 1];
           System.arraycopy(lines, 0, temp, 0, lineCount);
           lines = temp;
         }
@@ -260,7 +277,7 @@ public class PApplet {
       }
 
       // resize array to appropriate amount for these lines
-      String output[] = new String[lineCount];
+      String[] output = new String[lineCount];
       System.arraycopy(lines, 0, output, 0, lineCount);
       return output;
 
@@ -273,12 +290,7 @@ public class PApplet {
     return null;
   }
 
-  public void saveStrings(String filename, String strings[]) {
-    saveStrings(saveFile(filename), strings);
-  }
-
-
-  static public void saveStrings(File file, String strings[]) {
+  static public void saveStrings(File file, String[] strings) {
     OutputStream outputStream = null;
     try {
       outputStream = createOutput(file);
@@ -288,8 +300,7 @@ public class PApplet {
     }
   }
 
-
-  static public void saveStrings(OutputStream output, String strings[]) {
+  static public void saveStrings(OutputStream output, String[] strings) {
     PrintWriter writer = null;
     try {
       writer = createWriter(output);
@@ -305,13 +316,12 @@ public class PApplet {
     }
   }
 
-
-  static public int[] expand(int list[]) {
+  static public int[] expand(int[] list) {
     return expand(list, list.length << 1);
   }
 
-  static public int[] expand(int list[], int newSize) {
-    int temp[] = new int[newSize];
+  static public int[] expand(int[] list, int newSize) {
+    int[] temp = new int[newSize];
     System.arraycopy(list, 0, temp, 0, Math.min(newSize, list.length));
     return temp;
   }
@@ -324,7 +334,7 @@ public class PApplet {
       return stuff.substring(length - digits);
 
     } else if (length < digits) {
-      return "00000000".substring(8 - (digits-length)) + stuff;
+      return "00000000".substring(8 - (digits - length)) + stuff;
     }
     return stuff;
   }
@@ -353,10 +363,8 @@ public class PApplet {
    * @usage Application
    */
   static public void open(String filename) {
-    open(new String[] { filename });
+    open(new String[]{filename});
   }
-
-  static String openLauncher;
 
   /**
    * Launch a process using a platforms shell. This version uses an array
@@ -366,7 +374,7 @@ public class PApplet {
    *
    * @param list of commands passed to the command line
    */
-  static public Process open(String argv[]) {
+  static public Process open(String[] argv) {
     String[] params = null;
 
     if (platform == PConstants.WINDOWS) {
@@ -374,37 +382,41 @@ public class PApplet {
       // but make sure to chmod +x the .html files first
       // also place quotes around it in case there's a space
       // in the user.dir part of the url
-      params = new String[] { "cmd", "/c" };
+      params = new String[]{"cmd", "/c"};
 
     } else if (platform == PConstants.MACOSX) {
-      params = new String[] { "open" };
+      params = new String[]{"open"};
 
     } else if (platform == PConstants.LINUX) {
       if (openLauncher == null) {
         // Attempt to use gnome-open
         try {
-          Process p = Runtime.getRuntime().exec(new String[] { "gnome-open" });
-          /*int result =*/ p.waitFor();
+          Process p = Runtime.getRuntime().exec(new String[]{"gnome-open"});
+          /*int result =*/
+          p.waitFor();
           // Not installed will throw an IOException (JDK 1.4.2, Ubuntu 7.04)
           openLauncher = "gnome-open";
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
       }
       if (openLauncher == null) {
         // Attempt with kde-open
         try {
-          Process p = Runtime.getRuntime().exec(new String[] { "kde-open" });
-          /*int result =*/ p.waitFor();
+          Process p = Runtime.getRuntime().exec(new String[]{"kde-open"});
+          /*int result =*/
+          p.waitFor();
           openLauncher = "kde-open";
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
       }
       if (openLauncher == null) {
         System.err.println("Could not find gnome-open or kde-open, " +
                            "the open() command may not work.");
       }
       if (openLauncher != null) {
-        params = new String[] { openLauncher };
+        params = new String[]{openLauncher};
       }
-    //} else {  // give up and just pass it to Runtime.exec()
+      //} else {  // give up and just pass it to Runtime.exec()
       //open(new String[] { filename });
       //params = new String[] { filename };
     }
@@ -431,8 +443,8 @@ public class PApplet {
     }
   }
 
-  static public String[] concat(String a[], String b[]) {
-    String c[] = new String[a.length + b.length];
+  static public String[] concat(String[] a, String[] b) {
+    String[] c = new String[a.length + b.length];
     System.arraycopy(a, 0, c, 0, a.length);
     System.arraycopy(b, 0, c, a.length, b.length);
     return c;
@@ -463,7 +475,7 @@ public class PApplet {
     }
     return matches;
   }
-  
+
   /**
    * Match a string with a regular expression, and returns the match as an
    * array. The first index is the matching expression, and array elements
@@ -492,15 +504,8 @@ public class PApplet {
     return null;
   }
 
-  /**
-   * Integer number formatter.
-   */
-  static private NumberFormat int_nf;
-  static private int int_nf_digits;
-  static private boolean int_nf_commas;
-
-  static public String[] nf(int num[], int digits) {
-    String formatted[] = new String[num.length];
+  static public String[] nf(int[] num, int digits) {
+    String[] formatted = new String[num.length];
     for (int i = 0; i < formatted.length; i++) {
       formatted[i] = nf(num[i], digits);
     }
@@ -522,8 +527,8 @@ public class PApplet {
     return int_nf.format(num);
   }
 
-  static final public String[] str(int x[]) {
-    String s[] = new String[x.length];
+  static final public String[] str(int[] x) {
+    String[] s = new String[x.length];
     for (int i = 0; i < x.length; i++) s[i] = String.valueOf(x[i]);
     return s;
   }
@@ -547,19 +552,15 @@ public class PApplet {
     return createWriter(output);
   }
 
-
   /**
    * I want to print lines to a file. Why am I always explaining myself?
    * It's the JavaSoft API engineers who need to explain themselves.
    */
   static public PrintWriter createWriter(OutputStream output) {
-    try {
-      OutputStreamWriter osw = new OutputStreamWriter(output, "UTF-8");
-      return new PrintWriter(osw);
-    } catch (UnsupportedEncodingException e) { }  // not gonna happen
-    return null;
+    OutputStreamWriter osw = new OutputStreamWriter(output, StandardCharsets.UTF_8);
+    return new PrintWriter(osw);
   }
-  
+
   static public InputStream createInput(File file) {
     if (file == null) {
       throw new IllegalArgumentException("File passed to createInput() was null");
@@ -576,6 +577,47 @@ public class PApplet {
       e.printStackTrace();
       return null;
     }
+  }
+
+  static public OutputStream createOutput(File file) {
+    try {
+      createPath(file);  // make sure the path exists
+      FileOutputStream fos = new FileOutputStream(file);
+      if (file.getName().toLowerCase().endsWith(".gz")) {
+        return new GZIPOutputStream(fos);
+      }
+      return fos;
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  /**
+   * Takes a path and creates any in-between folders if they don't
+   * already exist. Useful when trying to save to a subfolder that
+   * may not actually exist.
+   */
+  static public void createPath(String path) {
+    createPath(new File(path));
+  }
+
+  static public void createPath(File file) {
+    try {
+      String parent = file.getParent();
+      if (parent != null) {
+        File unit = new File(parent);
+        if (!unit.exists()) unit.mkdirs();
+      }
+    } catch (SecurityException se) {
+      System.err.println("You don't have permissions to create " +
+                         file.getAbsolutePath());
+    }
+  }
+
+  public void saveStrings(String filename, String[] strings) {
+    saveStrings(saveFile(filename), strings);
   }
 
   /**
@@ -597,7 +639,6 @@ public class PApplet {
     createPath(filename);
     return filename;
   }
-
 
   /**
    * Identical to savePath(), but returns a File object.
@@ -622,22 +663,6 @@ public class PApplet {
    */
   public OutputStream createOutput(String filename) {
     return createOutput(saveFile(filename));
-  }
-
-
-  static public OutputStream createOutput(File file) {
-    try {
-      createPath(file);  // make sure the path exists
-      FileOutputStream fos = new FileOutputStream(file);
-      if (file.getName().toLowerCase().endsWith(".gz")) {
-        return new GZIPOutputStream(fos);
-      }
-      return fos;
-
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
   }
 
   /**
@@ -666,32 +691,10 @@ public class PApplet {
     // for 0120, added a try/catch anyways.
     try {
       if (new File(where).isAbsolute()) return where;
-    } catch (Exception e) { }
+    } catch (Exception e) {
+    }
 
     return sketchPath + File.separator + where;
-  }
-
-  /**
-   * Takes a path and creates any in-between folders if they don't
-   * already exist. Useful when trying to save to a subfolder that
-   * may not actually exist.
-   */
-  static public void createPath(String path) {
-    createPath(new File(path));
-  }
-
-
-  static public void createPath(File file) {
-    try {
-      String parent = file.getParent();
-      if (parent != null) {
-        File unit = new File(parent);
-        if (!unit.exists()) unit.mkdirs();
-      }
-    } catch (SecurityException se) {
-      System.err.println("You don't have permissions to create " +
-                         file.getAbsolutePath());
-    }
   }
 
 
