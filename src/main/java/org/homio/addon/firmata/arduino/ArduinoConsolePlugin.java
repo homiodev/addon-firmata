@@ -3,6 +3,7 @@ package org.homio.addon.firmata.arduino;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.homio.addon.firmata.arduino.setting.ConsoleArduinoCompilerWarningSetting;
 import org.homio.addon.firmata.arduino.setting.ConsoleArduinoUploadUsingProgrammerSetting;
 import org.homio.addon.firmata.arduino.setting.ConsoleArduinoVerboseSetting;
 import org.homio.addon.firmata.arduino.setting.ConsoleArduinoVerifyAfterUploadSetting;
@@ -53,9 +54,20 @@ import static org.homio.api.entity.HasJsonData.LEVEL_DELIMITER;
 public class ArduinoConsolePlugin implements ConsolePluginEditor {
 
   public static final String DEFAULT_SKETCH_NAME = "sketch_default.ino";
+  private static final String defaultSketch = """
+    void setup() {
+      // put your setup code here, to run once:
+    
+    }
+    
+    void loop() {
+      // put your main code here, to run repeatedly:
+    
+    }
+    """;
 
   static {
-    System.setProperty("APP_DIR", CommonUtils.getInstallPath().resolve("arduino").toString());
+    System.setProperty("ARDUINO_APP_DIR", CommonUtils.getInstallPath().resolve("arduino").toString());
   }
 
   private final Context context;
@@ -92,6 +104,9 @@ public class ArduinoConsolePlugin implements ConsolePluginEditor {
 
     context.setting().listenValue(ConsoleHeaderArduinoBuildSketchSetting.class, "avr-build",
       arduinoSketchService::build);
+
+    context.setting().listenValueAndGet(ConsoleArduinoCompilerWarningSetting.class, "avr-cw",
+      value -> PreferencesData.set("compiler.warning_level", value.toLowerCase()));
 
     context.setting().listenValue(ConsoleHeaderArduinoDeploySketchSetting.class, "avr-upload",
       () -> arduinoSketchService.upload(false));
@@ -148,8 +163,8 @@ public class ArduinoConsolePlugin implements ConsolePluginEditor {
     if (!fileModel.getName().endsWith(".ino")) {
       fileModel.setName(fileModel.getName() + ".ino");
     }
-    this.content = fileModel;
-    if(!this.content.equals(fileModel)) {
+    if (!this.content.equals(fileModel)) {
+      this.content = fileModel;
       this.updateSketch();
       return ActionResponseModel.showSuccess(Lang.getServerMessage("SKETCH_SAVED"));
     }
@@ -288,16 +303,4 @@ public class ArduinoConsolePlugin implements ConsolePluginEditor {
   public FileModel getValue() {
     return content;
   }
-
-  private static final String defaultSketch = """
-    void setup() {
-      // put your setup code here, to run once:
-    
-    }
-    
-    void loop() {
-      // put your main code here, to run repeatedly:
-    
-    }
-    """;
 }

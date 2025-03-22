@@ -1,11 +1,21 @@
 {
+  "field": {
+    "excludePins": "Exclude pins",
+    "pinMode": "Pin mode",
+    "deviceLastPingResponseTime": "Last ping response time",
+    "deviceWorkingTime": "Device working time",
+    "lastInitResponseTime": "Device registered time"
+  },
+  "help": {
+    "field": {
+      "excludePins": "List of pins that skip creation"
+    }
+  },
   "action": {
     "communicator": {
       "success": "Communicator restarted successfully",
-      "not_found": "Communicator not found",
       "already_run": "Communicator already run",
-      "restart_too_often": "Communicator restart calls too often",
-      "unable_create": "Unable to create communicator for such device",
+      "restart_too_often_error": "Communicator restart calls too often",
       "unknown_error": "Unknown error while restart communicator. See logs"
     }
   },
@@ -32,7 +42,7 @@
   },
   "PLACEHOLDER": {
     "st_ConsoleHeaderArduinoSketchNameSetting": "Sketch",
-    "st_FirmataScanPortRangeSetting": "Scan port range i.e.: 192.168.0.0-255",
+    "st_FirmataScanIpRangeSetting": "Scan ip range i.e.: 192.168.0.0-255",
     "st_ConsoleHeaderArduinoIncludeLibrarySetting": "Include library",
     "st_ConsoleHeaderArduinoIncludeLibrarySetting_unavailable": "Select board first",
     "st_ConsoleHeaderArduinoPortSetting": "Arduino port",
@@ -45,8 +55,7 @@
     "name": "Firmata",
     "SETTING": {
       "LABEL": "Firmata settings",
-      "st_FirmataScanPortRangeSetting": "Scan port range",
-      "st_FirmataWatchDogIntervalSetting": "Watch dog max inactivity",
+      "st_FirmataScanIpRangeSetting": "Scan ip range",
       "st_ConsoleHeaderArduinoPortSetting": "Select arduino port",
       "st_ConsoleHeaderArduinoGetBoardInfoSetting": "Get board info",
       "st_ConsoleHeaderArduinoDeploySketchSetting": "Deploy sketch to board",
@@ -77,6 +86,7 @@
     "CONSOLE": {
       "firmata": "Arduino editor",
       "st_ConsoleArduinoVerifyAfterUploadSetting": "Verify code after upload",
+      "st_ConsoleArduinoCompilerWarningSetting": "Compile warnings level",
       "st_ConsoleArduinoLibraryManagerSetting": "Library Manager",
       "st_ConsoleArduinoBoardManagerSetting": "Boards Manager",
       "st_ConsoleArduinoBoardPasswordSetting": "Board password",

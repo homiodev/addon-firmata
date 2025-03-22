@@ -31,7 +31,7 @@ public class ArduinoConfiguration {
   public static Platform getPlatform() {
     if (platform == null) {
       try {
-        Path arduinoPath = Paths.get(System.getProperty("APP_DIR"));
+        Path arduinoPath = Paths.get(System.getProperty("ARDUINO_APP_DIR"));
 
         // if (!ArchiveUtil.isValidArchive(arduinoPath.resolve("arduino-dependencies.7z"))) {
         //   log.warn("Skip creating arduino platform because no dependencies installed");
@@ -56,7 +56,6 @@ public class ArduinoConfiguration {
         PreferencesData.set("build.path", arduinoPath.resolve("build").toString());
         PreferencesData.set("sketchbook.path", "sketchbook");
 
-        PreferencesData.set("compiler.warning_level", "none");
         PreferencesData.setBoolean("compiler.cache_core", true);
         PreferencesData.setBoolean("cache.enable", true);
         PreferencesData.setInteger("build.warn_data_percentage", 75);

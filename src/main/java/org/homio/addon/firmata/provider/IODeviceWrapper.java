@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.firmata4j.IODevice;
+import org.homio.addon.firmata.model.FirmataService;
 import org.homio.addon.firmata.provider.command.FirmataCommand;
 import org.homio.addon.firmata.provider.util.OneWireDevice;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.function.Consumer;
@@ -35,7 +37,7 @@ public class IODeviceWrapper {
   private final IODevice ioDevice;
   @Getter
   private final IOOneWire ioOneWire = new IOOneWire();
-  private final FirmataDeviceCommunicator firmataDeviceCommunicator;
+  private final FirmataService service;
   private byte messageID;
 
   public byte nextMessageId() {
@@ -56,10 +58,6 @@ public class IODeviceWrapper {
     return sendMessage(command, Long.BYTES, payload -> payload.putLong(longValue));
   }
 
-  public long generateUniqueIDOnRegistrationSuccess() {
-    return firmataDeviceCommunicator.generateUniqueIDOnRegistrationSuccess();
-  }
-
   @SneakyThrows
   private byte sendMessage(FirmataCommand command, int length, Consumer<ByteBuffer> consumer) {
     ByteBuffer payload = ByteBuffer.allocate(6 + length);
@@ -67,7 +65,7 @@ public class IODeviceWrapper {
     payload.put(command.getValue());
     byte id = nextMessageId();
     payload.put(id);
-    payload.putShort(firmataDeviceCommunicator.getEntity().getTarget());
+    payload.putShort(service.getEntity().getDeviceID());
     consumer.accept(payload);
     payload.put(END_SYSEX);
 
@@ -75,8 +73,7 @@ public class IODeviceWrapper {
     return id;
   }
 
-  @SneakyThrows
-  public void sendMessage(byte[] bytes) {
+  public void sendMessage(byte[] bytes) throws IOException {
     this.ioDevice.sendMessage(bytes);
   }
 
@@ -130,7 +127,7 @@ public class IODeviceWrapper {
       Integer correlationId = (int) Math.floor(Math.random() * 255);
       byte subCommand = (byte) (ONEWIRE_WRITE_REQUEST_BIT | ONEWIRE_READ_REQUEST_BIT | ONEWIRE_SELECT_REQUEST_BIT
                                 | (delay == null ? 0 : ONEWIRE_DELAY_REQUEST_BIT) | (reset ? ONEWIRE_RESET_REQUEST_BIT : 0));
-      return firmataDeviceCommunicator.getOneWireCommand().waitForValue(correlationId,
+      return service.getOneWireCommand().waitForValue(correlationId,
         () -> sendOneWireRequest(pin, subCommand, address, numBytesToRead, correlationId, delay, data));
     }
 
@@ -138,7 +135,7 @@ public class IODeviceWrapper {
      * Searches for 1-wire devices on the bus.  The passed callback should accept and error argument and an array of device identifiers.
      */
     public List<OneWireDevice> sendOneWireSearch(byte pin) {
-      return firmataDeviceCommunicator.getOneWireCommand().waitForDevices(ONEWIRE_SEARCH_REPLY, pin,
+      return service.getOneWireCommand().waitForDevices(ONEWIRE_SEARCH_REPLY, pin,
         () -> sendOneWireSearch(ONEWIRE_SEARCH_REQUEST, pin));
     }
 
@@ -146,7 +143,7 @@ public class IODeviceWrapper {
      * Searches for 1-wire devices on the bus in an alarmed state.  The passed callback should accept and error argument and an array of device identifiers.
      */
     public List<OneWireDevice> sendOneWireAlarmsSearch(byte pin) {
-      return firmataDeviceCommunicator.getOneWireCommand().waitForDevices(ONEWIRE_SEARCH_REPLY, pin,
+      return service.getOneWireCommand().waitForDevices(ONEWIRE_SEARCH_REPLY, pin,
         () -> sendOneWireSearch(ONEWIRE_SEARCH_ALARMS_REQUEST, pin));
     }
 
@@ -189,8 +186,8 @@ public class IODeviceWrapper {
         bytes.put((byte) ((delay >> 16) & 0xFF));
         bytes.put((byte) ((delay >> 24) & 0xFF));
       }
-      for (int i = 0; i < data.length; i++) {
-        bytes.put(data[i]);
+      for (byte datum : data) {
+        bytes.put(datum);
       }
 
       sendRaw(ONEWIRE_DATA, subcommand, pin, to7BitArray(bytes.array()));

@@ -2,7 +2,7 @@ package org.homio.addon.firmata.provider.util;
 
 import java.nio.ByteBuffer;
 
-public final class THUtil {
+public final class HomioFirmataUtil {
 
   public static byte getByte(ByteBuffer byteBuffer) {
     byte value = byteBuffer.get();

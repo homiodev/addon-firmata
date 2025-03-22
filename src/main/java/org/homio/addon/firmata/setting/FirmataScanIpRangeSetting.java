@@ -5,7 +5,7 @@ import org.homio.hquery.hardware.network.NetworkDescription;
 
 import static org.homio.api.util.HardwareUtils.MACHINE_IP_ADDRESS;
 
-public class FirmataScanPortRangeSetting implements SettingPluginTextSet {
+public class FirmataScanIpRangeSetting implements SettingPluginTextSet {
 
   @Override
   public int order() {

@@ -8,6 +8,7 @@ import org.homio.api.setting.SettingPluginOptions;
 import org.homio.api.setting.console.header.dynamic.DynamicConsoleHeaderContainerSettingPlugin;
 import org.homio.api.setting.console.header.dynamic.DynamicConsoleHeaderSettingPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import processing.app.BaseNoGui;
 import processing.app.PreferencesData;
@@ -27,13 +28,6 @@ public class ConsoleHeaderGetBoardsDynamicSetting implements DynamicConsoleHeade
         if (!preferencesMap.isEmpty()) {
           var dynamicSetting = new BoardDynamicSettings(customMenuEntry.getKey(), customMenuEntry.getValue(), preferencesMap);
           consumer.addDynamicSetting(dynamicSetting);
-          var firstKey = preferencesMap.keySet().iterator().next();
-          var keyValue = targetBoard.getMenuPreferences(customMenuEntry.getKey(), firstKey);
-          if (keyValue != null) {
-            for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-              PreferencesData.set(entry.getKey(), entry.getValue());
-            }
-          }
         }
       }
     }
@@ -42,6 +36,16 @@ public class ConsoleHeaderGetBoardsDynamicSetting implements DynamicConsoleHeade
   @Override
   public Icon getIcon() {
     return new Icon("fas fa-cubes", "#1C9CB0");
+  }
+
+  @Override
+  public void setValue(@NotNull Context context, @NotNull DynamicConsoleHeaderSettingPlugin<?> setting, @Nullable String value) {
+    if (BaseNoGui.packages != null) {
+      TargetBoard targetBoard = BaseNoGui.getTargetBoard();
+      if (targetBoard != null) {
+        PreferencesData.set("custom_" + setting.getKey(), targetBoard.getId() + "_" + value);
+      }
+    }
   }
 
   @Override

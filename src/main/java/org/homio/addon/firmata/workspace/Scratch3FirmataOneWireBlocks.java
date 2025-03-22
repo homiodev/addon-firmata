@@ -46,18 +46,18 @@ public class Scratch3FirmataOneWireBlocks extends Scratch3FirmataBaseBlock {
 
     ByteBuffer address = OneWireDevice.toByteArray(longAddress);
     return execute(workspaceBlock, false, this.pinMenu1Wire, (entity, pin) -> {
-      entity.getDevice().getIoOneWire().sendOneWireConfig(pin.getIndex(), true);
+      entity.getService().sendOneWireConfig(pin.getIndex(), true);
 
       // start conversion, with parasite power on at the end
       ByteBuffer payload = ByteBuffer.allocate(1).put(ONE_WIRE.DS18B20.CONVERT_TEMPERATURE_COMMAND);
-      entity.getDevice().getIoOneWire().sendOneWireWrite(pin.getIndex(), address, payload, null, true);
+      entity.getService().sendOneWireWrite(pin.getIndex(), address, payload, null, true);
 
       // maybe 750 ms is enough, maybe not
-      entity.getDevice().getIoOneWire().sendOneWireDelay(pin.getIndex(), 1);
+      entity.getService().sendOneWireDelay(pin.getIndex(), 1);
 
       // Read Scratchpad
       payload = ByteBuffer.allocate(1).put(ONE_WIRE.DS18B20.READ_SCRATCHPAD_COMMAND);
-      byte[] data = entity.getDevice().getIoOneWire()
+      byte[] data = entity.getService()
         .sendOneWireWriteAndRead(pin.getIndex(), address, payload, ONE_WIRE.DS18B20.READ_COUNT, null, true);
       float value = (float) (data == null ? -1 : ((data[1] & 0xFF) << 8) | data[0] & 0xFF) / 16;
       return new DecimalType(value);

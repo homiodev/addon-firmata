@@ -1,5 +1,7 @@
-//#define COMM_ESP8266_WIFI
-//#define COMM_SERIAL
+// enable ENABLE_WIFI, otherwise serial will be used
+//#define ENABLE_WIFI
+
+//#efine SERIAL_DEBUG
 
 //#define ENABLE_DHT
 //#define ENABLE_I2C
@@ -18,7 +20,7 @@
 
 #include <ConfigurableFirmata.h>
 
-#include "homio.h"
+#include "Homio.h"
 homio homio;
 
 #ifdef ENABLE_SLEEP

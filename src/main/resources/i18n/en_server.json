@@ -3,7 +3,6 @@
   "FIRMATA": {
     "EVENT": {
       "FIRMATA_WRONG_DEVICE_TYPE": "Got UDP event with deviceID <{{ID}}> but attached device <{{NAME}}> has not type FirmataNetworkEntity",
-      "FOUND_FIRMATA_DEVICE": "Found device '{{BOARD}}' with device id '{{ID}}' and ip address '{{IP}}'",
       "CHANGED_IP": "Detected change IP for firmata device: <DEVICE> from <OLD> to <NEW>"
     },
     "NEW_DEVICE_QUESTION": "Do you want create new firmata network device?",

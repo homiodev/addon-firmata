@@ -29,11 +29,14 @@
 
 package cc.arduino.i18n;
 
+import org.apache.commons.lang3.SystemUtils;
 import processing.app.I18n;
 import processing.app.debug.MessageConsumer;
 
 import java.io.PrintStream;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static processing.app.I18n.tr;
 
@@ -43,10 +46,7 @@ public class I18NAwareMessageConsumer implements MessageConsumer {
   private final PrintStream err;
   private final MessageConsumer parent;
   private final ExternalProcessOutputParser parser;
-
-  public I18NAwareMessageConsumer(PrintStream out) {
-    this(out, out, null);
-  }
+  private final Set<String> ignorePath;
 
   public I18NAwareMessageConsumer(PrintStream out, MessageConsumer parent) {
     this(out, out, parent);
@@ -61,6 +61,10 @@ public class I18NAwareMessageConsumer implements MessageConsumer {
     this.err = err;
     this.parent = parent;
     this.parser = new ExternalProcessOutputParser();
+    this.ignorePath = new HashSet<>(Set.of(System.getProperty("ARDUINO_APP_DIR")));
+    if (SystemUtils.IS_OS_WINDOWS) {
+      this.ignorePath.add(System.getProperty("ARDUINO_APP_DIR").replace("\\", "\\\\"));
+    }
   }
 
   @Override
@@ -68,6 +72,7 @@ public class I18NAwareMessageConsumer implements MessageConsumer {
     if (s.startsWith("===")) {
       Map<String, Object> parsedMessage = parser.parse(s);
       String translatedMessage = I18n.format(tr((String) parsedMessage.get("msg")), (Object[]) parsedMessage.get("args"));
+      translatedMessage = skipPaths(translatedMessage);
       if (!parsedMessage.containsKey("level") || "".equals(parsedMessage.get("level")) || "info".equals(parsedMessage.get("level"))) {
         out.println(translatedMessage);
       } else {
@@ -76,10 +81,19 @@ public class I18NAwareMessageConsumer implements MessageConsumer {
       return;
     }
 
+    s = skipPaths(s);
+
     if (parent != null) {
       parent.message(s);
     } else {
       out.println(s);
     }
+  }
+
+  private String skipPaths(String text) {
+    for (String ignorePath : ignorePath) {
+      text = text.replace(ignorePath, "...");
+    }
+    return text;
   }
 }

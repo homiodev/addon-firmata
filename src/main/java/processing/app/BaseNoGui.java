@@ -55,7 +55,7 @@ import static processing.app.helpers.filefilters.OnlyDirs.ONLY_DIRS;
 public class BaseNoGui {
 
   /** Version string to be used for build */
-  public static final int REVISION = 10814;
+  public static final int REVISION = 10819;
   /** Extended version string displayed on GUI */
   public static final String VERSION_NAME = "1.8.14";
   public static final String VERSION_NAME_LONG;
@@ -207,7 +207,7 @@ public class BaseNoGui {
   }
 
   static public File getContentFile(String name) {
-    String appDir = System.getProperty("APP_DIR");
+    String appDir = System.getProperty("ARDUINO_APP_DIR");
     if (appDir == null || appDir.isEmpty()) {
       appDir = currentDirectory;
     }

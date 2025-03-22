@@ -33,7 +33,7 @@ public class Scratch3FirmataI2CBlocks extends Scratch3FirmataBaseBlock {
   private State getBME280ValueEvaluate(WorkspaceBlock workspaceBlock) {
     return execute(workspaceBlock, false, entity -> {
       BME280ValueMenu type = workspaceBlock.getMenuValue("TYPE", this.bme280ValueMenu);
-      I2CDevice i2CDevice = entity.getDevice().getIoDevice().getI2CDevice((byte) 0x77);
+      I2CDevice i2CDevice = entity.getService().getI2CDevice((byte) 0x77);
 
       return null; // entity.getDevice().getIoDevice().getProtocol();
     });

@@ -1,94 +1,171 @@
 package org.homio.addon.firmata.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Transient;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.StringUtils;
+import org.homio.addon.firmata.FirmataEntrypoint;
 import org.homio.addon.firmata.arduino.ArduinoConsolePlugin;
-import org.homio.addon.firmata.provider.FirmataDeviceCommunicator;
-import org.homio.addon.firmata.provider.IODeviceWrapper;
-import org.homio.addon.firmata.provider.command.FirmataRegisterCommand;
-import org.homio.addon.firmata.provider.command.PendingRegistrationContext;
 import org.homio.api.Context;
-import org.homio.api.ContextSetting;
+import org.homio.api.entity.device.DeviceEndpointsBehaviourContract;
+import org.homio.api.entity.log.HasEntityLog;
 import org.homio.api.entity.types.MicroControllerBaseEntity;
 import org.homio.api.model.ActionResponseModel;
 import org.homio.api.model.FileContentType;
 import org.homio.api.model.FileModel;
-import org.homio.api.model.OptionModel;
-import org.homio.api.model.Status;
+import org.homio.api.model.device.ConfigDeviceDefinition;
+import org.homio.api.model.endpoint.DeviceEndpoint;
+import org.homio.api.service.EntityService;
 import org.homio.api.ui.UI;
 import org.homio.api.ui.field.UIField;
+import org.homio.api.ui.field.UIFieldGroup;
+import org.homio.api.ui.field.UIFieldInlineEditConfirm;
+import org.homio.api.ui.field.UIFieldNoReadDefaultValue;
+import org.homio.api.ui.field.UIFieldSlider;
+import org.homio.api.ui.field.UIFieldType;
 import org.homio.api.ui.field.action.UIContextMenuAction;
-import org.homio.api.ui.field.color.UIFieldColorStatusMatch;
-import org.homio.api.ui.field.selection.UIFieldSelectConfig;
-import org.homio.api.ui.field.selection.dynamic.DynamicOptionLoader;
-import org.homio.api.ui.field.selection.dynamic.UIFieldDynamicSelection;
+import org.homio.api.ui.field.action.v1.UIInputBuilder;
 import org.homio.api.util.CommonUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.Set;
 
 
-@SuppressWarnings({"JpaAttributeTypeInspection", "unused", "UnusedReturnValue"})
+@SuppressWarnings({"unused", "UnusedReturnValue", "JpaAttributeTypeInspection", "JpaAttributeMemberSignatureInspection"})
 @Entity
 @Accessors(chain = true)
-public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>> extends MicroControllerBaseEntity {
+public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>>
+  extends MicroControllerBaseEntity
+  implements DeviceEndpointsBehaviourContract,
+  EntityService<FirmataService>,
+  HasEntityLog {
 
-  private static final Map<String, FirmataDeviceCommunicator> entityIDToDeviceCommunicator = new HashMap<>();
 
-  @Setter
-  @Getter
-  @Transient
-  @JsonIgnore
-  private FirmataDeviceCommunicator firmataDeviceCommunicator;
+  @Override
+  public void logBuilder(@NotNull HasEntityLog.EntityLogBuilder entityLogBuilder) {
+    entityLogBuilder.addTopicFilterByEntityID(FirmataEntrypoint.class);
 
-  @UIField(order = 11, hideInEdit = true)
-  @UIFieldColorStatusMatch
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  public Status getJoined() {
-    return ContextSetting.getStatus(this, "joined", Status.UNKNOWN);
   }
 
-  public void setJoined(@NotNull Status status) {
-    ContextSetting.setStatus(this, "joined", "Joined", status);
-  }
 
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  @UIField(order = 23, hideInEdit = true)
-  public String getBoardType() {
-    return getJsonData("boardType");
-  }
+  @Override
+  public void assembleActions(UIInputBuilder uiInputBuilder) {
 
-  public void setBoardType(String boardType) {
-    setJsonData("boardType", boardType);
   }
 
   @Override
-  @UIField(order = 100, inlineEdit = true)
-  @UIFieldDynamicSelection(SelectTargetFirmataDeviceLoader.class)
-  @UIFieldSelectConfig(selectOnEmptyLabel = "SELECTION.target", iconColor = "#A7D21E")
+  public @NotNull List<ConfigDeviceDefinition> findMatchDeviceConfigurations() {
+    return List.of();
+  }
+
+  @Override
+  public @NotNull String getDeviceFullName() {
+    return getTitle();
+  }
+
+  @Override
+  public @NotNull Map<String, ? extends DeviceEndpoint> getDeviceEndpoints() {
+    return getService().getEndpoints();
+  }
+
+  @UIField(order = 1, inlineEdit = true)
+  @UIFieldInlineEditConfirm(value = "W.CONFIRM.TOGGLE_SERVICE", dialogColor = UI.Color.RED)
+  @UIFieldGroup("GENERAL")
+  public boolean isStart() {
+    return getJsonData("start", true);
+  }
+
+  public void setStart(boolean start) {
+    setJsonData("start", start);
+  }
+
+  @UIField(order = 23, disableEdit = true)
+  @UIFieldNoReadDefaultValue
+  public String getBoard() {
+    return getJsonData("bn");
+  }
+
+  public FirmataBaseEntity<T> setBoard(String value) {
+    setJsonData("bn", value);
+    return this;
+  }
+
+  @UIField(order = 25)
+  @UIFieldSlider(min = 5, max = 60, header = "min")
+  @UIFieldGroup("CONNECT")
+  public int getWatchDogTimeout() {
+    return getJsonData("wdt", 10);
+  }
+
+  public void setWatchDogTimeout(int value) {
+    setJsonData("wdt", value);
+  }
+
+  @UIFieldGroup(value = "TIMES", borderColor = "#871DB8")
+  @UIField(order = 26, hideInEdit = true, type = UIFieldType.Duration, hideOnEmpty = true)
+  public Long getDeviceWorkingTime() {
+    return getService().getDeviceStartedTime();
+  }
+
+  @UIFieldGroup("TIMES")
+  @UIField(order = 27, hideInEdit = true, type = UIFieldType.Duration, hideOnEmpty = true)
+  public Long getDeviceLastPingResponseTime() {
+    return getService().getLastPingResponseTime();
+  }
+
+  @UIFieldGroup("TIMES")
+  @UIField(order = 28, hideInEdit = true, type = UIFieldType.Duration, hideOnEmpty = true)
+  public Long getLastInitResponseTime() {
+    return getService().getLastInitResponseTime();
+  }
+
+  @UIFieldGroup("TIMES")
+  @UIField(order = 29, hideInEdit = true, type = UIFieldType.DurationDowntime, hideOnEmpty = true)
+  public Long getWatchDogTimeoutToRestart() {
+    return getService().getWatchDogTimeoutToRestart();
+  }
+
+  @UIField(order = 35)
+  @UIFieldSlider(min = -1, max = 10, header = "min")
+  @UIFieldGroup("CONNECT")
+  public int getPingInterval() {
+    return getJsonData("pi", 1);
+  }
+
+  public void setPingInterval(int value) {
+    setJsonData("pi", value);
+  }
+
+  @Override
+  @UIField(order = 100, disableEdit = true)
+  @UIFieldGroup("GENERAL")
+  @UIFieldNoReadDefaultValue
   public String getIeeeAddress() {
     return super.getIeeeAddress();
   }
 
-  @UIContextMenuAction(value = "RESTART_COMMUNICATOR",icon = "fas fa-power-off", iconColor = UI.Color.RED)
+  @UIField(order = 500)
+  @UIFieldNoReadDefaultValue
+  public Set<String> getExcludePins() {
+    return getJsonDataSet("ep", String.class);
+  }
+
+  public FirmataBaseEntity<T> setExcludePins(String value) {
+    setJsonData("ep", value);
+    return this;
+  }
+
+  @UIContextMenuAction(value = "RESTART_COMMUNICATOR", icon = "fas fa-power-off", iconColor = UI.Color.RED)
   public ActionResponseModel restartCommunicator() {
-    if (firmataDeviceCommunicator != null) {
-      try {
-        String response = firmataDeviceCommunicator.restart();
-        return ActionResponseModel.showSuccess(response);
-      } catch (Exception ex) {
-        return ActionResponseModel.showError(ex);
-      }
+    String result = getService().restart();
+    if (result.endsWith("_error")) {
+      return ActionResponseModel.showError(result);
     }
-    return ActionResponseModel.showWarn("action.communicator.not_found");
+    return ActionResponseModel.showSuccess(result);
   }
 
   @UIContextMenuAction(value = "UPLOAD_SKETCH_MANUALLY", icon = "fas fa-upload")
@@ -96,7 +173,7 @@ public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>> extends 
     ArduinoConsolePlugin arduinoConsolePlugin = context.getBean(ArduinoConsolePlugin.class);
     String content = CommonUtils.getResourceAsString("firmata", "arduino_firmata.ino");
     String commName = this.getCommunicatorName();
-    String sketch = "#define COMM_" + commName + "\n" + content;
+    String sketch = "#define ENABLE_" + commName + "\n" + content;
     arduinoConsolePlugin.save(new FileModel("arduino_firmata_" + commName + ".ino", sketch, FileContentType.cpp));
     arduinoConsolePlugin.syncContentToUI();
     context.ui().console().openConsole(arduinoConsolePlugin.getName());
@@ -105,11 +182,11 @@ public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>> extends 
   protected abstract String getCommunicatorName();
 
   @JsonIgnore
-  public short getTarget() {
+  public short getDeviceID() {
     return getIeeeAddress() == null ? -1 : Short.parseShort(getIeeeAddress());
   }
 
-  public void setTarget(short target) {
+  public void setDeviceID(short target) {
     setIeeeAddress(Short.toString(target));
   }
 
@@ -123,46 +200,25 @@ public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>> extends 
     return 20;
   }
 
-  public abstract FirmataDeviceCommunicator createFirmataDeviceType(Context context);
-
-  @JsonIgnore
-  public final IODeviceWrapper getDevice() {
-    return firmataDeviceCommunicator.getDevice();
-  }
-
-  public long getUniqueID() {
-    return getJsonData("uniqueID", 0L);
-  }
-
-  public FirmataBaseEntity<T> setUniqueID(Long uniqueID) {
-    setJsonData("uniqueID", uniqueID);
-    return this;
-  }
-
-  protected abstract boolean allowRegistrationType(PendingRegistrationContext pendingRegistrationContext);
-
   @Override
-  public void afterFetch() {
-    setFirmataDeviceCommunicator(entityIDToDeviceCommunicator.computeIfAbsent(getEntityID(),
-      ignore -> createFirmataDeviceType(context())));
+  public @Nullable FirmataService createService(@NotNull Context context) {
+    return new FirmataService(context, this, true);
   }
 
   @Override
-  public void beforeDelete() {
-    var firmataDeviceCommunicator = entityIDToDeviceCommunicator.remove(getEntityID());
-    if (firmataDeviceCommunicator != null) {
-      firmataDeviceCommunicator.destroy();
-    }
+  public @NotNull Class<FirmataService> getEntityServiceItemClass() {
+    return FirmataService.class;
   }
 
-  public static class SelectTargetFirmataDeviceLoader implements DynamicOptionLoader {
-
-    @Override
-    public List<OptionModel> loadOptions(DynamicOptionLoaderParameters parameters) {
-      return parameters.context().getBean(FirmataRegisterCommand.class).getPendingRegistrations().entrySet().stream()
-        .filter(entry -> ((FirmataBaseEntity) parameters.getBaseEntity()).allowRegistrationType(entry.getValue()))
-        .map(entry -> OptionModel.of(Short.toString(entry.getKey()), entry.getKey() + "/" + entry.getValue()))
-        .collect(Collectors.toList());
+  public boolean tryUpdateEntity(FirmataService.DeviceInfo info) {
+    if (!Objects.equals(getBoard(), info.board()) ||
+        !Objects.equals(getIeeeAddress(), info.deviceID()) ||
+        (StringUtils.isNotEmpty(info.name()) && !Objects.equals(getName(), info.name()))) {
+      setBoard(info.board());
+      setIeeeAddress(info.deviceID());
+      setName(info.name());
+      return true;
     }
+    return false;
   }
 }

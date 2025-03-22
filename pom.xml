@@ -15,7 +15,7 @@
 
     <version>1.0.2</version>
 
-    <build>
+    <!--<build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -72,7 +72,7 @@
                 </excludes>
             </resource>
         </resources>
-    </build>
+    </build>-->
 
     <dependencies>
         <dependency>

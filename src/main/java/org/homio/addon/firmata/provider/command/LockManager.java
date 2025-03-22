@@ -10,7 +10,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Log4j2
-class LockManager<T> {
+public class LockManager<T> {
 
   private final Map<String, LockContext<T>> lockContextMap = new HashMap<>();
   private final Map<String, Pair<T, Long>> pendingLockValues = new HashMap<>();

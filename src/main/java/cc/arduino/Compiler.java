@@ -72,6 +72,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static processing.app.BaseNoGui.getContentFile;
 import static processing.app.I18n.tr;
 
 public class Compiler implements MessageConsumer {
@@ -147,6 +148,7 @@ public class Compiler implements MessageConsumer {
   private String buildPath;
   private File buildCache;
   private RunnerException exception;
+
   public Compiler(Sketch data) {
     this(data.getPrimaryFile().getFile(), data);
   }
@@ -178,8 +180,10 @@ public class Compiler implements MessageConsumer {
 
     PreferencesMap prefs = loadPreferences(board, platform, aPackage, vidpid);
 
-    MessageConsumerOutputStream out = new MessageConsumerOutputStream(new ProgressAwareMessageConsumer(new I18NAwareMessageConsumer(System.out, System.err), progListeners), "\n");
-    MessageConsumerOutputStream err = new MessageConsumerOutputStream(new I18NAwareMessageConsumer(System.err, Compiler.this), "\n");
+    MessageConsumerOutputStream out = new MessageConsumerOutputStream(new ProgressAwareMessageConsumer(
+      new I18NAwareMessageConsumer(System.out, System.err), progListeners), "\n");
+    MessageConsumerOutputStream err = new MessageConsumerOutputStream(
+      new I18NAwareMessageConsumer(System.err, Compiler.this), "\n");
 
     callArduinoBuilder(board, platform, aPackage, vidpid, BuilderAction.COMPILE, out, err);
 
@@ -215,11 +219,12 @@ public class Compiler implements MessageConsumer {
   private PreferencesMap loadPreferences(TargetBoard board, TargetPlatform platform, TargetPackage aPackage, String vidpid) throws RunnerException, IOException {
     ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     ByteArrayOutputStream stderr = new ByteArrayOutputStream();
-    MessageConsumerOutputStream err = new MessageConsumerOutputStream(new I18NAwareMessageConsumer(new PrintStream(stderr), Compiler.this), "\n");
+    var errConsumer = new I18NAwareMessageConsumer(new PrintStream(stderr), Compiler.this);
+    MessageConsumerOutputStream err = new MessageConsumerOutputStream(errConsumer, "\n");
     try {
       callArduinoBuilder(board, platform, aPackage, vidpid, BuilderAction.DUMP_PREFS, stdout, err);
     } catch (RunnerException e) {
-      System.err.println(stderr.toString());
+      System.err.println(stderr);
       throw e;
     }
     PreferencesMap prefs = new PreferencesMap();
@@ -236,7 +241,7 @@ public class Compiler implements MessageConsumer {
 
   private void callArduinoBuilder(TargetBoard board, TargetPlatform platform, TargetPackage aPackage, String vidpid, BuilderAction action, OutputStream outStream, OutputStream errStream) throws RunnerException {
     List<String> cmd = new ArrayList<>();
-    cmd.add(BaseNoGui.getContentFile("arduino-builder").getAbsolutePath());
+    cmd.add(getContentFile("arduino-builder").getAbsolutePath());
     cmd.add(action.value);
     cmd.add("-logger=machine");
 
@@ -246,11 +251,11 @@ public class Compiler implements MessageConsumer {
     addPathFlagIfPathExists(cmd, "-hardware", installedPackagesFolder);
     addPathFlagIfPathExists(cmd, "-hardware", BaseNoGui.getSketchbookHardwareFolder());
 
-    addPathFlagIfPathExists(cmd, "-tools", BaseNoGui.getContentFile("tools-builder"));
+    addPathFlagIfPathExists(cmd, "-tools", getContentFile("tools-builder"));
     addPathFlagIfPathExists(cmd, "-tools", Paths.get(BaseNoGui.getHardwarePath(), "tools", "avr").toFile());
     addPathFlagIfPathExists(cmd, "-tools", installedPackagesFolder);
 
-    addPathFlagIfPathExists(cmd, "-built-in-libraries", BaseNoGui.getContentFile("libraries"));
+    addPathFlagIfPathExists(cmd, "-built-in-libraries", getContentFile("libraries"));
     addPathFlagIfPathExists(cmd, "-libraries", BaseNoGui.getSketchbookLibrariesFolder().folder);
 
     String fqbn = Stream.of(aPackage.getId(), platform.getId(), board.getId(), boardOptions(board)).filter(s -> !s.isEmpty()).collect(Collectors.joining(":"));
