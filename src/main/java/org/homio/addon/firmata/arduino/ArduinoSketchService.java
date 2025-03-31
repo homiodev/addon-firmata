@@ -127,10 +127,12 @@ public class ArduinoSketchService {
       placeholders.put(key, defaultValue);
     }
     AtomicReference<T> success = new AtomicReference<>();
-    CountDownLatch latch = new CountDownLatch(1);
+    CountDownLatch dialogAccepted = new CountDownLatch(1);
+    CountDownLatch processDone = new CountDownLatch(1);
     AtomicReference<Exception> exceptionRef = new AtomicReference<>();
     if (!placeholders.isEmpty()) {
       context.ui().dialog().sendDialogRequest("sketch", "Sketch parameters", (responseType, pressedButton, parameters) -> {
+        dialogAccepted.countDown();
         if (responseType == ContextUI.DialogResponseType.Accepted) {
           String updContent = content;
           for (String replaceKey : placeholders.keySet()) {
@@ -139,7 +141,7 @@ public class ArduinoSketchService {
           }
           var backupSketch = sketch;
           try {
-            Path tmpSketch = Files.createTempFile(sketch.getPrimaryFile().getFile().getName(), ".ino");
+            Path tmpSketch = Files.createTempFile("sketch-", ".ino");
             Files.writeString(tmpSketch, updContent);
             sketch = new Sketch(tmpSketch.toFile());
             success.set(runnable.get());
@@ -147,10 +149,10 @@ public class ArduinoSketchService {
             exceptionRef.set(e);
           } finally {
             sketch = backupSketch;
-            latch.countDown();
+            processDone.countDown();
           }
         } else {
-          latch.countDown();
+          processDone.countDown();
         }
       }, builder -> {
         builder
@@ -166,11 +168,14 @@ public class ArduinoSketchService {
         }).group("General", inputs);
       });
     } else {
-      success.set(runnable.get());
+      return runnable.get();
     }
 
-    if (!latch.await(60, TimeUnit.SECONDS)) {
+    if (!dialogAccepted.await(60, TimeUnit.SECONDS)) {
       throw new TimeoutException("Dialog request timed out after 60 seconds");
+    }
+    if (!processDone.await(5, TimeUnit.MINUTES)) {
+      throw new TimeoutException("Unable to wait for process to finish after 5 minutes. Please try again later or contact support for assistance.");
     }
     if (exceptionRef.get() != null) {
       throw new RuntimeException(exceptionRef.get());
