@@ -22,6 +22,7 @@ import org.homio.api.Context;
 import org.homio.api.ContextNetwork;
 import org.homio.api.model.Icon;
 import org.homio.api.model.Status;
+import org.homio.api.model.device.ConfigDeviceDefinitionService;
 import org.homio.api.service.EntityService;
 import org.homio.api.state.DecimalType;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +46,9 @@ public class FirmataService extends EntityService.ServiceInstance<FirmataBaseEnt
 
   public static final byte SYSEX_INIT = 0x40;
   public static final byte SYSEX_PING = 0x41;
+
+  public static final ConfigDeviceDefinitionService CONFIG_DEVICE_SERVICE =
+    new ConfigDeviceDefinitionService("arduino-devices.json");
 
   @Getter
   private final FirmataOneWireResponseDataCommand oneWireCommand;
@@ -77,21 +81,23 @@ public class FirmataService extends EntityService.ServiceInstance<FirmataBaseEnt
         }
         // create a top group if required
         String topGroupID = context().var().createGroup("firmata", "Firmata", builder ->
-          builder.setIcon(new Icon("fas fa-microchip", "#27966E")));
+          builder.setIcon(new Icon("fas fa-microchip", "#27966E")).setLocked(true));
 
         var groupName = "Firmata " + entity.getBoard() + "(" + info.name + ")";
         context().var().createSubGroup(topGroupID, info.deviceID, groupName, builder ->
-          builder.setIcon(new Icon("fas fa-hard-drive", "#28A6A2")));
+          builder.setIcon(new Icon("fas fa-hard-drive", "#28A6A2")).setLocked(true));
 
         entity.setStatusOnline();
         log.info("[{}]: Firmata device <{}> joined successfully", entity.getEntityID(), entity.getTitle());
         context.event().fireDeviceStatus("firmata", entity);
+        var config = CONFIG_DEVICE_SERVICE.findDevicePin(entity.getBoard());
+
         for (Pin pin : device.getIoDevice().getPins()) {
-          String pinLabel = PinoutModel.getPinLabel(entity.getBoard(), pin.getIndex());
-          if (!entity.getExcludePins().contains(pinLabel)) {
-            var ep = new FirmataPinEndpoint(pinLabel, pin, entity, FirmataService.this);
-            endpoints.put(String.valueOf(pin.getIndex()), ep);
-          }
+          var pinConfig = config.get((int) pin.getIndex());
+          String pinLabel = pinConfig != null ? pinConfig.getName() : "Pin" + pin.getIndex();
+          String pinDescription = pinConfig != null ? pinConfig.getDescription() : null;
+          var ep = new FirmataPinEndpoint(pinLabel, pinDescription, pin, entity, FirmataService.this);
+          endpoints.put(String.valueOf(pin.getIndex()), ep);
         }
 
         // send init a message to tell a device that server wants to listen to it
@@ -102,25 +108,6 @@ public class FirmataService extends EntityService.ServiceInstance<FirmataBaseEnt
         }
       }
     };
-  }
-
-  @Override
-  public void entityUpdated(@NotNull FirmataBaseEntity<?> newEntity) {
-    super.entityUpdated(newEntity);
-    if (endpoints != null) {
-      for (FirmataPinEndpoint endpoint : endpoints.values()) {
-        endpoint.setEntity(newEntity);
-      }
-      for (String excludePin : entity.getExcludePins()) {
-        endpoints.values().removeIf(pin -> {
-          if (pin.getPinLabel().equals(excludePin)) {
-            pin.removePin();
-            return true;
-          }
-          return false;
-        });
-      }
-    }
   }
 
   @Override
@@ -323,14 +310,6 @@ public class FirmataService extends EntityService.ServiceInstance<FirmataBaseEnt
     return device.getIoDevice().getPin(pinNum);
   }
 
-  public boolean isReady() {
-    return device.getIoDevice().isReady();
-  }
-
-  public String getProtocol() {
-    return device.getIoDevice().getProtocol();
-  }
-
   public void sendOneWireDelay(byte pin, int delay) {
     device.getIoOneWire().sendOneWireDelay(pin, delay);
   }
@@ -347,6 +326,7 @@ public class FirmataService extends EntityService.ServiceInstance<FirmataBaseEnt
     return device.getIoOneWire().sendOneWireWriteAndRead(pin, address, data, numBytesToRead, delay, reset);
   }
 
+  @SuppressWarnings("unused")
   @SneakyThrows
   public I2CDevice getI2CDevice(byte address) {
     return device.getIoDevice().getI2CDevice(address);
@@ -369,5 +349,4 @@ public class FirmataService extends EntityService.ServiceInstance<FirmataBaseEnt
 
   public record DeviceInfo(String board, String deviceID, String name, long started) {
   }
-
 }

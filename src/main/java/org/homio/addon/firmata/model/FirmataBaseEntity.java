@@ -3,11 +3,12 @@ package org.homio.addon.firmata.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.StringUtils;
 import org.homio.addon.firmata.FirmataEntrypoint;
 import org.homio.addon.firmata.arduino.ArduinoConsolePlugin;
 import org.homio.api.Context;
+import org.homio.api.entity.HasPlace;
 import org.homio.api.entity.device.DeviceEndpointsBehaviourContract;
+import org.homio.api.entity.device.HasExcludeEndpoints;
 import org.homio.api.entity.log.HasEntityLog;
 import org.homio.api.entity.types.MicroControllerBaseEntity;
 import org.homio.api.model.ActionResponseModel;
@@ -31,24 +32,23 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 
-@SuppressWarnings({"unused", "UnusedReturnValue", "JpaAttributeTypeInspection", "JpaAttributeMemberSignatureInspection"})
+@SuppressWarnings({"unused", "UnusedReturnValue", "JpaAttributeTypeInspection"})
 @Entity
 @Accessors(chain = true)
 public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>>
   extends MicroControllerBaseEntity
   implements DeviceEndpointsBehaviourContract,
   EntityService<FirmataService>,
-  HasEntityLog {
-
+  HasEntityLog,
+  HasExcludeEndpoints,
+  HasPlace {
 
   @Override
   public void logBuilder(@NotNull HasEntityLog.EntityLogBuilder entityLogBuilder) {
     entityLogBuilder.addTopicFilterByEntityID(FirmataEntrypoint.class);
-
   }
 
 
@@ -148,17 +148,6 @@ public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>>
     return super.getIeeeAddress();
   }
 
-  @UIField(order = 500)
-  @UIFieldNoReadDefaultValue
-  public Set<String> getExcludePins() {
-    return getJsonDataSet("ep", String.class);
-  }
-
-  public FirmataBaseEntity<T> setExcludePins(String value) {
-    setJsonData("ep", value);
-    return this;
-  }
-
   @UIContextMenuAction(value = "RESTART_COMMUNICATOR", icon = "fas fa-power-off", iconColor = UI.Color.RED)
   public ActionResponseModel restartCommunicator() {
     String result = getService().restart();
@@ -211,14 +200,16 @@ public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>>
   }
 
   public boolean tryUpdateEntity(FirmataService.DeviceInfo info) {
-    if (!Objects.equals(getBoard(), info.board()) ||
-        !Objects.equals(getIeeeAddress(), info.deviceID()) ||
-        (StringUtils.isNotEmpty(info.name()) && !Objects.equals(getName(), info.name()))) {
+    return tryUpdateEntity(() -> {
       setBoard(info.board());
       setIeeeAddress(info.deviceID());
       setName(info.name());
-      return true;
-    }
-    return false;
+    });
+  }
+
+  @Override
+  public void beforePersist() {
+    super.beforePersist();
+    setExcludeEndpoints(String.join(LIST_DELIMITER, Set.of("TX", "RX")));
   }
 }

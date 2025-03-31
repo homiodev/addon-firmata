@@ -14,6 +14,7 @@ import org.homio.addon.firmata.provider.FirmataCommandPlugins;
 import org.homio.api.AddonConfiguration;
 import org.homio.api.AddonEntrypoint;
 import org.homio.api.Context;
+import org.homio.api.fs.archive.ArchiveUtil;
 import org.homio.api.setting.SettingPluginPackageInstall;
 import org.homio.api.util.CommonUtils;
 import org.homio.api.util.Lang;
@@ -49,7 +50,7 @@ public class FirmataEntrypoint implements AddonEntrypoint {
       service.setAfterStartHandler(new Consumer<>() {
         @Override
         public void accept(FirmataService.DeviceInfo deviceInfo) {
-          found.set(foundController(context, deviceInfo.board(), deviceInfo.deviceID(), hostAddress));
+          found.set(foundController(context, deviceInfo.board(), deviceInfo.deviceID(), deviceInfo.name(), hostAddress));
         }
       });
       service.startAndConnectToDevice();
@@ -63,6 +64,7 @@ public class FirmataEntrypoint implements AddonEntrypoint {
   public static boolean foundController(@NotNull Context context,
                                         @NotNull String board,
                                         @NotNull String deviceID,
+                                        @NotNull String name,
                                         @NotNull String hostAddress) {
     // check if we already have firmata device with deviceID
     var device = context.db().findAll(FirmataBaseEntity.class).stream()
@@ -89,6 +91,7 @@ public class FirmataEntrypoint implements AddonEntrypoint {
       messages.add(Lang.getServerMessage("FIRMATA.NEW_DEVICE_QUESTION"));
       messages.add(Lang.getServerMessage("FIRMATA.NEW_DEVICE_BOARD", "BOARD", board));
       messages.add(Lang.getServerMessage("FIRMATA.NEW_DEVICE_ID", "DEVICE_ID", deviceID));
+      messages.add(Lang.getServerMessage("FIRMATA.NEW_DEVICE_NAME", "NAME", name));
       messages.add(Lang.getServerMessage("FIRMATA.NEW_DEVICE_ADDRESS", "ADDRESS", hostAddress));
 
       context.ui().dialog().sendConfirmation("Confirm-Firmata-" + deviceID, "TITLE.NEW_DEVICE", () -> {
@@ -105,19 +108,19 @@ public class FirmataEntrypoint implements AddonEntrypoint {
   public void init() {
     var commonFiles = getClass().getResource("/arduino-files-common.7z");
     if (commonFiles == null) {
-      // throw new IllegalStateException("Could not find arduino-files-common.7z");
+      throw new IllegalStateException("Could not find arduino-files-common.7z");
     }
     var osFiles = getClass().getResource("/arduino-files-os.7z");
     if (osFiles == null) {
-      // throw new IllegalStateException("Could not find arduino-files-os.7z");
+      throw new IllegalStateException("Could not find arduino-files-os.7z");
     }
     var arduinoInstallPath = CommonUtils.getInstallPath().resolve("arduino");
     context.bgp().runWithProgress("arduino-install").execute(progressBar -> {
       try {
-        /*ArchiveUtil.unzip(commonFiles, "arduino-files-common.7z", arduinoInstallPath,
-          null, false, progressBar, ArchiveUtil.UnzipFileIssueHandler.skip);
+        ArchiveUtil.unzip(commonFiles, "arduino-files-common.7z", arduinoInstallPath,
+          null, false, progressBar, ArchiveUtil.UnzipFileIssueHandler.replace);
         ArchiveUtil.unzip(osFiles, "arduino-files-os.7z", arduinoInstallPath,
-          null, false, progressBar, ArchiveUtil.UnzipFileIssueHandler.skip);*/
+          null, false, progressBar, ArchiveUtil.UnzipFileIssueHandler.replace);
 
         // fire install ConfigurableFirmata library
         var firmataLib = new SettingPluginPackageInstall.PackageRequest();
@@ -141,9 +144,9 @@ public class FirmataEntrypoint implements AddonEntrypoint {
     this.context.network().listenUdp("listen-firmata-udp", null, 8266, (datagramPacket, payload) -> {
       if (payload.startsWith("hf:")) {
         String[] parts = payload.split(":");
-        if (parts.length == 3) {
+        if (parts.length == 5) {
           var hostAddress = datagramPacket.getAddress().getHostAddress();
-          foundController(context, parts[1].trim(), parts[2].trim(), hostAddress);
+          foundController(context, parts[1].trim(), parts[2].trim(), parts[3].trim(), hostAddress);
         }
       }
     });

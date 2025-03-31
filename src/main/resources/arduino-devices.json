@@ -1,0 +1,1988 @@
+{
+  "version": 1,
+  "devices": [
+    {
+      "name": "Teensy_3x",
+      "models": [
+        "Teensy 3.1/3.2",
+        "Teensy 3.5",
+        "Teensy 3.6"
+      ],
+      "pins": [
+        {
+          "index": 0,
+          "name": "D0",
+          "description": "Digital Pin 0 (GPIO0)"
+        },
+        {
+          "index": 1,
+          "name": "D1",
+          "description": "Digital Pin 1 (GPIO1)"
+        },
+        {
+          "index": 2,
+          "name": "D2",
+          "description": "Digital Pin 2 (GPIO2)"
+        },
+        {
+          "index": 3,
+          "name": "D3",
+          "description": "Digital Pin 3 (GPIO3/PWM/Interrupt)"
+        },
+        {
+          "index": 4,
+          "name": "D4",
+          "description": "Digital Pin 4 (GPIO4)"
+        },
+        {
+          "index": 5,
+          "name": "D5",
+          "description": "Digital Pin 5 (GPIO5)"
+        },
+        {
+          "index": 6,
+          "name": "D6",
+          "description": "Digital Pin 6 (GPIO6)"
+        },
+        {
+          "index": 7,
+          "name": "D7",
+          "description": "Digital Pin 7 (GPIO7)"
+        },
+        {
+          "index": 8,
+          "name": "D8",
+          "description": "Digital Pin 8 (GPIO8)"
+        },
+        {
+          "index": 9,
+          "name": "D9",
+          "description": "Digital Pin 9 (GPIO9)"
+        },
+        {
+          "index": 10,
+          "name": "D10",
+          "description": "Digital Pin 10 (GPIO10)"
+        },
+        {
+          "index": 11,
+          "name": "D11",
+          "description": "Digital Pin 11 (GPIO11)"
+        },
+        {
+          "index": 12,
+          "name": "D12",
+          "description": "Digital Pin 12 (GPIO12)"
+        },
+        {
+          "index": 13,
+          "name": "D13",
+          "description": "Digital Pin 13 (GPIO13)"
+        },
+        {
+          "index": 14,
+          "name": "A0",
+          "description": "Analog Pin 0 (ADC0)"
+        },
+        {
+          "index": 15,
+          "name": "A1",
+          "description": "Analog Pin 1 (ADC1)"
+        },
+        {
+          "index": 16,
+          "name": "A2",
+          "description": "Analog Pin 2 (ADC2)"
+        },
+        {
+          "index": 17,
+          "name": "A3",
+          "description": "Analog Pin 3 (ADC3)"
+        },
+        {
+          "index": 18,
+          "name": "A4",
+          "description": "Analog Pin 4 (ADC4)"
+        },
+        {
+          "index": 19,
+          "name": "A5",
+          "description": "Analog Pin 5 (ADC5)"
+        }
+      ]
+    },
+    {
+      "name": "Adafruit nRF52",
+      "pins": [
+        {
+          "index": 0,
+          "name": "D0",
+          "description": "Digital Pin 0 (GPIO0)"
+        },
+        {
+          "index": 1,
+          "name": "D1",
+          "description": "Digital Pin 1 (GPIO1)"
+        },
+        {
+          "index": 2,
+          "name": "D2",
+          "description": "Digital Pin 2 (GPIO2)"
+        },
+        {
+          "index": 3,
+          "name": "D3",
+          "description": "Digital Pin 3 (GPIO3)"
+        },
+        {
+          "index": 4,
+          "name": "D4",
+          "description": "Digital Pin 4 (GPIO4)"
+        },
+        {
+          "index": 5,
+          "name": "D5",
+          "description": "Digital Pin 5 (GPIO5)"
+        },
+        {
+          "index": 6,
+          "name": "D6",
+          "description": "Digital Pin 6 (GPIO6)"
+        },
+        {
+          "index": 7,
+          "name": "D7",
+          "description": "Digital Pin 7 (GPIO7)"
+        },
+        {
+          "index": 8,
+          "name": "D8",
+          "description": "Digital Pin 8 (GPIO8)"
+        },
+        {
+          "index": 9,
+          "name": "D9",
+          "description": "Digital Pin 9 (GPIO9)"
+        },
+        {
+          "index": 10,
+          "name": "D10",
+          "description": "Digital Pin 10 (GPIO10)"
+        },
+        {
+          "index": 11,
+          "name": "D11",
+          "description": "Digital Pin 11 (GPIO11)"
+        },
+        {
+          "index": 12,
+          "name": "D12",
+          "description": "Digital Pin 12 (GPIO12)"
+        },
+        {
+          "index": 13,
+          "name": "D13",
+          "description": "Digital Pin 13 (GPIO13)"
+        },
+        {
+          "index": 14,
+          "name": "D14",
+          "description": "Digital Pin 14 (GPIO14)"
+        },
+        {
+          "index": 15,
+          "name": "D15",
+          "description": "Digital Pin 15 (GPIO15)"
+        },
+        {
+          "index": 16,
+          "name": "D16",
+          "description": "Digital Pin 16 (GPIO16)"
+        },
+        {
+          "index": 17,
+          "name": "D17",
+          "description": "Digital Pin 17 (GPIO17)"
+        },
+        {
+          "index": 18,
+          "name": "D18",
+          "description": "Digital Pin 18 (GPIO18)"
+        },
+        {
+          "index": 19,
+          "name": "D19",
+          "description": "Digital Pin 19 (GPIO19)"
+        },
+        {
+          "index": 20,
+          "name": "D20",
+          "description": "Digital Pin 20 (GPIO20)"
+        },
+        {
+          "index": 21,
+          "name": "D21",
+          "description": "Digital Pin 21 (GPIO21)"
+        },
+        {
+          "index": 22,
+          "name": "D22",
+          "description": "Digital Pin 22 (GPIO22)"
+        },
+        {
+          "index": 23,
+          "name": "D23",
+          "description": "Digital Pin 23 (GPIO23)"
+        },
+        {
+          "index": 24,
+          "name": "D24",
+          "description": "Digital Pin 24 (GPIO24)"
+        },
+        {
+          "index": 25,
+          "name": "D25",
+          "description": "Digital Pin 25 (GPIO25)"
+        },
+        {
+          "index": 26,
+          "name": "D26",
+          "description": "Digital Pin 26 (GPIO26)"
+        },
+        {
+          "index": 27,
+          "name": "D27",
+          "description": "Digital Pin 27 (GPIO27)"
+        },
+        {
+          "index": 28,
+          "name": "D28",
+          "description": "Digital Pin 28 (GPIO28)"
+        },
+        {
+          "index": 29,
+          "name": "D29",
+          "description": "Digital Pin 29 (GPIO29)"
+        },
+        {
+          "index": 30,
+          "name": "D30",
+          "description": "Digital Pin 30 (GPIO30)"
+        },
+        {
+          "index": 31,
+          "name": "D31",
+          "description": "Digital Pin 31 (GPIO31)"
+        },
+        {
+          "index": 32,
+          "name": "A0",
+          "description": "Analog Pin 0 (ADC0)"
+        },
+        {
+          "index": 33,
+          "name": "A1",
+          "description": "Analog Pin 1 (ADC1)"
+        },
+        {
+          "index": 34,
+          "name": "A2",
+          "description": "Analog Pin 2 (ADC2)"
+        },
+        {
+          "index": 35,
+          "name": "A3",
+          "description": "Analog Pin 3 (ADC3)"
+        },
+        {
+          "index": 36,
+          "name": "A4",
+          "description": "Analog Pin 4 (ADC4)"
+        },
+        {
+          "index": 37,
+          "name": "A5",
+          "description": "Analog Pin 5 (ADC5)"
+        },
+        {
+          "index": 38,
+          "name": "A6",
+          "description": "Analog Pin 6 (ADC6)"
+        },
+        {
+          "index": 39,
+          "name": "A7",
+          "description": "Analog Pin 7 (ADC7)"
+        }
+      ]
+    },
+    {
+      "name": "Raspberry Pi Pico",
+      "pins": [
+        {
+          "index": 0,
+          "name": "GP0",
+          "description": "General I/O Pin 0 (GPIO0)"
+        },
+        {
+          "index": 1,
+          "name": "GP1",
+          "description": "General I/O Pin 1 (GPIO1)"
+        },
+        {
+          "index": 2,
+          "name": "GP2",
+          "description": "General I/O Pin 2 (GPIO2)"
+        },
+        {
+          "index": 3,
+          "name": "GP3",
+          "description": "General I/O Pin 3 (GPIO3)"
+        },
+        {
+          "index": 4,
+          "name": "GP4",
+          "description": "General I/O Pin 4 (GPIO4)"
+        },
+        {
+          "index": 5,
+          "name": "GP5",
+          "description": "General I/O Pin 5 (GPIO5)"
+        },
+        {
+          "index": 6,
+          "name": "GP6",
+          "description": "General I/O Pin 6 (GPIO6)"
+        },
+        {
+          "index": 7,
+          "name": "GP7",
+          "description": "General I/O Pin 7 (GPIO7)"
+        },
+        {
+          "index": 8,
+          "name": "GP8",
+          "description": "General I/O Pin 8 (GPIO8)"
+        },
+        {
+          "index": 9,
+          "name": "GP9",
+          "description": "General I/O Pin 9 (GPIO9)"
+        },
+        {
+          "index": 10,
+          "name": "GP10",
+          "description": "General I/O Pin 10 (GPIO10)"
+        },
+        {
+          "index": 11,
+          "name": "GP11",
+          "description": "General I/O Pin 11 (GPIO11)"
+        },
+        {
+          "index": 12,
+          "name": "GP12",
+          "description": "General I/O Pin 12 (GPIO12)"
+        },
+        {
+          "index": 13,
+          "name": "GP13",
+          "description": "General I/O Pin 13 (GPIO13)"
+        },
+        {
+          "index": 14,
+          "name": "GP14",
+          "description": "General I/O Pin 14 (GPIO14)"
+        },
+        {
+          "index": 15,
+          "name": "GP15",
+          "description": "General I/O Pin 15 (GPIO15)"
+        },
+        {
+          "index": 16,
+          "name": "GP16",
+          "description": "General I/O Pin 16 (GPIO16)"
+        },
+        {
+          "index": 17,
+          "name": "GP17",
+          "description": "General I/O Pin 17 (GPIO17)"
+        },
+        {
+          "index": 18,
+          "name": "GP18",
+          "description": "General I/O Pin 18 (GPIO18)"
+        },
+        {
+          "index": 19,
+          "name": "GP19",
+          "description": "General I/O Pin 19 (GPIO19)"
+        },
+        {
+          "index": 20,
+          "name": "GP20",
+          "description": "General I/O Pin 20 (GPIO20)"
+        },
+        {
+          "index": 21,
+          "name": "GP21",
+          "description": "General I/O Pin 21 (GPIO21)"
+        },
+        {
+          "index": 22,
+          "name": "GP22",
+          "description": "General I/O Pin 22 (GPIO22)"
+        },
+        {
+          "index": 23,
+          "name": "GP23",
+          "description": "General I/O Pin 23 (GPIO23)"
+        },
+        {
+          "index": 24,
+          "name": "GP24",
+          "description": "General I/O Pin 24 (GPIO24)"
+        },
+        {
+          "index": 25,
+          "name": "GP25",
+          "description": "General I/O Pin 25 (GPIO25)"
+        },
+        {
+          "index": 26,
+          "name": "GP26",
+          "description": "General I/O Pin 26 (GPIO26)"
+        },
+        {
+          "index": 27,
+          "name": "GP27",
+          "description": "General I/O Pin 27 (GPIO27)"
+        },
+        {
+          "index": 28,
+          "name": "GP28",
+          "description": "General I/O Pin 28 (GPIO28)"
+        },
+        {
+          "index": 29,
+          "name": "GP29",
+          "description": "General I/O Pin 29 (GPIO29)"
+        },
+        {
+          "index": 30,
+          "name": "GP30",
+          "description": "General I/O Pin 30 (GPIO30)"
+        },
+        {
+          "index": 31,
+          "name": "GP31",
+          "description": "General I/O Pin 31 (GPIO31)"
+        },
+        {
+          "index": 32,
+          "name": "ADC0",
+          "description": "Analog Pin 0 (ADC0)"
+        },
+        {
+          "index": 34,
+          "name": "ADC1",
+          "description": "Analog Pin 1 (ADC1)"
+        },
+        {
+          "index": 35,
+          "name": "ADC2",
+          "description": "Analog Pin 2 (ADC2)"
+        },
+        {
+          "index": 36,
+          "name": "ADC3",
+          "description": "Analog Pin 3 (ADC3)"
+        },
+        {
+          "index": 37,
+          "name": "ADC4",
+          "description": "Analog Pin 4 (ADC4)"
+        },
+        {
+          "index": 38,
+          "name": "ADC5",
+          "description": "Analog Pin 5 (ADC5)"
+        }
+      ]
+    },
+    {
+      "name": "ESP32",
+      "pins": [
+        {
+          "index": 0,
+          "name": "D0",
+          "description": "Digital Pin 0 (GPIO0)"
+        },
+        {
+          "index": 1,
+          "name": "D1",
+          "description": "Digital Pin 1 (GPIO1/TX)"
+        },
+        {
+          "index": 2,
+          "name": "D2",
+          "description": "Digital Pin 2 (GPIO2)"
+        },
+        {
+          "index": 3,
+          "name": "D3",
+          "description": "Digital Pin 3 (GPIO3/RX)"
+        },
+        {
+          "index": 4,
+          "name": "D4",
+          "description": "Digital Pin 4 (GPIO4)"
+        },
+        {
+          "index": 5,
+          "name": "D5",
+          "description": "Digital Pin 5 (GPIO5)"
+        },
+        {
+          "index": 6,
+          "name": "D6",
+          "description": "Digital Pin 6 (GPIO6)"
+        },
+        {
+          "index": 7,
+          "name": "D7",
+          "description": "Digital Pin 7 (GPIO7)"
+        },
+        {
+          "index": 8,
+          "name": "D8",
+          "description": "Digital Pin 8 (GPIO8)"
+        },
+        {
+          "index": 9,
+          "name": "D9",
+          "description": "Digital Pin 9 (GPIO9)"
+        },
+        {
+          "index": 10,
+          "name": "D10",
+          "description": "Digital Pin 10 (GPIO10)"
+        },
+        {
+          "index": 11,
+          "name": "D11",
+          "description": "Digital Pin 11 (GPIO11)"
+        },
+        {
+          "index": 12,
+          "name": "D12",
+          "description": "Digital Pin 12 (GPIO12)"
+        },
+        {
+          "index": 13,
+          "name": "D13",
+          "description": "Digital Pin 13 (GPIO13)"
+        },
+        {
+          "index": 14,
+          "name": "D14",
+          "description": "Digital Pin 14 (GPIO14)"
+        },
+        {
+          "index": 15,
+          "name": "D15",
+          "description": "Digital Pin 15 (GPIO15)"
+        },
+        {
+          "index": 16,
+          "name": "D16",
+          "description": "Digital Pin 16 (GPIO16)"
+        },
+        {
+          "index": 17,
+          "name": "D17",
+          "description": "Digital Pin 17 (GPIO17)"
+        },
+        {
+          "index": 18,
+          "name": "D18",
+          "description": "Digital Pin 18 (GPIO18)"
+        },
+        {
+          "index": 19,
+          "name": "D19",
+          "description": "Digital Pin 19 (GPIO19)"
+        },
+        {
+          "index": 21,
+          "name": "D21",
+          "description": "Digital Pin 21 (GPIO21)"
+        },
+        {
+          "index": 22,
+          "name": "D22",
+          "description": "Digital Pin 22 (GPIO22)"
+        },
+        {
+          "index": 23,
+          "name": "D23",
+          "description": "Digital Pin 23 (GPIO23)"
+        },
+        {
+          "index": 25,
+          "name": "D25",
+          "description": "Digital Pin 25 (GPIO25)"
+        },
+        {
+          "index": 26,
+          "name": "D26",
+          "description": "Digital Pin 26 (GPIO26)"
+        },
+        {
+          "index": 27,
+          "name": "D27",
+          "description": "Digital Pin 27 (GPIO27)"
+        },
+        {
+          "index": 32,
+          "name": "D32",
+          "description": "Digital Pin 32 (GPIO32)"
+        },
+        {
+          "index": 33,
+          "name": "D33",
+          "description": "Digital Pin 33 (GPIO33)"
+        },
+        {
+          "index": 34,
+          "name": "D34",
+          "description": "Digital Pin 34 (GPIO34)"
+        },
+        {
+          "index": 35,
+          "name": "D35",
+          "description": "Digital Pin 35 (GPIO35)"
+        },
+        {
+          "index": 36,
+          "name": "D36",
+          "description": "Digital Pin 36 (GPIO36)"
+        },
+        {
+          "index": 39,
+          "name": "D39",
+          "description": "Digital Pin 39 (GPIO39)"
+        },
+        {
+          "index": 100,
+          "name": "A0",
+          "description": "Analog Pin 0 (ADC1 Channel 6)"
+        },
+        {
+          "index": 101,
+          "name": "A1",
+          "description": "Analog Pin 1 (ADC1 Channel 7)"
+        },
+        {
+          "index": 102,
+          "name": "A2",
+          "description": "Analog Pin 2 (ADC1 Channel 0)"
+        },
+        {
+          "index": 103,
+          "name": "A3",
+          "description": "Analog Pin 3 (ADC1 Channel 3)"
+        },
+        {
+          "index": 104,
+          "name": "A4",
+          "description": "Analog Pin 4 (ADC1 Channel 4)"
+        },
+        {
+          "index": 105,
+          "name": "A5",
+          "description": "Analog Pin 5 (ADC1 Channel 5)"
+        }
+      ]
+    },
+    {
+      "name": "Arduino 101",
+      "pins": [
+        {
+          "index": 0,
+          "name": "D0",
+          "description": "Digital Pin 0 (GPIO0)"
+        },
+        {
+          "index": 1,
+          "name": "D1",
+          "description": "Digital Pin 1 (GPIO1)"
+        },
+        {
+          "index": 2,
+          "name": "D2",
+          "description": "Digital Pin 2 (GPIO2)"
+        },
+        {
+          "index": 3,
+          "name": "D3",
+          "description": "Digital Pin 3 (GPIO3)"
+        },
+        {
+          "index": 4,
+          "name": "D4",
+          "description": "Digital Pin 4 (GPIO4)"
+        },
+        {
+          "index": 5,
+          "name": "D5",
+          "description": "Digital Pin 5 (GPIO5)"
+        },
+        {
+          "index": 6,
+          "name": "D6",
+          "description": "Digital Pin 6 (GPIO6)"
+        },
+        {
+          "index": 7,
+          "name": "D7",
+          "description": "Digital Pin 7 (GPIO7)"
+        },
+        {
+          "index": 8,
+          "name": "D8",
+          "description": "Digital Pin 8 (GPIO8)"
+        },
+        {
+          "index": 9,
+          "name": "D9",
+          "description": "Digital Pin 9 (GPIO9)"
+        },
+        {
+          "index": 10,
+          "name": "D10",
+          "description": "Digital Pin 10 (GPIO10)"
+        },
+        {
+          "index": 11,
+          "name": "D11",
+          "description": "Digital Pin 11 (GPIO11)"
+        },
+        {
+          "index": 12,
+          "name": "D12",
+          "description": "Digital Pin 12 (GPIO12)"
+        },
+        {
+          "index": 13,
+          "name": "D13",
+          "description": "Digital Pin 13 (GPIO13)"
+        },
+        {
+          "index": 14,
+          "name": "A0",
+          "description": "Analog Pin 0 (ADC0)"
+        },
+        {
+          "index": 15,
+          "name": "A1",
+          "description": "Analog Pin 1 (ADC1)"
+        },
+        {
+          "index": 16,
+          "name": "A2",
+          "description": "Analog Pin 2 (ADC2)"
+        },
+        {
+          "index": 17,
+          "name": "A3",
+          "description": "Analog Pin 3 (ADC3)"
+        },
+        {
+          "index": 18,
+          "name": "A4",
+          "description": "Analog Pin 4 (ADC4)"
+        },
+        {
+          "index": 19,
+          "name": "A5",
+          "description": "Analog Pin 5 (ADC5)"
+        }
+      ]
+    },
+    {
+      "name": "Arduino Due",
+      "pins": [
+        {
+          "index": 0,
+          "name": "D0",
+          "description": "Digital Pin 0 (RX)"
+        },
+        {
+          "index": 1,
+          "name": "D1",
+          "description": "Digital Pin 1 (TX)"
+        },
+        {
+          "index": 2,
+          "name": "D2",
+          "description": "Digital Pin 2"
+        },
+        {
+          "index": 3,
+          "name": "D3",
+          "description": "Digital Pin 3 (PWM)"
+        },
+        {
+          "index": 4,
+          "name": "D4",
+          "description": "Digital Pin 4 (PWM)"
+        },
+        {
+          "index": 5,
+          "name": "D5",
+          "description": "Digital Pin 5 (PWM)"
+        },
+        {
+          "index": 6,
+          "name": "D6",
+          "description": "Digital Pin 6 (PWM)"
+        },
+        {
+          "index": 7,
+          "name": "D7",
+          "description": "Digital Pin 7 (PWM)"
+        },
+        {
+          "index": 8,
+          "name": "D8",
+          "description": "Digital Pin 8"
+        },
+        {
+          "index": 9,
+          "name": "D9",
+          "description": "Digital Pin 9 (PWM)"
+        },
+        {
+          "index": 10,
+          "name": "D10",
+          "description": "Digital Pin 10 (PWM)"
+        },
+        {
+          "index": 11,
+          "name": "D11",
+          "description": "Digital Pin 11 (PWM)"
+        },
+        {
+          "index": 12,
+          "name": "D12",
+          "description": "Digital Pin 12"
+        },
+        {
+          "index": 13,
+          "name": "D13",
+          "description": "Digital Pin 13 (PWM)"
+        },
+        {
+          "index": 14,
+          "name": "A0",
+          "description": "Analog Pin 0 (ADC0)"
+        },
+        {
+          "index": 15,
+          "name": "A1",
+          "description": "Analog Pin 1 (ADC1)"
+        },
+        {
+          "index": 16,
+          "name": "A2",
+          "description": "Analog Pin 2 (ADC2)"
+        },
+        {
+          "index": 17,
+          "name": "A3",
+          "description": "Analog Pin 3 (ADC3)"
+        },
+        {
+          "index": 18,
+          "name": "A4",
+          "description": "Analog Pin 4 (ADC4)"
+        },
+        {
+          "index": 19,
+          "name": "A5",
+          "description": "Analog Pin 5 (ADC5)"
+        },
+        {
+          "index": 20,
+          "name": "A6",
+          "description": "Analog Pin 6 (ADC6)"
+        },
+        {
+          "index": 21,
+          "name": "A7",
+          "description": "Analog Pin 7 (ADC7)"
+        },
+        {
+          "index": 22,
+          "name": "A8",
+          "description": "Analog Pin 8 (ADC8)"
+        },
+        {
+          "index": 23,
+          "name": "A9",
+          "description": "Analog Pin 9 (ADC9)"
+        },
+        {
+          "index": 24,
+          "name": "A10",
+          "description": "Analog Pin 10 (ADC10)"
+        },
+        {
+          "index": 25,
+          "name": "A11",
+          "description": "Analog Pin 11 (ADC11)"
+        },
+        {
+          "index": 26,
+          "name": "A12",
+          "description": "Analog Pin 12 (ADC12)"
+        },
+        {
+          "index": 27,
+          "name": "A13",
+          "description": "Analog Pin 13 (ADC13)"
+        },
+        {
+          "index": 28,
+          "name": "A14",
+          "description": "Analog Pin 14 (ADC14)"
+        },
+        {
+          "index": 29,
+          "name": "A15",
+          "description": "Analog Pin 15 (ADC15)"
+        },
+        {
+          "index": 30,
+          "name": "DAC0",
+          "description": "DAC Output 0 (PWM)"
+        },
+        {
+          "index": 31,
+          "name": "DAC1",
+          "description": "DAC Output 1 (PWM)"
+        }
+      ]
+    },
+    {
+      "name": "Arduino Zero",
+      "pins": [
+        {
+          "index": 0,
+          "name": "D0",
+          "description": "Digital Pin 0 (RX)"
+        },
+        {
+          "index": 1,
+          "name": "D1",
+          "description": "Digital Pin 1 (TX)"
+        },
+        {
+          "index": 2,
+          "name": "D2",
+          "description": "Digital Pin 2 (GPIO2/PWM)"
+        },
+        {
+          "index": 3,
+          "name": "D3",
+          "description": "Digital Pin 3 (GPIO3/PWM)"
+        },
+        {
+          "index": 4,
+          "name": "D4",
+          "description": "Digital Pin 4 (GPIO4)"
+        },
+        {
+          "index": 5,
+          "name": "D5",
+          "description": "Digital Pin 5 (GPIO5/PWM)"
+        },
+        {
+          "index": 6,
+          "name": "D6",
+          "description": "Digital Pin 6 (GPIO6/PWM)"
+        },
+        {
+          "index": 7,
+          "name": "D7",
+          "description": "Digital Pin 7 (GPIO7)"
+        },
+        {
+          "index": 8,
+          "name": "D8",
+          "description": "Digital Pin 8 (GPIO8)"
+        },
+        {
+          "index": 9,
+          "name": "D9",
+          "description": "Digital Pin 9 (GPIO9/PWM)"
+        },
+        {
+          "index": 10,
+          "name": "D10",
+          "description": "Digital Pin 10 (GPIO10/PWM)"
+        },
+        {
+          "index": 11,
+          "name": "D11",
+          "description": "Digital Pin 11 (GPIO11/PWM)"
+        },
+        {
+          "index": 12,
+          "name": "D12",
+          "description": "Digital Pin 12 (GPIO12)"
+        },
+        {
+          "index": 13,
+          "name": "D13",
+          "description": "Digital Pin 13 (GPIO13/SCK)"
+        },
+        {
+          "index": 14,
+          "name": "A0",
+          "description": "Analog Pin 0 (ADC0)"
+        },
+        {
+          "index": 15,
+          "name": "A1",
+          "description": "Analog Pin 1 (ADC1)"
+        },
+        {
+          "index": 16,
+          "name": "A2",
+          "description": "Analog Pin 2 (ADC2)"
+        },
+        {
+          "index": 17,
+          "name": "A3",
+          "description": "Analog Pin 3 (ADC3)"
+        },
+        {
+          "index": 18,
+          "name": "A4",
+          "description": "Analog Pin 4 (ADC4/SDA)"
+        },
+        {
+          "index": 19,
+          "name": "A5",
+          "description": "Analog Pin 5 (ADC5/SCL)"
+        },
+        {
+          "index": 20,
+          "name": "A6",
+          "description": "Analog Pin 6 (ADC6)"
+        },
+        {
+          "index": 21,
+          "name": "A7",
+          "description": "Analog Pin 7 (ADC7)"
+        }
+      ]
+    },
+    {
+      "name": "STM32",
+      "pins": [
+        {
+          "index": 0,
+          "name": "D0",
+          "description": "Digital Pin 0 (GPIO0)"
+        },
+        {
+          "index": 1,
+          "name": "D1",
+          "description": "Digital Pin 1 (GPIO1)"
+        },
+        {
+          "index": 2,
+          "name": "D2",
+          "description": "Digital Pin 2 (GPIO2)"
+        },
+        {
+          "index": 3,
+          "name": "D3",
+          "description": "Digital Pin 3 (GPIO3)"
+        },
+        {
+          "index": 4,
+          "name": "D4",
+          "description": "Digital Pin 4 (GPIO4)"
+        },
+        {
+          "index": 5,
+          "name": "D5",
+          "description": "Digital Pin 5 (GPIO5)"
+        },
+        {
+          "index": 6,
+          "name": "D6",
+          "description": "Digital Pin 6 (GPIO6)"
+        },
+        {
+          "index": 7,
+          "name": "D7",
+          "description": "Digital Pin 7 (GPIO7)"
+        },
+        {
+          "index": 8,
+          "name": "D8",
+          "description": "Digital Pin 8 (GPIO8)"
+        },
+        {
+          "index": 9,
+          "name": "D9",
+          "description": "Digital Pin 9 (GPIO9)"
+        },
+        {
+          "index": 10,
+          "name": "D10",
+          "description": "Digital Pin 10 (GPIO10)"
+        },
+        {
+          "index": 11,
+          "name": "D11",
+          "description": "Digital Pin 11 (GPIO11)"
+        },
+        {
+          "index": 12,
+          "name": "D12",
+          "description": "Digital Pin 12 (GPIO12)"
+        },
+        {
+          "index": 13,
+          "name": "D13",
+          "description": "Digital Pin 13 (GPIO13)"
+        },
+        {
+          "index": 14,
+          "name": "A0",
+          "description": "Analog Pin 0 (ADC1)"
+        },
+        {
+          "index": 15,
+          "name": "A1",
+          "description": "Analog Pin 1 (ADC2)"
+        },
+        {
+          "index": 16,
+          "name": "A2",
+          "description": "Analog Pin 2 (ADC3)"
+        },
+        {
+          "index": 17,
+          "name": "A3",
+          "description": "Analog Pin 3 (ADC4)"
+        },
+        {
+          "index": 18,
+          "name": "A4",
+          "description": "Analog Pin 4 (ADC5)"
+        },
+        {
+          "index": 19,
+          "name": "A5",
+          "description": "Analog Pin 5 (ADC6)"
+        },
+        {
+          "index": 20,
+          "name": "A6",
+          "description": "Analog Pin 6 (ADC7)"
+        },
+        {
+          "index": 21,
+          "name": "A7",
+          "description": "Analog Pin 7 (ADC8)"
+        },
+        {
+          "index": 22,
+          "name": "TX",
+          "description": "Serial Transmit Pin (USART1_TX)"
+        },
+        {
+          "index": 23,
+          "name": "RX",
+          "description": "Serial Receive Pin (USART1_RX)"
+        },
+        {
+          "index": 24,
+          "name": "SCL",
+          "description": "I2C Clock Pin (SCL)"
+        },
+        {
+          "index": 25,
+          "name": "SDA",
+          "description": "I2C Data Pin (SDA)"
+        },
+        {
+          "index": 26,
+          "name": "PWM1",
+          "description": "PWM Pin 1 (GPIO_PWM)"
+        },
+        {
+          "index": 27,
+          "name": "PWM2",
+          "description": "PWM Pin 2 (GPIO_PWM)"
+        },
+        {
+          "index": 28,
+          "name": "PWM3",
+          "description": "PWM Pin 3 (GPIO_PWM)"
+        }
+      ]
+    },
+    {
+      "name": "Arduino Uno/Nano",
+      "models": [
+        "Leonardo/Micro"
+      ],
+      "pins": [
+        {
+          "index": 2,
+          "name": "D2",
+          "description": "Digital Pin 2 (GPIO2)"
+        },
+        {
+          "index": 3,
+          "name": "D3",
+          "description": "Digital Pin 3 (GPIO3/PWM)"
+        },
+        {
+          "index": 4,
+          "name": "D4",
+          "description": "Digital Pin 4 (GPIO4)"
+        },
+        {
+          "index": 5,
+          "name": "D5",
+          "description": "Digital Pin 5 (GPIO5/PWM)"
+        },
+        {
+          "index": 6,
+          "name": "D6",
+          "description": "Digital Pin 6 (GPIO6/PWM)"
+        },
+        {
+          "index": 7,
+          "name": "D7",
+          "description": "Digital Pin 7 (GPIO7)"
+        },
+        {
+          "index": 8,
+          "name": "D8",
+          "description": "Digital Pin 8 (GPIO8)"
+        },
+        {
+          "index": 9,
+          "name": "D9",
+          "description": "Digital Pin 9 (GPIO9/PWM)"
+        },
+        {
+          "index": 10,
+          "name": "D10",
+          "description": "Digital Pin 10 (GPIO10/PWM/SS)"
+        },
+        {
+          "index": 11,
+          "name": "D11",
+          "description": "Digital Pin 11 (GPIO11/PWM/MOSI)"
+        },
+        {
+          "index": 12,
+          "name": "D12",
+          "description": "Digital Pin 12 (GPIO12/MISO)"
+        },
+        {
+          "index": 13,
+          "name": "D13",
+          "description": "Digital Pin 13 (GPIO13/SCK)"
+        },
+        {
+          "index": 14,
+          "name": "A0",
+          "description": "Analog Pin 0 (ADC0)"
+        },
+        {
+          "index": 15,
+          "name": "A1",
+          "description": "Analog Pin 1 (ADC1)"
+        },
+        {
+          "index": 16,
+          "name": "A2",
+          "description": "Analog Pin 2 (ADC2)"
+        },
+        {
+          "index": 17,
+          "name": "A3",
+          "description": "Analog Pin 3 (ADC3)"
+        },
+        {
+          "index": 18,
+          "name": "A4",
+          "description": "Analog Pin 4 (ADC4/SDA)"
+        },
+        {
+          "index": 19,
+          "name": "A5",
+          "description": "Analog Pin 5 (ADC5/SCL)"
+        }
+      ]
+    },
+    {
+      "name": "Arduino Mega",
+      "pins": [
+        {
+          "index": 2,
+          "name": "D2",
+          "description": "Digital Pin 2 (PE4)"
+        },
+        {
+          "index": 3,
+          "name": "D3",
+          "description": "Digital Pin 3 (PE5/PWM)"
+        },
+        {
+          "index": 4,
+          "name": "D4",
+          "description": "Digital Pin 4 (PG5/PWM)"
+        },
+        {
+          "index": 5,
+          "name": "D5",
+          "description": "Digital Pin 5 (PE3/PWM)"
+        },
+        {
+          "index": 6,
+          "name": "D6",
+          "description": "Digital Pin 6 (PH3/PWM)"
+        },
+        {
+          "index": 7,
+          "name": "D7",
+          "description": "Digital Pin 7 (PH4/PWM)"
+        },
+        {
+          "index": 8,
+          "name": "D8",
+          "description": "Digital Pin 8 (PH5/PWM)"
+        },
+        {
+          "index": 9,
+          "name": "D9",
+          "description": "Digital Pin 9 (PH6/PWM)"
+        },
+        {
+          "index": 10,
+          "name": "D10",
+          "description": "Digital Pin 10 (PB4/PWM)"
+        },
+        {
+          "index": 11,
+          "name": "D11",
+          "description": "Digital Pin 11 (PB5/PWM)"
+        },
+        {
+          "index": 12,
+          "name": "D12",
+          "description": "Digital Pin 12 (PB6/PWM)"
+        },
+        {
+          "index": 13,
+          "name": "D13",
+          "description": "Digital Pin 13 (PB7)"
+        },
+        {
+          "index": 14,
+          "name": "D14",
+          "description": "Digital Pin 14 (PJ1)"
+        },
+        {
+          "index": 15,
+          "name": "D15",
+          "description": "Digital Pin 15 (PJ0)"
+        },
+        {
+          "index": 16,
+          "name": "D16",
+          "description": "Digital Pin 16 (PH1)"
+        },
+        {
+          "index": 17,
+          "name": "D17",
+          "description": "Digital Pin 17 (PH0)"
+        },
+        {
+          "index": 18,
+          "name": "D18",
+          "description": "Digital Pin 18 (PD3)"
+        },
+        {
+          "index": 19,
+          "name": "D19",
+          "description": "Digital Pin 19 (PD2)"
+        },
+        {
+          "index": 20,
+          "name": "D20",
+          "description": "Digital Pin 20 (PD1)"
+        },
+        {
+          "index": 21,
+          "name": "D21",
+          "description": "Digital Pin 21 (PD0)"
+        },
+        {
+          "index": 22,
+          "name": "D22",
+          "description": "Digital Pin 22 (PA0)"
+        },
+        {
+          "index": 23,
+          "name": "D23",
+          "description": "Digital Pin 23 (PA1)"
+        },
+        {
+          "index": 24,
+          "name": "D24",
+          "description": "Digital Pin 24 (PA2)"
+        },
+        {
+          "index": 25,
+          "name": "D25",
+          "description": "Digital Pin 25 (PA3)"
+        },
+        {
+          "index": 26,
+          "name": "D26",
+          "description": "Digital Pin 26 (PA4)"
+        },
+        {
+          "index": 27,
+          "name": "D27",
+          "description": "Digital Pin 27 (PA5)"
+        },
+        {
+          "index": 28,
+          "name": "D28",
+          "description": "Digital Pin 28 (PA6)"
+        },
+        {
+          "index": 29,
+          "name": "D29",
+          "description": "Digital Pin 29 (PA7)"
+        },
+        {
+          "index": 30,
+          "name": "D30",
+          "description": "Digital Pin 30 (PC7)"
+        },
+        {
+          "index": 31,
+          "name": "D31",
+          "description": "Digital Pin 31 (PC6)"
+        },
+        {
+          "index": 32,
+          "name": "D32",
+          "description": "Digital Pin 32 (PC5)"
+        },
+        {
+          "index": 33,
+          "name": "D33",
+          "description": "Digital Pin 33 (PC4)"
+        },
+        {
+          "index": 34,
+          "name": "D34",
+          "description": "Digital Pin 34 (PC3)"
+        },
+        {
+          "index": 35,
+          "name": "D35",
+          "description": "Digital Pin 35 (PC2)"
+        },
+        {
+          "index": 36,
+          "name": "D36",
+          "description": "Digital Pin 36 (PC1)"
+        },
+        {
+          "index": 37,
+          "name": "D37",
+          "description": "Digital Pin 37 (PC0)"
+        },
+        {
+          "index": 38,
+          "name": "A0",
+          "description": "Analog 0 (PF0/ADC0)"
+        },
+        {
+          "index": 39,
+          "name": "A1",
+          "description": "Analog 1 (PF1/ADC1)"
+        },
+        {
+          "index": 40,
+          "name": "A2",
+          "description": "Analog 2 (PF2/ADC2)"
+        },
+        {
+          "index": 41,
+          "name": "A3",
+          "description": "Analog 3 (PF3/ADC3)"
+        },
+        {
+          "index": 42,
+          "name": "A4",
+          "description": "Analog 4 (PF4/ADC4)"
+        },
+        {
+          "index": 43,
+          "name": "A5",
+          "description": "Analog 5 (PF5/ADC5)"
+        },
+        {
+          "index": 44,
+          "name": "A6",
+          "description": "Analog 6 (PF6/ADC6)"
+        },
+        {
+          "index": 45,
+          "name": "A7",
+          "description": "Analog 7 (PF7/ADC7)"
+        },
+        {
+          "index": 46,
+          "name": "A8",
+          "description": "Analog 8 (PK0/ADC8)"
+        },
+        {
+          "index": 47,
+          "name": "A9",
+          "description": "Analog 9 (PK1/ADC9)"
+        },
+        {
+          "index": 48,
+          "name": "A10",
+          "description": "Analog 10 (PK2/ADC10)"
+        },
+        {
+          "index": 49,
+          "name": "A11",
+          "description": "Analog 11 (PK3/ADC11)"
+        },
+        {
+          "index": 50,
+          "name": "A12",
+          "description": "Analog 12 (PK4/ADC12)"
+        },
+        {
+          "index": 51,
+          "name": "A13",
+          "description": "Analog 13 (PK5/ADC13)"
+        },
+        {
+          "index": 52,
+          "name": "A14",
+          "description": "Analog 14 (PK6/ADC14)"
+        },
+        {
+          "index": 53,
+          "name": "A15",
+          "description": "Analog 15 (PK7/ADC15)"
+        }
+      ]
+    },
+    {
+      "name": "Arduino Mega 2560",
+      "pins": [
+        {
+          "index": 0,
+          "name": "D0",
+          "description": "Digital Pin 0 (RX)"
+        },
+        {
+          "index": 1,
+          "name": "D1",
+          "description": "Digital Pin 1 (TX)"
+        },
+        {
+          "index": 2,
+          "name": "D2",
+          "description": "Digital Pin 2"
+        },
+        {
+          "index": 3,
+          "name": "D3",
+          "description": "Digital Pin 3 (PWM)"
+        },
+        {
+          "index": 4,
+          "name": "D4",
+          "description": "Digital Pin 4"
+        },
+        {
+          "index": 5,
+          "name": "D5",
+          "description": "Digital Pin 5 (PWM)"
+        },
+        {
+          "index": 6,
+          "name": "D6",
+          "description": "Digital Pin 6 (PWM)"
+        },
+        {
+          "index": 7,
+          "name": "D7",
+          "description": "Digital Pin 7"
+        },
+        {
+          "index": 8,
+          "name": "D8",
+          "description": "Digital Pin 8"
+        },
+        {
+          "index": 9,
+          "name": "D9",
+          "description": "Digital Pin 9 (PWM)"
+        },
+        {
+          "index": 10,
+          "name": "D10",
+          "description": "Digital Pin 10 (PWM/SS)"
+        },
+        {
+          "index": 11,
+          "name": "D11",
+          "description": "Digital Pin 11 (PWM/MOSI)"
+        },
+        {
+          "index": 12,
+          "name": "D12",
+          "description": "Digital Pin 12 (MISO)"
+        },
+        {
+          "index": 13,
+          "name": "D13",
+          "description": "Digital Pin 13 (SCK)"
+        },
+        {
+          "index": 14,
+          "name": "D14",
+          "description": "Digital Pin 14 (TMS)"
+        },
+        {
+          "index": 15,
+          "name": "D15",
+          "description": "Digital Pin 15 (TDI)"
+        },
+        {
+          "index": 16,
+          "name": "D16",
+          "description": "Digital Pin 16 (TDO)"
+        },
+        {
+          "index": 17,
+          "name": "D17",
+          "description": "Digital Pin 17 (TCK)"
+        },
+        {
+          "index": 18,
+          "name": "D18",
+          "description": "Digital Pin 18 (PWM)"
+        },
+        {
+          "index": 19,
+          "name": "D19",
+          "description": "Digital Pin 19 (PWM)"
+        },
+        {
+          "index": 20,
+          "name": "D20",
+          "description": "Digital Pin 20 (PWM)"
+        },
+        {
+          "index": 21,
+          "name": "D21",
+          "description": "Digital Pin 21 (PWM)"
+        },
+        {
+          "index": 22,
+          "name": "D22",
+          "description": "Digital Pin 22 (PWM)"
+        },
+        {
+          "index": 23,
+          "name": "D23",
+          "description": "Digital Pin 23 (PWM)"
+        },
+        {
+          "index": 24,
+          "name": "D24",
+          "description": "Digital Pin 24 (PWM)"
+        },
+        {
+          "index": 25,
+          "name": "D25",
+          "description": "Digital Pin 25 (PWM)"
+        },
+        {
+          "index": 26,
+          "name": "D26",
+          "description": "Digital Pin 26 (PWM)"
+        },
+        {
+          "index": 27,
+          "name": "D27",
+          "description": "Digital Pin 27 (PWM)"
+        },
+        {
+          "index": 28,
+          "name": "D28",
+          "description": "Digital Pin 28 (PWM)"
+        },
+        {
+          "index": 29,
+          "name": "D29",
+          "description": "Digital Pin 29 (PWM)"
+        },
+        {
+          "index": 30,
+          "name": "D30",
+          "description": "Digital Pin 30 (PWM)"
+        },
+        {
+          "index": 31,
+          "name": "D31",
+          "description": "Digital Pin 31 (PWM)"
+        },
+        {
+          "index": 32,
+          "name": "D32",
+          "description": "Digital Pin 32 (PWM)"
+        },
+        {
+          "index": 33,
+          "name": "D33",
+          "description": "Digital Pin 33 (PWM)"
+        },
+        {
+          "index": 34,
+          "name": "D34",
+          "description": "Digital Pin 34 (PWM)"
+        },
+        {
+          "index": 35,
+          "name": "D35",
+          "description": "Digital Pin 35 (PWM)"
+        },
+        {
+          "index": 36,
+          "name": "D36",
+          "description": "Digital Pin 36 (PWM)"
+        },
+        {
+          "index": 37,
+          "name": "D37",
+          "description": "Digital Pin 37 (PWM)"
+        },
+        {
+          "index": 38,
+          "name": "D38",
+          "description": "Digital Pin 38 (PWM)"
+        },
+        {
+          "index": 39,
+          "name": "D39",
+          "description": "Digital Pin 39 (PWM)"
+        },
+        {
+          "index": 40,
+          "name": "A0",
+          "description": "Analog Pin 0 (ADC0)"
+        },
+        {
+          "index": 41,
+          "name": "A1",
+          "description": "Analog Pin 1 (ADC1)"
+        },
+        {
+          "index": 42,
+          "name": "A2",
+          "description": "Analog Pin 2 (ADC2)"
+        },
+        {
+          "index": 43,
+          "name": "A3",
+          "description": "Analog Pin 3 (ADC3)"
+        },
+        {
+          "index": 44,
+          "name": "A4",
+          "description": "Analog Pin 4 (ADC4/SDA)"
+        },
+        {
+          "index": 45,
+          "name": "A5",
+          "description": "Analog Pin 5 (ADC5/SCL)"
+        },
+        {
+          "index": 46,
+          "name": "A6",
+          "description": "Analog Pin 6 (ADC6)"
+        },
+        {
+          "index": 47,
+          "name": "A7",
+          "description": "Analog Pin 7 (ADC7)"
+        },
+        {
+          "index": 48,
+          "name": "A8",
+          "description": "Analog Pin 8 (ADC8)"
+        },
+        {
+          "index": 49,
+          "name": "A9",
+          "description": "Analog Pin 9 (ADC9)"
+        },
+        {
+          "index": 50,
+          "name": "A10",
+          "description": "Analog Pin 10 (ADC10)"
+        },
+        {
+          "index": 51,
+          "name": "A11",
+          "description": "Analog Pin 11 (ADC11)"
+        },
+        {
+          "index": 52,
+          "name": "A12",
+          "description": "Analog Pin 12 (ADC12)"
+        },
+        {
+          "index": 53,
+          "name": "A13",
+          "description": "Analog Pin 13 (ADC13)"
+        },
+        {
+          "index": 54,
+          "name": "A14",
+          "description": "Analog Pin 14 (ADC14)"
+        },
+        {
+          "index": 55,
+          "name": "A15",
+          "description": "Analog Pin 15 (ADC15)"
+        }
+      ]
+    },
+    {
+      "name": "ESP8266",
+      "pins": [
+        {
+          "index": 0,
+          "name": "D3",
+          "description": "GPIO0 (Boot Mode)"
+        },
+        {
+          "index": 1,
+          "name": "TX",
+          "description": "GPIO1 (UART Transmit)"
+        },
+        {
+          "index": 2,
+          "name": "D4",
+          "description": "GPIO2 (I2C SDA, Boot Mode)"
+        },
+        {
+          "index": 3,
+          "name": "RX",
+          "description": "GPIO3 (UART Receive)"
+        },
+        {
+          "index": 4,
+          "name": "D2",
+          "description": "GPIO4 (I2C SDA)"
+        },
+        {
+          "index": 5,
+          "name": "D1",
+          "description": "GPIO5 (I2C SCL)"
+        },
+        {
+          "index": 6,
+          "name": "SPI_CLK",
+          "description": "GPIO6 (SPI_CLK, Reserved)"
+        },
+        {
+          "index": 7,
+          "name": "SPI_MISO",
+          "description": "GPIO7 (SPI_MISO, Reserved)"
+        },
+        {
+          "index": 8,
+          "name": "SPI_MOSI",
+          "description": "GPIO8 (SPI_MOSI, Reserved)"
+        },
+        {
+          "index": 9,
+          "name": "SD0",
+          "description": "GPIO9 (SPIHD, SD Card Data)"
+        },
+        {
+          "index": 10,
+          "name": "SD1",
+          "description": "GPIO10 (SPIWP, SD Card Data)"
+        },
+        {
+          "index": 11,
+          "name": "SPI_CS0",
+          "description": "GPIO11 (SPI_CS0, Reserved)"
+        },
+        {
+          "index": 12,
+          "name": "D6",
+          "description": "GPIO12 (MISO)"
+        },
+        {
+          "index": 13,
+          "name": "D7",
+          "description": "GPIO13 (MOSI)"
+        },
+        {
+          "index": 14,
+          "name": "D5",
+          "description": "GPIO14 (SCK)"
+        },
+        {
+          "index": 15,
+          "name": "D8",
+          "description": "GPIO15 (SS, Boot Mode)"
+        },
+        {
+          "index": 16,
+          "name": "D0",
+          "description": "GPIO16 (Wake, No PWM/I2C)"
+        },
+        {
+          "index": 17,
+          "name": "A0",
+          "description": "Analog (ADC0)"
+        }
+      ]
+    }
+  ]
+}

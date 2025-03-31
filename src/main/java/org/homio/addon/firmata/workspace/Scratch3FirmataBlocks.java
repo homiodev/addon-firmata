@@ -8,6 +8,7 @@ import org.firmata4j.Pin;
 import org.firmata4j.firmata.FirmataMessageFactory;
 import org.homio.addon.firmata.FirmataEntrypoint;
 import org.homio.addon.firmata.model.FirmataBaseEntity;
+import org.homio.addon.firmata.provider.util.OneWireDevice;
 import org.homio.api.Context;
 import org.homio.api.model.OptionModel;
 import org.homio.api.state.DecimalType;
@@ -18,35 +19,49 @@ import org.homio.api.workspace.scratch.Scratch3BaseDeviceBlocks;
 import org.homio.api.workspace.scratch.Scratch3Block;
 import org.springframework.stereotype.Component;
 
+import java.nio.ByteBuffer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
-
-import static org.homio.addon.firmata.workspace.Scratch3FirmataBaseBlock.PIN;
-import static org.homio.addon.firmata.workspace.Scratch3FirmataBaseBlock.REST_PIN;
 
 @Log4j2
 @Getter
 @Component
 public class Scratch3FirmataBlocks extends Scratch3BaseDeviceBlocks<FirmataBaseEntity<?>> {
 
+  public static final String ALL_REST_PIN = "rest/firmata/pin";
+  public static final String REST_PIN = "rest/firmata/pin/";
+  public static final String PIN = "PIN";
+  public static final String ONE_REST = "rest/firmata/onewire/address?family=";
   private final MenuBlock.StaticMenuBlock<CompareType> menuOp;
   private final MenuBlock.StaticMenuBlock<Pin.Mode> menuPinMode;
-
   private final MenuBlock.ServerMenuBlock menuPinDigital;
   private final MenuBlock.ServerMenuBlock menuPinPwm;
-  private final MenuBlock.ServerMenuBlock menuPinAnalog;
   private final MenuBlock.ServerMenuBlock menuPinAll;
   private final MenuBlock.ServerMenuBlock menuPinServo;
+  private final MenuBlock.ServerMenuBlock pinMenu1Wire;
+  private final MenuBlock.ServerMenuBlock menuTemperatureAddress;
+
+  private final Scratch3Block ds18b20Value;
+  boolean sendConfig = false;
 
   public Scratch3FirmataBlocks(Context context, FirmataEntrypoint firmataEntrypoint) {
     super("#3B7470", context, firmataEntrypoint, "firmata");
 
+    this.pinMenu1Wire = menuServer(PIN, REST_PIN + Pin.Mode.ONEWIRE, "1-Wire").setDependency(deviceMenu);
+    this.menuTemperatureAddress = menuServer("pinMenu1WireAddress",
+      ONE_REST + ONE_WIRE.DS18B20.TEMPERATURE_FAMILY, "Temperature address")
+      .setDependency(deviceMenu, this.pinMenu1Wire);
+
+    this.ds18b20Value = blockReporter(10, "DS18B20",
+      "DS18B20(1-Wire) on [PIN] address [ADDRESS] of [FIRMATA]", this::getDS18B20Value, block ->
+        addPinMenu(block, this.pinMenu1Wire));
+    this.ds18b20Value.addArgument("ADDRESS", this.menuTemperatureAddress);
+
     // Menu
     this.menuPinDigital = menuServer("pinMenuDigital", REST_PIN + Pin.Mode.OUTPUT, "Digital pin").setDependency(deviceMenu);
     this.menuPinPwm = menuServer("pinMenuPwm", REST_PIN + Pin.Mode.PWM, "Pwm pin").setDependency(deviceMenu);
-    this.menuPinAnalog = menuServer("pinMenuAnalog", REST_PIN + Pin.Mode.ANALOG, "Analog pin").setDependency(deviceMenu);
     this.menuPinServo = menuServer("pinMenuServo", REST_PIN + Pin.Mode.SERVO, "Servo pin").setDependency(deviceMenu);
-    this.menuPinAll = menuServer("pinMenuAll", REST_PIN, "Pin").setDependency(deviceMenu);
+    this.menuPinAll = menuServer("pinMenuAll", ALL_REST_PIN, "Pin").setDependency(deviceMenu);
 
     this.menuOp = menuStatic("opMenu", CompareType.class, CompareType.GREATER);
     this.menuPinMode = menuStatic("pinModeMenu", Pin.Mode.class, Pin.Mode.OUTPUT);
@@ -58,11 +73,6 @@ public class Scratch3FirmataBlocks extends Scratch3BaseDeviceBlocks<FirmataBaseE
     blockCommand(10, "digital_write", "Set(D) Pin [PIN] [ON_OFF] to [DEVICE]", this::digitalWriteHandler, block -> {
       block.addArgument("ON_OFF", getOnOffMenu());
       addPinMenu(block, this.menuPinDigital);
-    });
-
-    blockCommand(15, "analog_write", "Set(A) Pin [PIN] [VALUE] to [DEVICE]", this::pwmWriteHandler, block -> {
-      block.addArgument(VALUE, 50);
-      addPinMenu(block, this.menuPinAnalog);
     });
 
     blockCommand(20, "pwm_write", "Set(PWM) Pin [PIN] [VALUE] to [DEVICE]", this::pwmWriteHandler, block -> {
@@ -200,6 +210,34 @@ public class Scratch3FirmataBlocks extends Scratch3BaseDeviceBlocks<FirmataBaseE
     });
   }
 
+  private State getDS18B20Value(WorkspaceBlock workspaceBlock) {
+    Long longAddress = workspaceBlock.getMenuValue("ADDRESS", this.menuTemperatureAddress, Long.class);
+    ByteBuffer address = OneWireDevice.toByteArray(longAddress);
+
+    Integer pinNum = pinMenu1Wire == null ? null : getPin(workspaceBlock, pinMenu1Wire);
+    FirmataBaseEntity<?> entity = workspaceBlock.getMenuValueEntityRequired(DEVICE, deviceMenu);
+    var pin = entity.getService().getPin(pinNum);
+
+    if (entity.getStatus().isOnline()) {
+      entity.getService().sendOneWireConfig(pin.getIndex(), true);
+
+      // start conversion, with parasite power on at the end
+      ByteBuffer payload = ByteBuffer.allocate(1).put(ONE_WIRE.DS18B20.CONVERT_TEMPERATURE_COMMAND);
+      entity.getService().sendOneWireWrite(pin.getIndex(), address, payload, null, true);
+
+      // maybe 750 ms is enough, maybe not
+      entity.getService().sendOneWireDelay(pin.getIndex(), 1);
+
+      // Read Scratchpad
+      payload = ByteBuffer.allocate(1).put(ONE_WIRE.DS18B20.READ_SCRATCHPAD_COMMAND);
+      byte[] data = entity.getService()
+        .sendOneWireWriteAndRead(pin.getIndex(), address, payload, ONE_WIRE.DS18B20.READ_COUNT, null, true);
+      float value = (float) (data == null ? -1 : ((data[1] & 0xFF) << 8) | data[0] & 0xFF) / 16;
+      return new DecimalType(value);
+    }
+    return null;
+  }
+
   @AllArgsConstructor
   public enum CompareType implements OptionModel.KeyValueEnum {
     GREATER(">", (a, b) -> a > b),
@@ -220,6 +258,17 @@ public class Scratch3FirmataBlocks extends Scratch3BaseDeviceBlocks<FirmataBaseE
     @Override
     public String toString() {
       return shortName;
+    }
+  }
+
+  private static class ONE_WIRE {
+
+    private static class DS18B20 {
+
+      private static final byte TEMPERATURE_FAMILY = 0x28;
+      private static final byte CONVERT_TEMPERATURE_COMMAND = 0x44;
+      private static final byte READ_SCRATCHPAD_COMMAND = (byte) 0xBE;
+      private static final byte READ_COUNT = 2;
     }
   }
 }

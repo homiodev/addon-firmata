@@ -5,6 +5,7 @@ import cc.arduino.UploaderUtils;
 import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
 import com.fazecast.jSerialComm.SerialPort;
+import com.pivovarit.function.ThrowingSupplier;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -15,8 +16,11 @@ import org.homio.addon.firmata.arduino.setting.header.ConsoleHeaderArduinoInclud
 import org.homio.addon.firmata.arduino.setting.header.ConsoleHeaderArduinoPortSetting;
 import org.homio.addon.firmata.arduino.setting.header.ConsoleHeaderGetBoardsDynamicSetting;
 import org.homio.api.Context;
+import org.homio.api.ContextUI;
 import org.homio.api.exception.ServerException;
 import org.homio.api.model.FileModel;
+import org.homio.api.model.Icon;
+import org.homio.api.ui.field.action.ActionInputParameter;
 import org.homio.api.util.Lang;
 import org.homio.hquery.ProgressBar;
 import org.springframework.stereotype.Component;
@@ -32,9 +36,20 @@ import processing.app.packages.UserLibrary;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.homio.api.entity.HasJsonData.LEVEL_DELIMITER;
 
@@ -52,10 +67,9 @@ public class ArduinoSketchService {
     if (BaseNoGui.packages == null) {
       return null;
     }
-    ProgressBar progressBar = (progress, message, error) ->
-      context.ui().progress().update("avr-build", progress, message, false);
+    ProgressBar progressBar = context.ui().progress().progressBar("compile-sketch");
     return context.ui().console().streamInlineConsole("Build sketch",
-      () -> compileSketch(progressBar), progressBar::done);
+      () -> fireWithReplacePlaceHolders(() -> compileSketch(progressBar)), progressBar::done);
   }
 
   public void upload(boolean usingProgrammer) {
@@ -77,13 +91,13 @@ public class ArduinoSketchService {
     }
 
     List<String> warningsAccumulator = new LinkedList<>();
-    boolean success = false;
+    Boolean success = false;
     try {
       if (!PreferencesData.has("serial.port")) {
         throw new ServerException("W.ERROR.NO_PORT_SELECTED");
       }
       success = context.ui().console().streamInlineConsole("Deploy sketch",
-        () -> {
+        () -> fireWithReplacePlaceHolders(() -> {
           String fileName = compileSketch(progressBar);
           System.out.println("Uploading sketch...");
           progressBar.progress(20, "Uploading sketch...");
@@ -92,13 +106,76 @@ public class ArduinoSketchService {
             System.out.println("Done uploading.");
           }
           return uploaded;
-        },
+        }),
         progressBar::done);
     } finally {
-      if (uploader.requiresAuthorization() && !success) {
+      if (uploader.requiresAuthorization() && !Boolean.TRUE.equals(success)) {
         PreferencesData.remove(uploader.getAuthorizationKey());
       }
     }
+  }
+
+  @SneakyThrows
+  private <T> T fireWithReplacePlaceHolders(ThrowingSupplier<T, Exception> runnable) {
+    String content = Files.readString(sketch.getPrimaryFile().getFile().toPath());
+    Map<String, String> placeholders = new LinkedHashMap<>();
+    Matcher matcher = Pattern.compile("\\$\\{([^}:]+)(?::([^}]+))?}").matcher(content);
+
+    while (matcher.find()) {
+      String key = matcher.group(1).trim();
+      String defaultValue = matcher.group(2) != null ? matcher.group(2).trim() : "";
+      placeholders.put(key, defaultValue);
+    }
+    AtomicReference<T> success = new AtomicReference<>();
+    CountDownLatch latch = new CountDownLatch(1);
+    AtomicReference<Exception> exceptionRef = new AtomicReference<>();
+    if (!placeholders.isEmpty()) {
+      context.ui().dialog().sendDialogRequest("sketch", "Sketch parameters", (responseType, pressedButton, parameters) -> {
+        if (responseType == ContextUI.DialogResponseType.Accepted) {
+          String updContent = content;
+          for (String replaceKey : placeholders.keySet()) {
+            updContent = updContent.replaceAll("\\$\\{" + Pattern.quote(replaceKey) + "(?::[^}]*)?}",
+              parameters.get(replaceKey).asText());
+          }
+          var backupSketch = sketch;
+          try {
+            Path tmpSketch = Files.createTempFile(sketch.getPrimaryFile().getFile().getName(), ".ino");
+            Files.writeString(tmpSketch, updContent);
+            sketch = new Sketch(tmpSketch.toFile());
+            success.set(runnable.get());
+          } catch (Exception e) {
+            exceptionRef.set(e);
+          } finally {
+            sketch = backupSketch;
+            latch.countDown();
+          }
+        } else {
+          latch.countDown();
+        }
+      }, builder -> {
+        builder
+          .sendCancelOnLeaveDialog()
+          .disableCloseDialogOutsideArea()
+          .maxTimeoutInSec(60)
+          .appearance(new Icon("fas fa-keyboard"), "#2d6f7a");
+        List<ActionInputParameter> inputs = new ArrayList<>();
+        for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+          inputs.add(ActionInputParameter.textRequired(entry.getKey(), entry.getValue(), 3, 100));
+        }
+        builder.submitButton("Apply", button -> {
+        }).group("General", inputs);
+      });
+    } else {
+      success.set(runnable.get());
+    }
+
+    if (!latch.await(60, TimeUnit.SECONDS)) {
+      throw new TimeoutException("Dialog request timed out after 60 seconds");
+    }
+    if (exceptionRef.get() != null) {
+      throw new RuntimeException(exceptionRef.get());
+    }
+    return success.get();
   }
 
   public void getBoardInfo() {
@@ -168,7 +245,7 @@ public class ArduinoSketchService {
     System.out.println(compileMsg);
     String result;
     try {
-      result = new Compiler(sketch).build(value -> progressBar.progress(value, compileMsg), true);
+      result = new Compiler(sketch).build(value -> progressBar.progress(value, compileMsg), true, progressBar);
     } catch (Exception ex) {
       System.err.println("Error while compiling sketch: " + ex.getMessage());
       throw ex;

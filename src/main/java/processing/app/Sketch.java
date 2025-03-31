@@ -151,7 +151,7 @@ public class Sketch {
    * Returns a file object for the primary .pde of this sketch.
    */
   public SketchFile getPrimaryFile() {
-    return files.get(0);
+    return files.getFirst();
   }
 
   /**

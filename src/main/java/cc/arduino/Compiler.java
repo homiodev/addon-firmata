@@ -35,6 +35,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.homio.hquery.ProgressBar;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.PreferencesData;
@@ -159,13 +160,13 @@ public class Compiler implements MessageConsumer {
     this.verbose = PreferencesData.getBoolean("build.verbose");
   }
 
-  public String build(CompilerProgressListener progListener, boolean exportHex) throws RunnerException, PreferencesMapException, IOException {
+  public String build(CompilerProgressListener progListener, boolean exportHex, ProgressBar progressBar) throws RunnerException, PreferencesMapException, IOException {
     List<CompilerProgressListener> listeners = new ArrayList<>();
     listeners.add(progListener);
-    return this.build(listeners, exportHex);
+    return build(listeners, exportHex, progressBar);
   }
 
-  public String build(List<CompilerProgressListener> progListeners, boolean exportHex) throws RunnerException, PreferencesMapException, IOException {
+  public String build(List<CompilerProgressListener> progListeners, boolean exportHex, ProgressBar progressBar) throws RunnerException, PreferencesMapException, IOException {
     this.buildPath = sketch.getBuildPath().getAbsolutePath();
     this.buildCache = BaseNoGui.getCachePath();
 
@@ -185,7 +186,7 @@ public class Compiler implements MessageConsumer {
     MessageConsumerOutputStream err = new MessageConsumerOutputStream(
       new I18NAwareMessageConsumer(System.err, Compiler.this), "\n");
 
-    callArduinoBuilder(board, platform, aPackage, vidpid, BuilderAction.COMPILE, out, err);
+    callArduinoBuilder(board, platform, aPackage, vidpid, BuilderAction.COMPILE, out, err, progressBar);
 
     out.flush();
     err.flush();
@@ -222,7 +223,7 @@ public class Compiler implements MessageConsumer {
     var errConsumer = new I18NAwareMessageConsumer(new PrintStream(stderr), Compiler.this);
     MessageConsumerOutputStream err = new MessageConsumerOutputStream(errConsumer, "\n");
     try {
-      callArduinoBuilder(board, platform, aPackage, vidpid, BuilderAction.DUMP_PREFS, stdout, err);
+      callArduinoBuilder(board, platform, aPackage, vidpid, BuilderAction.DUMP_PREFS, stdout, err, null);
     } catch (RunnerException e) {
       System.err.println(stderr);
       throw e;
@@ -239,7 +240,7 @@ public class Compiler implements MessageConsumer {
     }
   }
 
-  private void callArduinoBuilder(TargetBoard board, TargetPlatform platform, TargetPackage aPackage, String vidpid, BuilderAction action, OutputStream outStream, OutputStream errStream) throws RunnerException {
+  private void callArduinoBuilder(TargetBoard board, TargetPlatform platform, TargetPackage aPackage, String vidpid, BuilderAction action, OutputStream outStream, OutputStream errStream, ProgressBar progressBar) throws RunnerException {
     List<String> cmd = new ArrayList<>();
     cmd.add(getContentFile("arduino-builder").getAbsolutePath());
     cmd.add(action.value);
@@ -304,6 +305,9 @@ public class Compiler implements MessageConsumer {
     int result;
     try {
       Process proc = ProcessUtils.exec(cmd.toArray(new String[0]));
+      if (progressBar != null) {
+        progressBar.onCancel(proc::destroy);
+      }
       MessageSiphon in = new MessageSiphon(proc.getInputStream(), (msg) -> {
         try {
           outStream.write(msg.getBytes());
@@ -330,7 +334,7 @@ public class Compiler implements MessageConsumer {
       throw exception;
 
     if (result > 1) {
-      System.err.println(I18n.format(tr("{0} returned {1}"), cmd.get(0), result));
+      System.err.println(I18n.format(tr("{0} returned {1}"), cmd.getFirst(), result));
     }
 
     if (result != 0) {

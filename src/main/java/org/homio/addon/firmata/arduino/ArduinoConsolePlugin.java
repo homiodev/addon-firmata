@@ -258,6 +258,8 @@ public class ArduinoConsolePlugin implements ConsolePluginEditor {
       if (foundModel != null) {
         Path path = Paths.get(foundModel.getJson().get("path").asText());
         save(new FileModel(path.getFileName().toString(), new String(Files.readAllBytes(path)), FileContentType.cpp));
+        context.setting().setValue(ConsoleHeaderArduinoSketchNameSetting.class, path.getFileName().toString());
+        context.setting().reloadSettings(ConsoleHeaderArduinoSketchNameSetting.class);
       }
       return;
     } else {

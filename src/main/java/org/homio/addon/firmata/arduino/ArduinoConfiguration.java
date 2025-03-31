@@ -78,7 +78,7 @@ public class ArduinoConfiguration {
 
   public static ContributionInstaller getContributionInstaller(@NotNull Context context) {
     if (contributionInstaller == null) {
-      var progressBar = context.ui().progress().createProgressBar("update-contrib-installer", false, null, true);
+      var progressBar = context.ui().progress().progressBar("update-contrib-installer");
       ProgressListener progressListener = progress ->
         progressBar.progress(progress.getProgress(), progress.getStatus());
 

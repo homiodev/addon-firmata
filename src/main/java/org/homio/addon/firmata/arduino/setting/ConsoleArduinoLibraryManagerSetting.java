@@ -42,11 +42,11 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
       AtomicReference<String> error = new AtomicReference<>();
       Collection<PackageModel> bundleEntities = new ArrayList<>();
       if (BaseNoGui.packages != null) {
-        var progress = context.ui().progress().createProgressBar("all-libs", false);
+        var progress = context.ui().progress().progressBar("all-libs");
         try {
           for (ContributedLibraryReleases release : getReleases(progress, error).values()) {
             ContributedLibrary latest = release.getLatest();
-            bundleEntities.add(buildBundleEntity(release.getReleases().stream().map(ContributedLibrary::getVersion).collect(Collectors.toList()), latest));
+            bundleEntities.add(buildPackageModel(release.getReleases().stream().map(ContributedLibrary::getVersion).collect(Collectors.toList()), latest));
           }
         } finally {
           progress.done();
@@ -54,6 +54,60 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
       }
       return new PackageContext(error.get(), bundleEntities);
     });
+
+  private static PackageModel buildPackageModel(List<String> versions, ContributedLibrary library) {
+    PackageModel packageModel = new PackageModel()
+      .setName(library.getName())
+      .setTitle(library.getSentence())
+      .setVersions(versions)
+      .setVersion(library.getVersion())
+      .setSize(library.getSize())
+      .setWebsite(library.getWebsite())
+      .setAuthor(library.getAuthor())
+      .setCategory(library.getCategory())
+      .setReadme(library.getParagraph());
+    if (library.isIDEBuiltIn()) {
+      packageModel.setTags(Set.of(BUILT_IN_TAG));
+      packageModel.setDisableRemovable(true);
+    }
+
+    return packageModel;
+  }
+
+  @SneakyThrows
+  private static synchronized Map<String, ContributedLibraryReleases> getReleases(@NotNull ProgressBar progressBar, @Nullable AtomicReference<String> error) {
+    if (releases == null) {
+      releases = new HashMap<>();
+
+      BaseNoGui.onBoardOrPortChange();
+
+      ProgressListener progressListener = progress ->
+        progressBar.progress(progress.getProgress(), progress.getStatus());
+
+      try {
+        LibraryInstaller libraryInstaller = ArduinoConfiguration.getLibraryInstaller();
+        libraryInstaller.updateIndex(progressListener);
+      } catch (Exception ex) {
+        if (error == null) {
+          throw ex;
+        }
+        error.set(ex.getMessage());
+        BaseNoGui.librariesIndexer.parseIndex();
+        BaseNoGui.librariesIndexer.rescanLibraries();
+      } finally {
+        progressBar.done();
+      }
+
+      for (ContributedLibrary lib : BaseNoGui.librariesIndexer.getIndex().getLibraries()) {
+        if (releases.containsKey(lib.getName())) {
+          releases.get(lib.getName()).add(lib);
+        } else {
+          releases.put(lib.getName(), new ContributedLibraryReleases(lib));
+        }
+      }
+    }
+    return releases;
+  }
 
   @Override
   public Icon getIcon() {
@@ -75,7 +129,7 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
     Collection<PackageModel> bundleEntities = new ArrayList<>();
     if (BaseNoGui.packages != null) {
       for (UserLibrary library : BaseNoGui.librariesIndexer.getInstalledLibraries()) {
-        bundleEntities.add(buildBundleEntity(library));
+        bundleEntities.add(buildPackageModel(library));
       }
     }
     return new PackageContext(null, bundleEntities);
@@ -132,7 +186,7 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
   }
 
   @SneakyThrows
-  private PackageModel buildBundleEntity(UserLibrary library) {
+  private PackageModel buildPackageModel(UserLibrary library) {
     PackageModel packageModel = new PackageModel()
       .setName(library.getName())
       .setTitle(library.getSentence())
@@ -155,63 +209,9 @@ public class ConsoleArduinoLibraryManagerSetting implements SettingPluginPackage
     return packageModel;
   }
 
-  private static PackageModel buildBundleEntity(List<String> versions, ContributedLibrary library) {
-    PackageModel packageModel = new PackageModel()
-      .setName(library.getName())
-      .setTitle(library.getSentence())
-      .setVersions(versions)
-      .setVersion(library.getVersion())
-      .setSize(library.getSize())
-      .setWebsite(library.getWebsite())
-      .setAuthor(library.getAuthor())
-      .setCategory(library.getCategory())
-      .setReadme(library.getParagraph());
-    if (library.isIDEBuiltIn()) {
-      packageModel.setTags(Set.of(BUILT_IN_TAG));
-      packageModel.setDisableRemovable(true);
-    }
-
-    return packageModel;
-  }
-
   private void reBuildLibraries(@NotNull Context context, @NotNull ProgressBar progressBar) {
     ConsoleArduinoLibraryManagerSetting.releases = null;
     getReleases(progressBar, null);
     context.setting().reloadSettings(ConsoleHeaderArduinoIncludeLibrarySetting.class);
-  }
-
-  @SneakyThrows
-  private static synchronized Map<String, ContributedLibraryReleases> getReleases(@NotNull ProgressBar progressBar, @Nullable AtomicReference<String> error) {
-    if (releases == null) {
-      releases = new HashMap<>();
-
-      BaseNoGui.onBoardOrPortChange();
-
-      ProgressListener progressListener = progress ->
-        progressBar.progress(progress.getProgress(), progress.getStatus());
-
-      try {
-        LibraryInstaller libraryInstaller = ArduinoConfiguration.getLibraryInstaller();
-        libraryInstaller.updateIndex(progressListener);
-      } catch (Exception ex) {
-        if (error == null) {
-          throw ex;
-        }
-        error.set(ex.getMessage());
-        BaseNoGui.librariesIndexer.parseIndex();
-        BaseNoGui.librariesIndexer.rescanLibraries();
-      } finally {
-        progressBar.done();
-      }
-
-      for (ContributedLibrary lib : BaseNoGui.librariesIndexer.getIndex().getLibraries()) {
-        if (releases.containsKey(lib.getName())) {
-          releases.get(lib.getName()).add(lib);
-        } else {
-          releases.put(lib.getName(), new ContributedLibraryReleases(lib));
-        }
-      }
-    }
-    return releases;
   }
 }

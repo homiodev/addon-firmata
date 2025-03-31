@@ -58,7 +58,7 @@ public class FirmataNetworkControllerScanner implements ItemDiscoverySupport {
 
     List<Integer> availableIpAddresses = context.bgp().runInBatchAndGet("firmata-ip-scan",
       Duration.ofMinutes(5), 8, tasks,
-      completedTaskCount -> progressBar.progress(100 / 256F * completedTaskCount, "Firmata bundle scanned " + completedTaskCount + "/255"));
+      completedTaskCount -> progressBar.progress(100 / 256F * completedTaskCount, "Firmata device scanned " + completedTaskCount + "/255"));
     long availableIpAddressesSize = availableIpAddresses.stream().filter(Objects::nonNull).count();
     log.debug("Found {} devices", availableIpAddressesSize);
     result.getNewCount().set((int) (availableIpAddressesSize - existedDevices.size()));

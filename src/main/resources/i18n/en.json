@@ -1,15 +1,9 @@
 {
   "field": {
-    "excludePins": "Exclude pins",
     "pinMode": "Pin mode",
     "deviceLastPingResponseTime": "Last ping response time",
     "deviceWorkingTime": "Device working time",
     "lastInitResponseTime": "Device registered time"
-  },
-  "help": {
-    "field": {
-      "excludePins": "List of pins that skip creation"
-    }
   },
   "action": {
     "communicator": {
@@ -21,7 +15,6 @@
   },
   "WORKSPACE": {
     "firmata": "Firmata",
-    "firmata-onewire": "Firmata 1-Wire sensors",
     "firmata-ic": "Firmata I2C devices",
     "firmata_pin_read": "Get pin value",
     "firmata_digital_write": "Write digital pin value",

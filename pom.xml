@@ -10,12 +10,12 @@
     <parent>
         <artifactId>addon-parent</artifactId>
         <groupId>org.homio.addon</groupId>
-        <version>1.2.8</version>
+        <version>1.2.9-SNAPSHOT</version>
     </parent>
 
     <version>1.0.2</version>
 
-    <!--<build>
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -72,9 +72,19 @@
                 </excludes>
             </resource>
         </resources>
-    </build>-->
+    </build>
 
     <dependencies>
+        <dependency>
+            <groupId>com.diozero</groupId>
+            <artifactId>diozero-provider-firmata</artifactId>
+            <version>1.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.diozero</groupId>
+            <artifactId>diozero-core</artifactId>
+            <version>1.4.1</version>
+        </dependency>
         <dependency>
             <artifactId>firmata4j</artifactId>
             <groupId>com.github.kurbatov</groupId>
@@ -104,17 +114,18 @@
         <dependency>
             <groupId>com.github.zafarkhaja</groupId>
             <artifactId>java-semver</artifactId>
-            <version>0.9.0</version>
+            <version>0.10.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpg-jdk18on</artifactId>
-            <version>1.80</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.80</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <artifactId>junit-jupiter-api</artifactId>
@@ -122,4 +133,30 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/homiodev/addon-firmata</url>
+        </repository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>github-addon-parent</id>
+            <url>https://maven.pkg.github.com/homiodev/addon-parent</url>
+        </repository>
+        <repository>
+            <id>github-homio-dependency</id>
+            <url>https://maven.pkg.github.com/homiodev/homio-dependency</url>
+        </repository>
+        <repository>
+            <id>github-homio-hquery</id>
+            <url>https://maven.pkg.github.com/homiodev/homio-hquery</url>
+        </repository>
+        <repository>
+            <id>github-homio-api</id>
+            <url>https://maven.pkg.github.com/homiodev/homio-api</url>
+        </repository>
+    </repositories>
 </project>

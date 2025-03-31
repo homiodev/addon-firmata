@@ -183,6 +183,7 @@ public class ConsoleHeaderArduinoSketchNameSetting implements
       String folderName = key.substring(0, key.length() - 4);
       Path dropFolder = BaseNoGui.getSketchbookFolder().toPath().resolve(folderName);
       FileUtils.deleteDirectory(dropFolder.toFile());
+      context.setting().setValue(getClass(), DEFAULT_SKETCH_NAME);
       context.setting().reloadSettings(getClass());
     } else {
       throw new Exception("Cannot remove sketch with name: " + key);

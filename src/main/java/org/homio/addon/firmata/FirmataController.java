@@ -20,8 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.homio.addon.firmata.workspace.Scratch3FirmataBaseBlock.FIRMATA_ID_MENU;
-import static org.homio.addon.firmata.workspace.Scratch3FirmataBaseBlock.PIN;
+import static org.homio.addon.firmata.workspace.Scratch3FirmataBlocks.PIN;
 
 @Log4j2
 @RestController
@@ -34,7 +33,7 @@ public class FirmataController {
   @GetMapping("/onewire/address")
   public Collection<OptionModel> getOneWireAddress(
     @RequestParam(name = "family", required = false) Byte family,
-    @RequestParam(name = FIRMATA_ID_MENU, required = false) String firmataIdMenu,
+    @RequestParam(name = "deviceMenu", required = false) String firmataIdMenu,
     @RequestParam(name = PIN, required = false) String pin) {
     if (firmataIdMenu != null && pin != null) {
       byte pinNum;
@@ -43,8 +42,8 @@ public class FirmataController {
       } catch (Exception ex) {
         return Collections.emptyList();
       }
-      FirmataBaseEntity<?> entity = context.db().get(firmataIdMenu);
-      if (entity != null && entity.getStatus().isOnline()) {
+      FirmataBaseEntity<?> entity = context.db().getRequire(firmataIdMenu);
+      if (entity.getStatus().isOnline()) {
         entity.getService().sendOneWireConfig(pinNum, true);
 
         List<OneWireDevice> devices = entity.getService().sendOneWireSearch(pinNum);
@@ -61,12 +60,12 @@ public class FirmataController {
   }
 
   @GetMapping("/pin")
-  public Collection<OptionModel> getAllPins(@RequestParam(name = FIRMATA_ID_MENU, required = false) String firmataIdMenu) {
+  public Collection<OptionModel> getAllPins(@RequestParam(name = "deviceMenu", required = false) String firmataIdMenu) {
     return this.getPins(null, firmataIdMenu);
   }
 
   @GetMapping("pin/{mode}")
-  public Collection<OptionModel> getPins(@PathVariable("mode") String mode, @RequestParam(name = FIRMATA_ID_MENU, required = false) String firmataIdMenu) {
+  public Collection<OptionModel> getPins(@PathVariable("mode") String mode, @RequestParam(name = "deviceMenu", required = false) String firmataIdMenu) {
     if (firmataIdMenu != null) {
       FirmataBaseEntity<?> entity = context.db().get(firmataIdMenu);
       if (entity != null && entity.getStatus().isOnline()) {

@@ -8,7 +8,8 @@
     "NEW_DEVICE_QUESTION": "Do you want create new firmata network device?",
     "NEW_DEVICE_BOARD": "Board     '{{BOARD}}'",
     "NEW_DEVICE_ID": "Device ID '{{DEVICE_ID}}'",
-    "NEW_DEVICE_ADDRESS": "Address   '{{ADDRESS}}'"
+    "NEW_DEVICE_ADDRESS": "Address   '{{ADDRESS}}'",
+    "NEW_DEVICE_NAME": "Name      '{NAME}'"
   },
   "INSTALL_ERROR": "Error during installation",
   "BOARD_INFO": "Board info",
