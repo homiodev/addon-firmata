@@ -32,6 +32,14 @@
                                 <descriptor>assemblies/win.xml</descriptor>
                             </descriptors>
                             <finalName>${project.artifactId}</finalName>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                </manifest>
+                                <manifestEntries>
+                                    <Implementation-ArtifactId>${project.artifactId}</Implementation-ArtifactId>
+                                </manifestEntries>
+                            </archive>
                         </configuration>
                     </execution>
                     <execution>
@@ -45,6 +53,14 @@
                                 <descriptor>assemblies/linux-64.xml</descriptor>
                             </descriptors>
                             <finalName>${project.artifactId}</finalName>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                </manifest>
+                                <manifestEntries>
+                                    <Implementation-ArtifactId>${project.artifactId}</Implementation-ArtifactId>
+                                </manifestEntries>
+                            </archive>
                         </configuration>
                     </execution>
                     <execution>
@@ -58,6 +74,14 @@
                                 <descriptor>assemblies/linux-aarch64.xml</descriptor>
                             </descriptors>
                             <finalName>${project.artifactId}</finalName>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                </manifest>
+                                <manifestEntries>
+                                    <Implementation-ArtifactId>${project.artifactId}</Implementation-ArtifactId>
+                                </manifestEntries>
+                            </archive>
                         </configuration>
                     </execution>
                 </executions>
