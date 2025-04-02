@@ -67,7 +67,7 @@ public class FirmataService extends EntityService.ServiceInstance<FirmataBaseEnt
   private long lastPingRequestTime;
 
   public FirmataService(@NotNull Context context, @NotNull FirmataBaseEntity entity, boolean fireInitialize) {
-    super(context, entity, fireInitialize, "Firmata");
+    super(context, entity, fireInitialize, "Firmata", true);
     this.oneWireCommand = context.getBean(FirmataOneWireResponseDataCommand.class);
     this.firmataCommandPlugins = context.getBean(FirmataCommandPlugins.class);
 
