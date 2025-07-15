@@ -7,10 +7,10 @@ import org.homio.addon.firmata.FirmataEntrypoint;
 import org.homio.addon.firmata.arduino.ArduinoConsolePlugin;
 import org.homio.api.Context;
 import org.homio.api.entity.HasPlace;
+import org.homio.api.entity.device.DeviceBaseEntity;
 import org.homio.api.entity.device.DeviceEndpointsBehaviourContract;
 import org.homio.api.entity.device.HasExcludeEndpoints;
 import org.homio.api.entity.log.HasEntityLog;
-import org.homio.api.entity.types.MicroControllerBaseEntity;
 import org.homio.api.model.ActionResponseModel;
 import org.homio.api.model.FileContentType;
 import org.homio.api.model.FileModel;
@@ -18,12 +18,7 @@ import org.homio.api.model.device.ConfigDeviceDefinition;
 import org.homio.api.model.endpoint.DeviceEndpoint;
 import org.homio.api.service.EntityService;
 import org.homio.api.ui.UI;
-import org.homio.api.ui.field.UIField;
-import org.homio.api.ui.field.UIFieldGroup;
-import org.homio.api.ui.field.UIFieldInlineEditConfirm;
-import org.homio.api.ui.field.UIFieldNoReadDefaultValue;
-import org.homio.api.ui.field.UIFieldSlider;
-import org.homio.api.ui.field.UIFieldType;
+import org.homio.api.ui.field.*;
 import org.homio.api.ui.field.action.UIContextMenuAction;
 import org.homio.api.ui.field.action.v1.UIInputBuilder;
 import org.homio.api.util.CommonUtils;
@@ -39,7 +34,7 @@ import java.util.Set;
 @Entity
 @Accessors(chain = true)
 public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>>
-  extends MicroControllerBaseEntity
+  extends DeviceBaseEntity
   implements DeviceEndpointsBehaviourContract,
   EntityService<FirmataService>,
   HasEntityLog,
@@ -192,11 +187,6 @@ public abstract class FirmataBaseEntity<T extends FirmataBaseEntity<T>>
   @Override
   public @Nullable FirmataService createService(@NotNull Context context) {
     return new FirmataService(context, this, true);
-  }
-
-  @Override
-  public @NotNull Class<FirmataService> getEntityServiceItemClass() {
-    return FirmataService.class;
   }
 
   public boolean tryUpdateEntity(FirmataService.DeviceInfo info) {

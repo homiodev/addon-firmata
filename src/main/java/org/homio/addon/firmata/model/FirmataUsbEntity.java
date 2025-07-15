@@ -5,17 +5,17 @@ import jakarta.persistence.Entity;
 import org.homio.api.converter.serial.JsonSerialPort;
 import org.homio.api.converter.serial.SerialPortDeserializer;
 import org.homio.api.optionProvider.SelectSerialPortOptionLoader;
-import org.homio.api.ui.UISidebarChildren;
 import org.homio.api.ui.field.UIField;
 import org.homio.api.ui.field.selection.UIFieldSelectConfig;
 import org.homio.api.ui.field.selection.dynamic.UIFieldDynamicSelection;
+import org.homio.api.ui.route.UIRouteMicroController;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
 @SuppressWarnings({"JpaAttributeTypeInspection", "unused", "rawtypes"})
 @Entity
-@UISidebarChildren(icon = "fas fa-microchip", color = "#27966E")
+@UIRouteMicroController(icon = "fas fa-microchip", color = "#27966E")
 public final class FirmataUsbEntity extends FirmataBaseEntity<FirmataUsbEntity> {
 
   @Override

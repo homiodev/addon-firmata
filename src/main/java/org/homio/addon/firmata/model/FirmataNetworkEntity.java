@@ -2,10 +2,10 @@ package org.homio.addon.firmata.model;
 
 import jakarta.persistence.Entity;
 import lombok.NoArgsConstructor;
-import org.homio.api.ui.UISidebarChildren;
 import org.homio.api.ui.field.UIField;
 import org.homio.api.ui.field.UIFieldPort;
 import org.homio.api.ui.field.UIFieldType;
+import org.homio.api.ui.route.UIRouteMicroController;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -14,7 +14,7 @@ import static org.homio.addon.firmata.FirmataNetworkControllerScanner.FIRMATA_PO
 
 @Entity
 @NoArgsConstructor
-@UISidebarChildren(icon = "fas fa-microchip", color = "#27966E")
+@UIRouteMicroController(icon = "fas fa-microchip", color = "#27966E")
 public final class FirmataNetworkEntity extends FirmataBaseEntity<FirmataNetworkEntity> {
 
   public FirmataNetworkEntity(@NotNull String hostAddress) {
