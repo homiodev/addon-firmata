@@ -161,7 +161,7 @@ public class Scratch3FirmataBlocks extends Scratch3BaseDeviceBlocks<FirmataBaseE
       executeWhenDeviceReady(workspaceBlock, entity -> {
         var pinIndex = getPin(workspaceBlock, menuPinAll);
         var pin = entity.getService().getPin(pinIndex);
-        var lock = workspaceBlock.getLockManager().getLock(workspaceBlock, entity.getDeviceID() + "-pin-" + pin.getIndex());
+        var lock = workspaceBlock.getLockManager().createLock(workspaceBlock, entity.getDeviceID() + "-pin-" + pin.getIndex());
         workspaceBlock.subscribeToLock(lock, checkFn, next::handle);
       }));
   }
